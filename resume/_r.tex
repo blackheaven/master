@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage[titletoc,toc,title]{appendix}
+
+\title{Data-flow programming}
+\author{Gautier DI FOLCO}
+\date{Janvier 2014}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{Introduction}\label{introduction}
+
+Ce document vise à donner un premier aperçu de ma compréhension du sujet
+ainsi que des pistes trouvées qui seront vraisemblablement suivit lors
+du PFE.
+
+Le data-flow programming est décrit \cite{dataflow} comme un paradigme de
+programmation faisant partie des paradigmes déclaratifs, par opposition
+aux paradigmes impératif. On peut signaler que cette description est
+erronée car cela impliquerait d'avoir un programme n'ayant aucun effet
+de bords, ce qui n'est pas le cas de toutes les implémentations
+actuelle.
+
+L'essence même du data-flow \cite{dataflow} est d'être en mesure de structurer
+les programmes (le Data-flow est donc plus proche d'une famille de
+design patterns structurels) en mettant en avant l'information traitée
+au seins des différentes partie du programme.
+
+Le programme est donc réduit à un ensemble de \emph{noeuds} qui
+manipulent les données et des \emph{arcs} qui représentent les
+``\emph{communications}'' entre ces noeuds, ou plutôt le chemin des
+données et les traitements successifs de celles-ci par le système.
+
+Il existe trois sous-famille de langages de programmation data-flow :
+flow-based, cell-oriented et reactive. À part l'approche cell-oriented
+(qui ne sera pas traité ici car son domaine d'application est restreinte
+aux feuilles de calculs, qui ne permettent pas d'avoir une conduite de
+projet ou de réaliser des programmes qui passent à l'échelle) ces deux
+familles sont détaillés ci-dessous.
+
+\section{Flow-based}\label{flow-based}
+
+\subsection{Principes}\label{principes}
+
+La programmation flow-based reprend cette idée de \emph{noeuds
+communicants} en ajoutant une notion de tamporisation des communications
+entre les noeuds. Les communications se font par passage de message et
+ce principe est partagé par le modèle à acteurs \cite{actors} dont Erlang
+\cite{erlang}, Akka \cite{akka} et celluloid \cite{celluloid}.
+
+\subsection{Bénéfices}\label{bénéfices}
+
+L'apport de cette approche est de permettre d'avoir une certaine
+asynchronicité dans le système, qu'elle doit maîtriser, en temps (au
+bout d'un certain délais, le message est supprimé) ou en nombre (quand
+le nombre de messages en attente dépasse un certain nombre, les nouveaux
+ou les plus anciens sont supprimés).
+
+Cette asynchronicité permet d'une part de pouvoir distribuer le
+déroulement du programme, puisque l'asynchronicité sera absorbé par les
+latences réseaux; et d'autre part la possibilité de faire du traitement
+batch à l'aide d'outils comme hadoop \cite{hadoop}.
+
+\section{Reactive}\label{reactive}
+
+\subsection{Principes}\label{principes-1}
+
+La programmation vise à réagir à des \emph{événements} en appliquant des
+\emph{comportement} sur ceux-ci. Ces événements sont deplus ordonnés par
+leur date de création dans le système.
+
+\subsection{Historique}\label{historique}
+
+De nombreuses implémentations ont eu lieux en Haskell \cite{haskell} car,
+s'agissant d'un langage de programmation fonctionnelle pure les effets
+de bords ne peuvent être représentés que par transitions explicites,
+deplus le système de type était assez puissant pour supporter aisément
+une telle logique ce qui a permit d'avoir des implémentations fiables
+relativement aisément.
+
+Cette investissement massive du monde de la programmation fonctionnelle
+dans le domaine à même créer une sous-famille à part entière nommée la
+programmation réactive fonctionnelle (functial reactive programming)
+\cite{frp}.
+
+De plus cette notion de contrôle de flux d'un programme a été repris
+sous le nom d'event sourcing \cite{eventsourcing}. Ce concept a été ensuite remis au
+goût du jour avec l'iintroduction du CQRS \cite{cqrs} (Command Query
+Responsability Segregation), lui-même dérivé de Domain Driven Design
+\cite{ddd}.
+
+Parmis ses implémentations nous pouvons citer yampa \cite{yampa} \cite{arrows};
+reactive banana \cite{reactivebanana} et sodium \cite{sodium} qui d'une part considère que
+la variation temporelle est un événement à part entière (contrairement à
+la quasi-totalité des autres implémentation du fait que la notion de
+comportement soit fortement couplé au temps), mais qui plus est les
+auteurs se sont aperçuts que le coeur de leur code sont le même au nom
+près \cite{sodium_talk}.
+
+\subsection{Bénéfices}\label{bénéfices-1}
+
+Le premier avantage de l'ordre des événements est la reproductibilité
+des situations, ce qui aide considérablement durant la recherche et la
+correction de bugs.
+
+Deplus, comme le fait le CQRS, il est possible d'intéprêter différemment
+les événements, ainsi en cas d'évolution du système, rien n'est perdu et
+un grand nombre de données sont déjà présentes.
+
+Enfin, le fait que de nombreux travaux ais été conduits en Haskell sur
+le sujet, le système de type à fait que la composabilité, donc
+l'extensibilité et la maîtrise de la complexité d'une application, est
+au premier plan.
+
+\section{Conclusions}\label{conclusions}
+
+Le Data-flow tente de résoudre des problèmes de souplesse des programmes
+et de passage à l'échelle en mettant le flux de traitement des données
+au centre de la l'architecture logicielle.
+
+Cette étude pourra donc se concentrer sur la nature profonde de la
+programmation data-flow, en comparant les différentes approches
+existante.
+
+D'autres questions comme le typage ou l'expressivité pourront également
+se poser durant cette étude.
+
+
+\begin{appendices}
+\section{Références}\label{références}
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{appendices}
+\end{document}
