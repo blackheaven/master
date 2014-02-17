@@ -5,7 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[titletoc,toc,title]{appendix}
 
-\title{Data-flow programming}
+\title{\emph{Data-flow programming}}
 \author{Gautier DI FOLCO}
 \date{Janvier 2014}
 
@@ -13,94 +13,169 @@
 \maketitle
 \tableofcontents
 
+% \section{Abstract}\label{abstract}
+\begin{abstract}
+Le \emph{data-flow programming} est une approche de structuration des programmes
+ayant pour but de représenter ceux-ci comme un graphe direct où les noeuds sont
+des unités de traitement d'information et où les arcs représentent la circulation
+des données au sein du programme.
+
+Il s'agit donc de ne plus centrer le programme sur les traitements qu'il va
+effectuer mais sur les données qu'il manipule.
+
+Le but de ce document est d'introduire les concepts du \emph{data-flow programming}
+sous la forme d'une synthèse bibliographique.
+\end{abstract}
+
 \section{Introduction}\label{introduction}
 
-Ce document vise à donner un premier aperçu de ma compréhension du sujet
-ainsi que des pistes trouvées qui seront vraisemblablement suivit lors
-du PFE.
-
-Le data-flow programming est décrit \cite{dataflow} comme un paradigme de
+Le \emph{data-flow programming}~\cite{dataflow} est décrit comme un paradigme de
 programmation faisant partie des paradigmes déclaratifs, par opposition
-aux paradigmes impératif. On peut signaler que cette description est
-erronée car cela impliquerait d'avoir un programme n'ayant aucun effet
-de bords, ce qui n'est pas le cas de toutes les implémentations
-actuelle.
+aux paradigmes impératif.
+L'essence même du \emph{data-flow}~\cite{dataflow} est d'être en mesure de structurer
+les programmes, le \emph{Data-flow} est une famille de
+\emph{design patterns} structurels, articulant le programme sur l'enchaînement des
+traitements appliqués aux information traitée au sein d.
 
-L'essence même du data-flow \cite{dataflow} est d'être en mesure de structurer
-les programmes (le Data-flow est donc plus proche d'une famille de
-design patterns structurels) en mettant en avant l'information traitée
-au seins des différentes partie du programme.
-
-Le programme est donc réduit à un ensemble de \emph{noeuds} qui
-manipulent les données et des \emph{arcs} qui représentent les
-``\emph{communications}'' entre ces noeuds, ou plutôt le chemin des
+Le programme est donc réduit à un ensemble de noeuds qui
+manipulent les données et des arcs qui représentent les
+communications entre ces noeuds, ou plutôt le chemin des
 données et les traitements successifs de celles-ci par le système.
 
-Il existe trois sous-famille de langages de programmation data-flow :
-flow-based, cell-oriented et reactive. À part l'approche cell-oriented
-(qui ne sera pas traité ici car son domaine d'application est restreinte
-aux feuilles de calculs, qui ne permettent pas d'avoir une conduite de
-projet ou de réaliser des programmes qui passent à l'échelle) ces deux
-familles sont détaillés ci-dessous.
+Il existe deux sous-familles de langages de programmation \emph{data-flow} :
+\emph{flow} et \emph{reactive}. 
 
-\section{Flow-based}\label{flow-based}
+\section{Critères}\label{criteres}
+Afin de pouvoir comparer les différents approches nous proposons les critères suivants :
+
+
+\subsection{Synchrone}
+On parle de message synchrone lorsque le message est passé d'une partie à A à une
+partie B d'un programme et que lors de cet appel à la fonction d'envois par A, celui-ci
+est bloqué jusqu'à ce que B ait traité ce message et ait renvoyé une réponse.
+
+À l'inverse, un message asynchrone ne provoquera pas de blocage et ne sera pas
+traité de manière déterministe.
+
+\subsection{Cohérence}
+Il s'agit d'être en mesure de garantir, de manière plus ou moins forte, que lorsqu'une
+action est effectuée sur un ensemble de données, les invariants sont conservés.
+
+Par exemple, lors d'un transfère d'argent entre deux comptes bancaires, si le système
+est en mesure de garantir que la somme des soldes est égale au début et à la fin
+de l'opération, on parle de cohérence forte, si non on parle de cohérence faible.
+
+\subsection{Distribution}
+La distribution est la capacité du système à être exécuté sur plusieurs machines.
+
+\subsection{Composabilité}
+La composabilité est la possibilité plus ou moins importante de modifier les parties
+du système qui communiquent entre elles.
+
+\subsection{Évolutivité}
+L'évolutivité est la facilité d'ajout de nouvelles parties dans un système et notamment
+la capacité à s'intégrer facilement avec les parties déjà en place.
+
+\subsection{Reproductibilité}
+La reproductibilité est la capacité du système à produire le même ensemble de messages,
+dans le même ordre et avec les mêmes informations, à partir des mêmes informations d'entrées.
+
+
+\section{\emph{Flow-based programming}}\label{flow-based}
 
 \subsection{Principes}\label{principes}
 
-La programmation flow-based reprend cette idée de \emph{noeuds
-communicants} en ajoutant une notion de tamporisation des communications
-entre les noeuds. Les communications se font par passage de message et
-ce principe est partagé par le modèle à acteurs \cite{actors} dont Erlang
-\cite{erlang}, Akka \cite{akka} et celluloid \cite{celluloid}.
+Le \emph{flow-based programming} reprend cette idée de noeuds
+communicants en ajoutant une notion de tamporisation des communications
+entre les noeuds. Les communications se font par passage de message.
+
+\subsection{Historique}\label{historique}
+L'exemple le plus important de\emph{flow-based programming} est le modèle à acteurs~\cite{actors}
+qui a été largement diffusé par Erlang~\cite{erlang}.
+Erlang a comme principal objectif de fournir une infrastructure hautement disponible
+pour le monde des télécommunication.
+Pour y parvenir il a été nécessaire de changer la manière dont les programmes étaient pensée :
+il ne s'agit plus de tenter de réduire les erreurs, il faut au contraire les gérer.
+Il faut être en mesure de faire des reprises après erreurs ou après un panne.
+Ainsi il fallait fournir à un langage les primitives nécessaires pour non seulement
+être en mesure de faire communiquer les différentes partie du système, mais aussi
+pour garantir les bonnes communications et le bon fonctionnement global du système.
+
+Pour cela le modèle à acteurs a été créé. Le principe de base est d'avoir un grand
+nombre de tâches s'exécutant de manière concurrente et non déterministes.
+Une tâche est appelée acteur et est l'unique propriétaire de ses données.
+Les acteurs communiquent entre eux par envois de messages.
+Lorsqu'un message est reçu par un acteur il est ajouté à sa file d'attente~\footnote{il s'agit du principe d'une boîte aux lettres}.
+Les messages sont donc traités un à un.
+Lorsqu'un acteurs s'est terminé ou est suspendu, pour un rechargement de code, durant
+un rechargement après erreur ou lorsqu'il n'est pas en cours d'exécution, il est possible
+de continuer à lui envoyer des messages.
+Cela permet d'être en mesure de changer les acteurs de coeur dans le processeur ou
+de machine, de charger une nouvelle version du code de l'acteur ou de le relancer
+après une erreur, sans perdre d'informations et sans devoir suspendre le système.
+
+Plus tard des implantations en bibliothèqes ont vu le jour comme Akka~\cite{akka}
+en Scala et celluloid~\cite{celluloid} en Ruby.
 
 \subsection{Bénéfices}\label{bénéfices}
 
 L'apport de cette approche est de permettre d'avoir une certaine
-asynchronicité dans le système, qu'elle doit maîtriser, en temps (au
-bout d'un certain délais, le message est supprimé) ou en nombre (quand
-le nombre de messages en attente dépasse un certain nombre, les nouveaux
-ou les plus anciens sont supprimés).
+asynchronicité dans le système, qu'elle doit maîtriser :
+en temps, c'est-à-dire qu'au bout d'un certain délais, le message est supprimé;
+ou en nombre, quand le nombre de messages en attente dépasse un certain nombre,
+les nouveaux ou les plus anciens sont supprimés.
 
 Cette asynchronicité permet d'une part de pouvoir distribuer le
 déroulement du programme, puisque l'asynchronicité sera absorbé par les
 latences réseaux; et d'autre part la possibilité de faire du traitement
-batch à l'aide d'outils comme hadoop \cite{hadoop}.
+batch à l'aide d'outils comme hadoop~\cite{hadoop}.
 
-\section{Reactive}\label{reactive}
+\section{\emph{Reactive-based programming}}\label{reactive}
 
 \subsection{Principes}\label{principes-1}
 
-La programmation vise à réagir à des \emph{événements} en appliquant des
-\emph{comportement} sur ceux-ci. Ces événements sont deplus ordonnés par
+La programmation vise à réagir à des événements en appliquant des
+comportement sur ceux-ci. Ces événements sont de plus ordonnés par
 leur date de création dans le système.
 
-\subsection{Historique}\label{historique}
+\subsection{Historique}\label{historique-1}
 
-De nombreuses implémentations ont eu lieux en Haskell \cite{haskell} car,
-s'agissant d'un langage de programmation fonctionnelle pure les effets
-de bords ne peuvent être représentés que par transitions explicites,
-deplus le système de type était assez puissant pour supporter aisément
-une telle logique ce qui a permit d'avoir des implémentations fiables
-relativement aisément.
+Haskell~\cite{haskell} est un langage de programmation fonctionnelle pure, c'est-à-dire
+que chaque partie d'un programme est considérer comme une expression mathématique
+à évaluer. L'évaluation se fait par substitution~\footnote{comme le fait le pré-processeur
+des compilateurs du langage C}, il y n'a donc aucune mutation ou changement d'état
+possible. Cela conduit à une propriété appelée transparence référentielle, qui se
+manifeste de la façon suivante : lorsqu'une même fonction est appelée avec les mêmes
+arguments, elle retournera le même résultat.
 
-Cette investissement massive du monde de la programmation fonctionnelle
+Haskell étant un langage a usage général, il doit intéragir avec le "monde extérieur"~\footnote{tout ce qui est extérieur au programme}.
+Celà a posé un problème puisque le monde extérieur est un monde d'états, qui change~\footnote{lire deux fois le même fichier ou faire deux fois le même appel système ne donnera pas nécessairement le même résultat},
+Haskell quand a lui se veut constant.
+Il a donc été nécessaire de trouver un moyen de prendre en compte ces changements,
+ce qui a donné lieu à beaucoup de travaux sur le \emph{Reactive-based programming}.
+
+Cet investissement massif du monde de la programmation fonctionnelle
 dans le domaine à même créer une sous-famille à part entière nommée la
-programmation réactive fonctionnelle (functial reactive programming)
-\cite{frp}.
+programmation réactive fonctionnelle, \emph{functionnal reactive programming}~\cite{frp}.
 
-De plus cette notion de contrôle de flux d'un programme a été repris
-sous le nom d'event sourcing \cite{eventsourcing}. Ce concept a été ensuite remis au
-goût du jour avec l'iintroduction du CQRS \cite{cqrs} (Command Query
-Responsability Segregation), lui-même dérivé de Domain Driven Design
-\cite{ddd}.
+De plus cette notion de discrétisation de flux d'un programme a été repris
+sous le nom d'event sourcing~\cite{eventsourcing}. 
+L'idée étant de prendre une unité logique (généralement une classe ou un paquetage),
+de fournir une interface permettant la soumission d'événements. Lors de chaque événement
+reçu, celui-ci déclenche une série de modifications interne, de manière atomique.
 
-Parmis ses implémentations nous pouvons citer yampa \cite{yampa} \cite{arrows};
-reactive banana \cite{reactivebanana} et sodium \cite{sodium} qui d'une part considère que
-la variation temporelle est un événement à part entière (contrairement à
-la quasi-totalité des autres implémentation du fait que la notion de
-comportement soit fortement couplé au temps), mais qui plus est les
-auteurs se sont aperçuts que le coeur de leur code sont le même au nom
-près \cite{sodium_talk}.
+Ce concept a été ensuite remis au goût du jour avec l'introduction du CQRS~\cite{cqrs}, pour \emph{Command Query
+Responsability Segregation}, lui-même dérivé de Domain Driven Design~\cite{ddd}.
+Il s'agit de stocker directement les événements de chaque unité logique et d'effectuer
+des projections~\footnote{une application particulière d'un événement} spécifique à un contexte.
+
+Parmis ses implémentations nous pouvons citer yampa~\cite{yampa}~\cite{arrows};
+reactive banana~\cite{reactivebanana} et sodium~\cite{sodium} qui d'une part considèrent que
+la variation temporelle est un événement à part entière, contrairement à
+la quasi-totalité des autres implantations du fait que la notion de
+comportement soit fortement couplé au temps; mais qui plus est les
+auteurs se sont aperçus que le coeur de leur code sont le même au nom
+près~\cite{sodium_talk}.
 
 \subsection{Bénéfices}\label{bénéfices-1}
 
@@ -108,7 +183,7 @@ Le premier avantage de l'ordre des événements est la reproductibilité
 des situations, ce qui aide considérablement durant la recherche et la
 correction de bugs.
 
-Deplus, comme le fait le CQRS, il est possible d'intéprêter différemment
+De plus, comme le fait le CQRS, il est possible d'intéprêter différemment
 les événements, ainsi en cas d'évolution du système, rien n'est perdu et
 un grand nombre de données sont déjà présentes.
 
@@ -117,23 +192,39 @@ le sujet, le système de type à fait que la composabilité, donc
 l'extensibilité et la maîtrise de la complexité d'une application, est
 au premier plan.
 
+\section{Comparaison}
+Le détail des correspondances de ces solutions avec les critères sera détaillé
+dans les sections suivantes, mais voici le récapitulatif :
+
+\begin{center}
+\begin{tabular}{r|c c}
+Critère & \emph{Flow} & \emph{Reactive} \\
+\hline
+Synchrone & Non & Oui \\
+Cohérence & Faible & Fort \\
+Distribution & Oui & Non \\
+Composabilité & Médiocre & Bonne \\
+Évolutivité & Moyenne & Bonne \\
+Reproductibilité & Non & Oui \\
+\end{tabular}
+\end{center}
+
 \section{Conclusions}\label{conclusions}
 
-Le Data-flow tente de résoudre des problèmes de souplesse des programmes
-et de passage à l'échelle en mettant le flux de traitement des données
+Le \emph{Data-flow} tente de résoudre des problèmes de vie des systèmes,
+notamment de passage à l'échelle en mettant le flux de traitement des données
 au centre de la l'architecture logicielle.
 
 Cette étude pourra donc se concentrer sur la nature profonde de la
-programmation data-flow, en comparant les différentes approches
+programmation \emph{data-flow}, en comparant les différentes approches
 existante.
 
 D'autres questions comme le typage ou l'expressivité pourront également
 se poser durant cette étude.
 
 
-\begin{appendices}
 \section{Références}\label{références}
 \bibliographystyle{plain}
 \bibliography{refs}
-\end{appendices}
+
 \end{document}
