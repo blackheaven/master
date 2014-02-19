@@ -17,13 +17,13 @@
 \begin{abstract}
 Le \emph{data-flow programming} est une approche de structuration des programmes
 ayant pour but de considerer que les données dont il dispose sont sous forme
-d'un ou plusieurs flux d'informations continu.
-
+d'un ou plusieurs flux d'informations continus.
 Il s'agit donc de ne plus centrer le programme sur les traitements qu'il va
 effectuer mais sur la circulation des données qu'il manipule.
 
 Le but de ce document est d'introduire les concepts du \emph{data-flow programming}
-sous la forme d'une synthèse bibliographique.
+sous la forme d'une synthèse bibliographique, en proposant quelques critères de
+comparaison des grandes familles de langage \emph{data-flow}.
 \end{abstract}
 
 \section{Introduction}\label{introduction}
@@ -31,11 +31,9 @@ sous la forme d'une synthèse bibliographique.
 Le \emph{data-flow programming}~\cite{dataflow} est décrit comme un paradigme de
 programmation faisant partie des paradigmes déclaratifs, par opposition
 aux paradigmes impératif.
-L'essence même du \emph{data-flow} est d'être en mesure de structurer
-les programmes.
 Le \emph{data-flow} est une famille de \emph{design patterns} structurels,
-articulant le programme sur l'enchaînement des
-traitements appliqués aux information traitée au sein d.
+il s'agit d'articuler le programme sur l'enchaînement des
+traitements appliqués aux informations circulant dans le système.
 
 Le programme est réduit à un ensemble de noeuds qui
 manipulent les données et des arcs qui représentent les
@@ -43,18 +41,24 @@ communications entre ces noeuds, ou plutôt le chemin des
 données et les traitements successifs de celles-ci par le système.
 
 Il existe deux sous-familles de langages de programmation \emph{data-flow} :
-\emph{flow} et \emph{reactive}. 
+\emph{flow} et \emph{reactive}.
+
+Le \emph{flow-based programming} consiste à envoyer et recevoir des messages entre
+les parties d'un système.
+
+Le \emph{reactive-based programming} consiste à émettre et récupérer des événements,
+puis de leur appliquer des comportements.
+
+Afin de comparer ces deux familles, arrêtons-nous d'abord sur quelques critères.
+Ces critères nous permettront de cibler le comportement des différentes familles présentes.
 
 \section{Critères}\label{criteres}
-Afin de pouvoir comparer les approches nous proposons les critères suivants.
-
-
 \subsection{Synchronisme}
 On parle de message synchrone lors de l'appel d'un message d'une partie d'un système
-à une autrea,  le premier est bloqué jusqu'à ce que le second ait traité ce message
-et ait renvoyé une réponse.
+à une autre, la première est bloquée jusqu'à ce que la seconde ait traité ce message.
 
-À l'inverse, un message asynchrone ne provoquera pas de blocage.
+À l'inverse, un message asynchrone ne provoquera pas de blocage, on ne s'attends pas
+à ce qu'il renvoit une réponse.
 
 \subsection{Cohérence}
 Il s'agit d'être en mesure de garantir, de manière plus ou moins forte, que lorsqu'une
@@ -69,8 +73,8 @@ La distribution est la capacité du système à s'exécuter sur plusieurs machin
 même temps, sans qu'il soit nécessaire de le construire dans ce sens.
 
 \subsection{Composabilité}
-La composabilité est la possibilité plus ou moins importante de modifier les parties
-du système qui communiquent entre elles.
+La composabilité est la faciliter de modification de parties du système qui
+communiquent entre elles.
 
 Plus le nombre de changements est important pour faire communiquer deux parties
 d'un système qui ne communicaient pas entre elles, plus la composabilité est mauvaise.
@@ -100,11 +104,11 @@ communicants en ajoutant une notion de tamporisation des communications
 entre les noeuds. Les communications se font par passage de message.
 
 \subsection{Historique}\label{historique}
-L'exemple le plus important de\emph{flow-based programming} est le modèle à acteurs~\cite{actors}
+L'exemple le plus important de \emph{flow-based programming} est le modèle à acteurs~\cite{actors}
 qui a été largement diffusé par Erlang~\cite{erlang}.
 Erlang a comme principal objectif de fournir une infrastructure hautement disponible
 pour le monde des télécommunications.
-Pour y parvenir il a été nécessaire de changer la manière dont les programmes étaient pensés.
+Pour y parvenir il a été nécessaire de changer la manière dont les programmes sont pensés.
 Il ne s'agit plus de tenter de réduire les erreurs, il faut au contraire les gérer.
 Il faut être en mesure de faire des reprises après erreurs ou après un panne.
 Ainsi il faut fournir à un langage les primitives nécessaires pour, non seulement
@@ -117,30 +121,36 @@ Une tâche est appelée acteur et est l'unique propriétaire de ses données.
 Les acteurs communiquent entre eux par envois de messages.
 Lorsqu'un message est reçu par un acteur il est ajouté à sa file d'attente~\footnote{il s'agit du principe d'une boîte aux lettres}.
 Les messages sont donc traités un à un.
-Lorsqu'un acteur s'est terminé ou est suspendu, pour un rechargement de code, durant
-un rechargement après erreur ou lorsqu'il n'est pas en cours d'exécution, il est possible
-de continuer à lui envoyer des messages.
+
+Lorsqu'un acteur est indisponible, il est possible de continuer à lui envoyer
+des messages.
+Un acteur peut être indisponible pour les raisons suivantes :
+\begin{itemize}
+    \item Il s'est arrêter, normalement ou non
+    \item Son code est en train d'être rechargé à partir d'une version différente
+    \item Il n'est pas en cours d'exécution
+\end{itemize}
+
 Cela permet d'être en mesure de changer les acteurs de coeur dans le processeur ou
-de machine, de charger une nouvelle version du code de l'acteur ou de le relancer
+de machine, en chargeant une nouvelle version du code de l'acteur ou de le relancer
 après une erreur, sans perdre d'informations et sans devoir suspendre le système.
 
 Plus tard des implantations en bibliothèques ont vu le jour comme Akka~\cite{akka}
 en Scala et celluloid~\cite{celluloid} en Ruby.
 
 \subsection{Bénéfices}\label{bénéfices}
-L'apport de cette approche est de permettre d'avoir une certaine
-asynchronicité dans le système, qu'elle doit maîtriser :
-en temps, c'est-à-dire qu'au bout d'un certain délais, le message est supprimé;
-ou en nombre, quand le nombre de messages en attente dépasse un certain nombre,
-les nouveaux ou les plus anciens sont supprimés.
+Cette asynchronicité permet de pouvoir distribuer le déroulement du programme,
+puisque l'asynchronicité permet un délai dans le traitement, ce délai pourra comprendre
+les latences réseaux.
 
-Cette asynchronicité permet d'une part de pouvoir distribuer le
-déroulement du programme, puisque l'asynchronicité sera absorbé par les
-latences réseaux; et d'autre part la possibilité de faire du traitement
-batch à l'aide d'outils comme hadoop~\cite{hadoop}.
+Cela permettra également de tamporiser les informations lorsque l'unité de
+traitement est suspendue ou arrêtée.
+
+Enfin, il est possible de traiter les messages par lots, aves des outils comme hadoop~\cite{hadoop},
+ce qui peut être intéressant si la consommation de ressources de l'unité de traitement
+est importante, notament à l'initialisation.
 
 \subsection{Comparaisons aux critères}
-Il s'agit de voir comment se situe cette approche vis-à-vis des critères sélectionnés :  
 \begin{itemize}
     \item[Synchronisme] Cette approche est asynchrone, qui plus est les messages
 sont reçus de  manière non-déterministe.
@@ -167,13 +177,13 @@ non-déterministe de la réception des messages par les différentes parties du 
 \subsection{Principes}\label{principes-1}
 
 La programmation vise à réagir à des événements en appliquant des
-comportement sur ceux-ci. Ces événements sont de plus ordonnés par
+comportements sur ceux-ci. Ces événements sont de plus ordonnés par
 leur date de création dans le système.
 
 \subsection{Historique}\label{historique-1}
 
 Haskell~\cite{haskell} est un langage de programmation fonctionnelle pure, c'est-à-dire
-que chaque partie d'un programme est considérer comme une expression mathématique
+que chaque partie d'un programme est considérée comme une expression mathématique
 à évaluer. L'évaluation se fait par substitution~\footnote{comme le fait le pré-processeur
 des compilateurs du langage C}, il y n'a donc aucune mutation ou changement d'état
 possible. Cela conduit à une propriété appelée transparence référentielle, qui se
@@ -226,8 +236,6 @@ l'extensibilité et la maîtrise de la complexité d'une application, est
 au premier plan.
 
 \subsection{Comparaisons aux critères}
-Il s'agit de voir comment se situe cette approche vis-à-vis des critères sélectionnés :
-
 \begin{itemize}
     \item[Synchronisme] Cette approche est synchrone, qui plus est les messages
 sont reçus et traités de manière déterministe.
