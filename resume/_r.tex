@@ -16,9 +16,8 @@
 % \section{Abstract}\label{abstract}
 \begin{abstract}
 Le \emph{data-flow programming} est une approche de structuration des programmes
-ayant pour but de représenter ceux-ci comme un graphe direct où les noeuds sont
-des unités de traitement d'informations et où les arcs représentent la circulation
-des données au sein du programme.
+ayant pour but de considerer que les données dont il dispose sont sous forme
+d'un ou plusieurs flux d'informations continu.
 
 Il s'agit donc de ne plus centrer le programme sur les traitements qu'il va
 effectuer mais sur la circulation des données qu'il manipule.
@@ -38,7 +37,7 @@ Le \emph{data-flow} est une famille de \emph{design patterns} structurels,
 articulant le programme sur l'enchaînement des
 traitements appliqués aux information traitée au sein d.
 
-Le programme est donc réduit à un ensemble de noeuds qui
+Le programme est réduit à un ensemble de noeuds qui
 manipulent les données et des arcs qui représentent les
 communications entre ces noeuds, ou plutôt le chemin des
 données et les traitements successifs de celles-ci par le système.
@@ -55,15 +54,14 @@ On parle de message synchrone lors de l'appel d'un message d'une partie d'un sys
 à une autrea,  le premier est bloqué jusqu'à ce que le second ait traité ce message
 et ait renvoyé une réponse.
 
-À l'inverse, un message asynchrone ne provoquera pas de blocage et ne sera pas
-traité de manière déterministe.
+À l'inverse, un message asynchrone ne provoquera pas de blocage.
 
 \subsection{Cohérence}
 Il s'agit d'être en mesure de garantir, de manière plus ou moins forte, que lorsqu'une
 action est effectuée sur un ensemble de données, les invariants sont conservés.
 
 Par exemple, lors d'un transfère d'argent entre deux comptes bancaires, si le système
-est en mesure de garantir que la somme des soldes est égale au début et à la fin
+est en mesure de garantir que la somme des soldes est égal au début et à la fin
 de l'opération, on parle de cohérence forte, on parle de cohérence faible.
 
 \subsection{Distribution}
@@ -106,10 +104,10 @@ L'exemple le plus important de\emph{flow-based programming} est le modèle à ac
 qui a été largement diffusé par Erlang~\cite{erlang}.
 Erlang a comme principal objectif de fournir une infrastructure hautement disponible
 pour le monde des télécommunications.
-Pour y parvenir il a été nécessaire de changer la manière dont les programmes étaient pensée.
+Pour y parvenir il a été nécessaire de changer la manière dont les programmes étaient pensés.
 Il ne s'agit plus de tenter de réduire les erreurs, il faut au contraire les gérer.
 Il faut être en mesure de faire des reprises après erreurs ou après un panne.
-Ainsi il fallait fournir à un langage les primitives nécessaires pour non seulement
+Ainsi il faut fournir à un langage les primitives nécessaires pour, non seulement
 être en mesure de faire communiquer les différentes partie du système, mais aussi
 pour garantir les bonnes communications et le bon fonctionnement global du système.
 
@@ -119,7 +117,7 @@ Une tâche est appelée acteur et est l'unique propriétaire de ses données.
 Les acteurs communiquent entre eux par envois de messages.
 Lorsqu'un message est reçu par un acteur il est ajouté à sa file d'attente~\footnote{il s'agit du principe d'une boîte aux lettres}.
 Les messages sont donc traités un à un.
-Lorsqu'un acteurs s'est terminé ou est suspendu, pour un rechargement de code, durant
+Lorsqu'un acteur s'est terminé ou est suspendu, pour un rechargement de code, durant
 un rechargement après erreur ou lorsqu'il n'est pas en cours d'exécution, il est possible
 de continuer à lui envoyer des messages.
 Cela permet d'être en mesure de changer les acteurs de coeur dans le processeur ou
