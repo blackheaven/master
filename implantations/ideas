@@ -1,0 +1,11 @@
+Algorithmes et structures types :
+  * Listes :
+    * Insert/remove/search (simple, dichotomique)
+    * Sort (merge, insert, quick)
+    * Max/Avg/Min/Length/Sum/Compare/Diff
+  * Arbres (Binaires ou B-tree)
+    * Insert/remove/search
+    * Balance
+  * Graphes
+    * Insert/remove/search
+    * Shortest path
