@@ -8,3 +8,10 @@ merge_sort_test() ->
     ?assertEqual([0, 1, 3], list:merge_sort([1, 0, 3])),
     ?assertEqual([-10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], list:merge_sort([3, 8, 9, 0, 2, 4, 7, 5, 6, -10, 1]))
     .
+
+create_raw_test() ->
+    ?assertEqual([], list:raw(list:create([]))),
+    ?assertEqual([0], list:raw(list:create([0]))),
+    ?assertEqual([0, 1], list:raw(list:create([0, 1]))),
+    ?assertEqual(lists:seq(0, 100), list:raw(list:create(lists:seq(0, 100))))
+    .
