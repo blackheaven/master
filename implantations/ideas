@@ -1,11 +1,21 @@
 Algorithmes et structures types :
   * Listes :
-    * Insert/remove/search (simple, dichotomique)
-    * Sort (merge, insert, quick)
-    * fold => map => filter/Max/Avg/Min/Length/Sum/Compare/Diff
+    * Sort (merge)
   * Arbres (Binaires ou B-tree)
     * Insert/remove/search
     * Balance
   * Graphes
     * Insert/remove/search
     * Shortest path
+
+
+Listes :
+                                      +------------------------------+
+                                      |                              |
+                                     \/                              |
+Client ---> [AtomicSort] -----> [Accumulator] ------------------> [Merger] ---------------> [Last]
+       [1]     Trie un   [1]     Accumule     [[], [1]]           Fusionne    [1]           Garde la
+       [6, 4]  msg       [4, 6]  et pousse    [[1], [4, 6]]       deux sets   [1, 4, 6]     dernière
+       [2]               [2]     1/2 msg      [[1, 4, 6], [2]]                [1, 2, 4, 6]  version
+                                 initialisé
+                                 à []

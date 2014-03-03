@@ -1,123 +1,76 @@
 -module(list).
--export([merge_sort/1, merge_e_r/1, merge_sort_f/2, create/0, list/0, create/1, raw/1, insert/2, val/2, map/2]).
+-export([merger/0, atomic_sort/0, accumulator/0, last/1, init/0, add/2, get/1]).
 
-create() -> spawn(?MODULE, list, []).
-
-create(L) ->
-    P = create(),
-    lists:foreach(fun(E) -> insert(P, E) end, L),
-    P.
-
-id(V) -> V.
-
-raw(L) -> map(L, fun id/1).
-
-map(L, F) ->
-    S = self(),
-    L ! {foreach, fun(V) -> S !
-        case V of
-            nil -> nil;
-            _ -> {F(V)}
-        end
-        end},
-    acc_wait([]).
-
-acc_wait(L) ->
+atomic_sort() ->
     receive
-        nil -> lists:reverse(L);
-        {E} -> acc_wait([E|L])
+        {L, Accumulator, Merger, Last} ->
+            Accumulator ! {lists:sort(L), Merger, Last},
+            atomic_sort()
     end.
 
-list() ->
+accumulator() ->
     receive
-        {insert, V} ->
-            E = spawn(?MODULE, val, [V, nil]),
-            list(E, E, 1);
-        {foreach, F} ->
-            F(nil),
-            list()
+        {L, _, _} ->
+            % io:format("~p : ~p~n", ["acc0", L]),
+            accumulator(L)
     end.
 
-list(B, E, S) ->
+accumulator(L1) ->
     receive
-        {insert, V} ->
-            N = spawn(?MODULE, val, [V, nil]),
-            E ! {set_next, N},
-            list(B, N, S+1);
-        {foreach, F} ->
-            case S of
-                0 -> F(nil);
-                _ -> B ! {foreach, F}
-            end,
-            list(B, E, S)
+        {L2, Merger, Last} ->
+            % io:format("~p : ~p~n", ["acc1", L2]),
+            Merger ! {L1, L2, self(), Last},
+            accumulator()
     end.
 
-insert(L, E) ->
-    L ! {insert, E},
-    L.
-
-val(V, nil) ->
+merger() ->
     receive
-        {set_next, NN} -> val(V, NN);
-        {foreach, F} ->
-            F(V),
-            F(nil);
-        {value, Asker} ->
-            Asker ! V,
-            val(V, nil);
-        {delete, Previous} -> Previous ! {set_next, nil};
-        destroy -> ok
-    end;
-val(V, N) ->
-    receive
-        {set_next, NN} -> val(V, NN);
-        {foreach, F} ->
-            F(V),
-            N ! {foreach, F},
-            val(V, N);
-        {value, Asker} ->
-            Asker ! V,
-            val(V, N);
-        {delete, Previous} -> Previous ! {set_next, N};
-        destroy -> ok
+        {L1, L2, Accumulator, Last} ->
+            L = merge(L1, L2),
+            % io:format("~p : ~p~n", ["merge", L]),
+            Accumulator ! {L, self(), Last},
+            Last ! {set, L},
+            merger()
     end.
 
-merge_f([], X) -> X;
-merge_f(X, []) -> X;
-merge_f([X|XS], [Y|YS]) ->
+merge([], X) -> X;
+merge(X, []) -> X;
+merge([X|XS], [Y|YS]) ->
     case X > Y of
-        true -> [Y | merge_f([X|XS], YS)];
-        _ -> [X | merge_f(XS, [Y|YS])]
+        true -> [Y | merge([X|XS], YS)];
+        _ -> [X | merge(XS, [Y|YS])]
     end.
 
-merge_e_r(MERGER) ->
+last(C) ->
     receive
-        L -> merge_o_r(L, MERGER)
+        {set, N} ->
+            % io:format("~p : ~p~n", ["last", N]),
+            last(N);
+        {get, A} ->
+            A ! C,
+            last(C)
     end.
 
-merge_o_r(L1, MERGER) ->
+init() ->
+    A = spawn(?MODULE, accumulator, []),
+    A ! {[], nil, nil},
+    S = spawn(?MODULE, atomic_sort, []),
+    M = spawn(?MODULE, merger, []),
+    L = spawn(?MODULE, last, [[]]),
+    {S, A, M, L}.
+
+add(List, {S, A, M, L}) ->
+    S ! {List, A, M, L}
+    .
+
+get({_, _, _, L}) ->
+    L ! {get, self()},
     receive
-        L2 -> MERGER ! merge_f(L1, L2)
-    end.
-
-merge_sort(L) ->
-    spawn(?MODULE, merge_sort_f, [L, self()]),
+        R -> R
+    end;
+get(L) ->
+    L ! {get, self()},
     receive
         R -> R
     end.
 
-merge_sort_f([], SORTER) -> SORTER ! [];
-merge_sort_f([X], SORTER) -> SORTER ! [X];
-merge_sort_f([X, Y], SORTER) -> 
-    SORTER ! case X > Y of
-        true -> [Y, X];
-        _ -> [X, Y]
-    end;
-merge_sort_f(L, SORTER) ->
-    MERGER = spawn(?MODULE, merge_e_r, [self()]),
-    {A, B} = lists:split(round(length(L)/2), L),
-    merge_sort_f(A, MERGER),
-    merge_sort_f(B, MERGER),
-    receive
-        R -> SORTER ! R
-    end.

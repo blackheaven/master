@@ -1,17 +1,37 @@
 -module(list_tests).
 -include_lib("eunit/include/eunit.hrl").
 
-merge_sort_test() ->
-    ?assertEqual([], list:merge_sort([])),
-    ?assertEqual([0], list:merge_sort([0])),
-    ?assertEqual([0, 1], list:merge_sort([1, 0])),
-    ?assertEqual([0, 1, 3], list:merge_sort([1, 0, 3])),
-    ?assertEqual([-10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], list:merge_sort([3, 8, 9, 0, 2, 4, 7, 5, 6, -10, 1]))
-    .
+empty_test() ->
+    P = list:init(),
+    ?assertEqual([], list:get(P)).
 
-create_raw_test() ->
-    ?assertEqual([], list:raw(list:create([]))),
-    ?assertEqual([0], list:raw(list:create([0]))),
-    ?assertEqual([0, 1], list:raw(list:create([0, 1]))),
-    ?assertEqual(lists:seq(0, 100), list:raw(list:create(lists:seq(0, 100))))
-    .
+empty_one_var_test() ->
+    {_, _, _, L} = list:init(),
+    ?assertEqual([], list:get(L)).
+
+add_one_ordered_set_test() ->
+    P = list:init(),
+    list:add([1, 2], P),
+    timer:sleep(5),
+    ?assertEqual([1, 2], list:get(P)).
+
+add_one_unordered_set_test() ->
+    P = list:init(),
+    list:add([2, 1], P),
+    timer:sleep(5),
+    ?assertEqual([1, 2], list:get(P)).
+
+add_two_sets_test() ->
+    P = list:init(),
+    list:add([5, 4], P),
+    list:add([1, 8], P),
+    timer:sleep(5),
+    ?assertEqual([1, 4, 5, 8], list:get(P)).
+
+add_three_sets_test() ->
+    P = list:init(),
+    list:add([9], P),
+    list:add([5, 4], P),
+    list:add([1, 8], P),
+    timer:sleep(5),
+    ?assertEqual([1, 4, 5, 8, 9], list:get(P)).
