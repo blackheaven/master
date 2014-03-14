@@ -1,0 +1,7 @@
+digraph g {
+    p [label="Producer"]
+    f [label="Front"]
+    c [label="Consummer"]
+    p -> f [label="1, 3, 2"]
+    f -> c [label="1, 3, <interrupt>, 2"]
+}
