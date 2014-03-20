@@ -23,11 +23,6 @@ qu'ils impliquent.
 \end{abstract}
 
 \section{Lexique}
-% notion statiques du système
-% objets minimaux (flux, noeud, message)
-% synchrone : pas obligé de transmettre un pour un
-% file d'attente = n'existe pas, noeud spécialisé, idem cannaux
-% rédéfinir sur-type, curryfication, plusieurs flux
 \subsection{\emph{flow-based programming}}
 Structuration d'un programme en partant du principe que les données sont modélisées
 dans un flux et qu'elles sont traités par un ensemble de noeuds.
@@ -45,8 +40,14 @@ Un message possède un type et un corps.
 Unité de traitement qui possède des entrées qui sont des flux, où sont déposés
 les messages et qui peut envoyer d'autres messages.
 
+\subsubsection{Noeud initial}
+Noeud qui ne reçoit pas de messages.
+
+\subsubsection{Noeud terminal}
+Noeud qui n'envoie pas de messages.
+
 \subsection{Envoi de messages}
-Lorsqu'un noeud envoi un message, le message est déposé par l'emetteur "chez" le
+Lorsqu'un noeud envoie un message, le message est déposé par l'emetteur "chez" le
 récepteur (\emph{push}).
 L'emetteur reste bloqué jusqu'à ce que le destinataire ai traité ce message (c'est-à-dire
 que le noeud se termine où qu'il tente de lire un autre message sur ce flux).
@@ -93,5 +94,29 @@ Le noeud va calculer une information à partir d'un ensemble de messages.
 
 \subsubsection{Best}
 Le noeud va constament renvoyer le meilleur message vis-à-vis d'une condition.
+
+\section{Cas pratique : monitoring d'un système basé sur le modèle à acteurs}
+Nous avons un système à acteurs, chaque acteur est un processus indépendant qui
+reçoit des messages dans sa boîte aux lettres et peut envoyer des messages à d'autres
+acteurs.
+
+Il s'agit d'effectuer du monitoring sur ce système pour être en mesure d'améliorer
+ses performances.
+
+Pour cela nous prennons un ensemble de métriques :
+\begin{itemize}
+    \item Messages envoyés
+    \item Nombre de messages en attente
+    \item Mémoire consommée par acteur
+    \item Créations d'acteurs
+    \item Morts d'acteurs
+\end{itemize}
+
+Certaines de ces données sont envoyées de manière périodique (comme la consommation
+mémoire ou le nombre de messages en attente) alors que les autres sont envoyées au
+fur et à mesure.
+
+L'objectif est de visualiser graphiquement (sous plusieurs formes et points de vue)
+le système de manière dynamique.
 
 \end{document}
