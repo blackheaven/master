@@ -17,70 +17,52 @@
 \begin{abstract}
 L'objectif de ce document est de caractériser le \emph{flow-based programming}.
 
-Il va s'agir de poser un lexique réutiliser tout au long de l'étude ainsi que les
+Il va s'agir de poser un lexique réutilisé tout au long de l'étude ainsi que les
 éléments primaires qui constituent le \emph{flow-based programming} et les problèmes
 qu'ils impliquent.
 \end{abstract}
 
 \section{Lexique}
+% notion statiques du système
+% objets minimaux (flux, noeud, message)
+% synchrone : pas obligé de transmettre un pour un
+% file d'attente = n'existe pas, noeud spécialisé, idem cannaux
+% rédéfinir sur-type, curryfication, plusieurs flux
 \subsection{\emph{flow-based programming}}
-Structuration d'un programme en partant du principe que les données sont un flux
-et qu'elles sont traités par un ensemble de noeuds.
+Structuration d'un programme en partant du principe que les données sont modélisées
+dans un flux et qu'elles sont traités par un ensemble de noeuds.
 
 \subsection{Flux}
-Ensemble de messages ordonnés par date de réception par un noeud.
+Ensemble de messages ordonnés reçus par un noeud.
 
-Un flux possède un début inaccessible et aucune fin, seul son débit de messages
-varrie.
-
-\subsection{Noeud}
-Unité de traitement qui possède une entrée où sont déposés les messages et qui
-peut envoyer d'autres messages.
-
-Un noeud ne peut accepter qu'un sur-type de messages.
-
-\subsection{Envois de messages}
-Lorsqu'un noeud envois un message, cet envois peut être synchrone ou asynchrone.
-
-Le message est déposé par l'emetteur "chez" le récepteur (\emph{push}).
-
-Lorsque l'émetteur est suceptible d'envoyer des messages à un récepteur, ont dit
-qu'ils sont reliés par unie arête partant de l'émetteur au récepteur.
-
-L'ensemble des messages envoiés part un émetteur sont reçu dans l'ordre par
-le destinataire.
-
-\subsection{Envois de messages de manière synchrone}
-Le noeud émetteur est bloqué jusqu'à ce que le noeud suivant ai traité le message.
-
-Le noeud est forcé d'envoyer un et un seul message par message reçu.
-
-\subsection{Envois de messages de manière asynchrone}
-Le noeud émetteur envois un message qui sera mit dans la file de messages du destinataire.
-
-Le noeud possède une file d'attente inifinie de messages.
-
-Le noeud peut envoyer un nombre arbitraire de messages, même à lui-même.
+Un flux possède un début inaccessible et aucune fin, Il est dôté de deux attributs :
+le type des messages et le débit.
 
 \subsection{Message}
 Un message possède un type et un corps.
 
-\subsection{Sur-type de messages}
-Ensemble de types de messages nécessaires pour effectuer un traitement.
+\subsection{Noeud}
+Unité de traitement qui possède des entrées qui sont des flux, où sont déposés
+les messages et qui peut envoyer d'autres messages.
 
-Le cas général étant que le sur-type d'arité 1, dans ce cas, chaque
-message sera traité au fur et à mesure.
+\subsection{Envoi de messages}
+Lorsqu'un noeud envoi un message, le message est déposé par l'emetteur "chez" le
+récepteur (\emph{push}).
+L'emetteur reste bloqué jusqu'à ce que le destinataire ai traité ce message (c'est-à-dire
+que le noeud se termine où qu'il tente de lire un autre message sur ce flux).
 
-S'il s'agit d'un sur-type d'arité supérieur à 1, ils ne seront traités que lorsque
-le noeud aura reçu un message de chaque type.
-L'envois synchrone de messages est impossible dans ce cas, car nous avons besoin
-de tamporiser plusieurs messages avant de pouvoir les traiter.
+Lorsque l'émetteur est suceptible d'envoyer des messages à un récepteur, ont dit
+qu'ils sont reliés par unie arête partant de l'émetteur au récepteur.
 
-\subsection{Arité de sur-type}
-Nombre de type de messages contenu dans un sur-type.
+\subsection{Arité de noeud}
+Nombre de flux attendu par un noeud.
 
-Un sur-type d'arité 1 attendra un type de message, un sur-type d'arité 2 attendra
-deux types de messages, etc.
+Un noeud d'arité 1 attendra un flux, un noeud d'arité 2 attendra
+deux flux, etc.
+
+Lorsqu'un noeud d'arité supérieure à 1 ne possède plus de messages à consommer sur
+tous ses flux, il va commencer à effectuer sa tâche et ne surveillera plus que les
+flux qui lui manque pour la compléter.
 
 \section{Noeuds primaires}
 \subsection{Famille sans état}
@@ -90,22 +72,21 @@ Le noeud ne fait que transmettre le message sans le modifier.
 \subsubsection{Map}
 Le noeud change le type et le contenu du message.
 
-\subsubsection{Tee (asynchrone)}
+\subsubsection{Tee}
 Le noeud transfert le message à deux autres noeuds sans le modifier.
 
-\subsubsection{Filter (asynchrone)}
+\subsubsection{Filter}
 Le noeud transfert ou non le message en fonction d'une condition.
+
+\subsubsection{Buffer}
+Le noeud met les messages dans une file d'attente et les transferts au fur et à
+mesure que le noeud suivant est en mesure de les consommer.
 
 \subsection{Famille à état}
 Il s'agit d'une famille de noeuds ont besoin de connaitre le précédent message qu'ils
 ont envoyés pour calculer le message courant à envoyer.
 
 Ils envoient les évolutions de leur calcul au fur et à mesure des messages reçus
-
-En mode synchrone le noeud nécessite une mémoire pour stocker le résultat courant.
-
-En mode asynchrone le noeud utilisera un Tee pour se renvoyer le résultat courant,
-le noeud aura un sur-type d'arité 2.
 
 \subsubsection{Fold}
 Le noeud va calculer une information à partir d'un ensemble de messages.
