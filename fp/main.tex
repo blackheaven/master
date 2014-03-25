@@ -1,0 +1,109 @@
+\documentclass{article}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage[titletoc,toc,title]{appendix}
+\usepackage{listings}
+\lstset{breaklines=true, breakatwhitespace=true}
+\usepackage{varwidth}
+
+\title{Caractérisation de la programmation fonctionnelle}
+\author{Gautier DI FOLCO}
+\date{2014}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+% \section{Abstract}\label{abstract}
+\begin{abstract}
+L'objectif est d'être en mesure de pouvoir distinguer un langage fonctionnel
+d'un langage impératif.
+\end{abstract}
+
+Les exemples de codes fonctionnel sont en Haskell et les exemples de codes impératifs sont en Ruby.
+
+\section{Caractérisations}
+\subsection{Exécution}
+Conceptuellement, dans un langage de fonctionnel l’exécution d’un programme se
+fait uniquement par substitution d’expression sans modification de l’état d’une
+machine alors que dans un langage impératif l’exécution se fait par évaluation
+d’expression et modification de l’état de la machine.
+
+Exemple de somme des éléments d'un tableau :
+
+\begin{itemize}
+    \item Haskell
+
+\begin{lstlisting}[language=haskell]
+foldl (+) 0 [1, 2, 3]
+-- Sera execute de cette maniere
+-- foldl (+) (0 + 1) [2, 3]
+-- foldl (+) (0 + 1) [2, 3]
+-- foldl (+) (0 + 1 + 2) [3]
+-- foldl (+) (0 + 1 + 2 + 3) []
+-- (0 + 1 + 2 + 3)
+-- (1 + 2 + 3)
+-- (3 + 3)
+-- 6
+\end{lstlisting}
+
+    \item Ruby
+
+\begin{lstlisting}[language=ruby]
+sum = 0
+data = [1, 2, 3]
+tmp = nil
+while (tmp = data.shift)
+    sum = sum + tmp
+end
+# Sera execute de cette maniere
+# sum = 0 / tmp = 1 / data = [2, 3]
+# sum = 1 / tmp = 2 / data = [3]
+# sum = 3 / tmp = 3 / data = []
+# sum = 6 / tmp = nil / data = []
+\end{lstlisting}
+\end{itemize}
+
+
+\begin{lstlisting}[language=ruby]
+\end{lstlisting}
+
+\subsection{Fonction comme citoyen de première classe}
+Un langage semble fonctionnel dès qu'il inclut des mécanismes pour manipuler des
+fonctions comme citoyens de première classe (valeurs fonctionelles, création de
+fonctions anonymes, fonctions d'ordre supérieur).
+
+\subsection{Un état dans la pile mais pas dans le tas}
+L'état d'un système basé sur la programmation fonctionnelle se trouve uniquement
+dans la pile, donc ni dans le tas, ni dans une variable globale.
+
+\subsection{Pas de notions de mutabilité}
+Tout n'étant qu'expression, aucune expression ne peut être modifiée.
+
+Aucun effet de bord n'est possible.
+
+\subsection{Transparence référentielle}
+Deux appels à une même fonction avec les mêmes arguments donnera le même résultat.
+
+\subsection{}
+
+
+\subsection{}
+
+\section{}
+\subsection{}
+\subsection{}
+\subsection{}
+\subsection{}
+\subsection{}
+
+\section{}
+\subsection{}
+\subsection{}
+\subsection{}
+\subsection{}
+\subsection{}
+
+\end{document}
