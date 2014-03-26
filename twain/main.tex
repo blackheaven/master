@@ -25,12 +25,12 @@ Spécification séquentielle des calculs à effectuer sur une donnée d'entrée
 pour obtenir une donnée en sortie.
 
 \subsection{Fonctionnel}
-Spécification de l'ensemble transformations à effectuer sur des données d'entrées
-pour obtenir les données de sortie.
+Spécification de l'ensemble des transformations à effectuer sur des données
+d'entrées pour obtenir les données de sortie.
 
 \subsection{\emph{Flow-based programming}}
-Spécification de l'enchainement des transformations pour obtenir une flux de
-données en sortie à partir d'un flux de données en entrée.
+Spécification de l'enchainement des transformations à partir d'un flux de données
+d'entrée pour obtenir une flux de données en sortie.
 
 \section{Constats}
 \subsection{\emph{Legacy}}
@@ -38,14 +38,13 @@ Aujourd'hui la majorité des programmes existants se reposent sur le paradigme i
 
 Cela implique que d'une part la majorité des développeurs est habituée au paradigme
 impératif.
-Changer de paradigme est un effort intellectuel que tout le monde ne peut pas fournir,
-le temps d'apprentissage global (c'est-à-dire de la syntaxe, des concepts et des
-idiomes) et non-négligeable.
+Changer de paradigme requiert un temps d'apprentissage global, c'est-à-dire de
+la syntaxe, des concepts et des idiomes, non-négligeable.
 À tel point qu'il peut sembler plus rentable de vivre avec les difficultés
 d'expressions intrinsèques au paradigme vis-à-vis du problème que l'on tente de
 résoudre, que d'apprendre et d'utiliser un paradigme plus adéquat.
 
-Et d'autre part la masse de code pré-existante (ainsi que les outils disponibles)
+Enfin, la masse de code pré-existante, ainsi que les outils disponibles,
 est trop importante pour envisager une ré-écriture ou une adaptation
 vers ou pour des langages de type \emph{flow-based programming}.
 
@@ -78,8 +77,8 @@ cette liste, sans que le programme puisse s'arrêter.
 Pour que celà soit possible, nous devons introduire la notion de paresse.
 
 Ainsi, les éléments d'une liste ne seront calculés que si une instruction tente
-d'accéder à un de ses éléments (ou si une boucle tente d'itérer sur cette dernière
-via un \emph{iterator}).
+d'accéder à un de ses éléments, ou si une boucle tente d'itérer sur cette dernière
+via un \emph{iterator}.
 
 De plus, lorsqu'une boucle va itérer sur un flux, celle-ci sera bloqué jusqu'à ce
 qu'un élément soit disponible pour être traité.
