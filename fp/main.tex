@@ -31,6 +31,12 @@ fait uniquement par substitution d’expression sans modification de l’état d
 machine alors que dans un langage impératif l’exécution se fait par évaluation
 d’expression et modification de l’état de la machine.
 
+Ainsi toutes les fonctions des langages fonctionnels ne sont que des expressions
+qui possède ou non un nom, on parle de \emph{bind}, qui peut être substitué par
+l'expression elle-même.
+
+Schématiquement : toute fonction ne ferait que renvoyer une valeur.
+
 Exemple de somme des éléments d'un tableau :
 
 \begin{itemize}
@@ -66,10 +72,6 @@ end
 \end{lstlisting}
 \end{itemize}
 
-
-\begin{lstlisting}[language=ruby]
-\end{lstlisting}
-
 \subsection{Fonction comme citoyen de première classe}
 Un langage semble fonctionnel dès qu'il inclut des mécanismes pour manipuler des
 fonctions comme citoyens de première classe (valeurs fonctionelles, création de
@@ -87,23 +89,41 @@ Aucun effet de bord n'est possible.
 \subsection{Transparence référentielle}
 Deux appels à une même fonction avec les mêmes arguments donnera le même résultat.
 
-\subsection{}
+\subsection{Ré-écriture des expressions}
+L'une des conséquences de la transparence référentielle est la liberté que le compilateur
+a de ré-écrire les expressions.
 
+Les fonctions n'ayant pas d'effets de bords, il peut changer l'ordre d'appel s'il
+considère que ça peut apporter un gain quelconque.
 
-\subsection{}
+\subsection{Évaluation paresseuse}
+Le second bénéfice de la transparence référentielle est la possibilité de n'exécuter
+que les expressions qui sont nécessaires.
 
-\section{}
-\subsection{}
-\subsection{}
-\subsection{}
-\subsection{}
-\subsection{}
+Ainsi cela permet d'introduire la notion d'infini.
 
-\section{}
-\subsection{}
-\subsection{}
-\subsection{}
-\subsection{}
-\subsection{}
+Par exemple, nous pouvons définir la suite de fibonacci sans se préoccuper de sa
+terminaison :
+
+\begin{lstlisting}[language=haskell]
+fib = 1:1:zipWith (+) fib (tail)
+-- n'evaluera rien tant qu'il n'y est pas force
+fib !! 3
+-- renverra 5
+-- seul les 4 premiers elements sont evalues
+\end{lstlisting}
+
+\subsection{Pureté/Impureté}
+Afin de rendre nos programme utile, il faut être en mesure d'effectuer
+des effets de bords afin de pouvoir, par exemple, lire des informations en entrée
+et écrire le résultat des calculs en sortie.
+
+On considère qu'un langage est pure lorsque ces effets de bords sont effectués au
+travers d'une structure comme une monade\footnote{un ensemble de types
+encapsulants une valeur dans un contexte, fournissants des fonctions pour
+modifier cette valeur, cette modification étant retranscrite de manière
+impérative vers la cible, modifiant le contexte par la même occasion}.
+
+Les langages ne faisant pas cette distinction sont considérés comme impurs ou strict.
 
 \end{document}
