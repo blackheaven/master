@@ -35,6 +35,8 @@ Ainsi toutes les fonctions des langages fonctionnels ne sont que des expressions
 qui possède ou non un nom, on parle de \emph{bind}, qui peut être substitué par
 l'expression elle-même.
 
+Une fonction non-nommée est appelée \emph{lambda expression}.
+
 Schématiquement : toute fonction ne ferait que renvoyer une valeur.
 
 Exemple de somme des éléments d'un tableau :
@@ -125,5 +127,31 @@ modifier cette valeur, cette modification étant retranscrite de manière
 impérative vers la cible, modifiant le contexte par la même occasion}.
 
 Les langages ne faisant pas cette distinction sont considérés comme impurs ou strict.
+
+\subsection{Paramètres et currification}
+Les fonctions ne peuvent prendre et retourner qu'une valeur.
+
+Ainsi, pour qu'une fonction puisse prendre plusieurs valeurs, chaque fois qu'une
+valeur sera fournie en paramètre, elle va conceptuellement créer une \emph{lambda expression},
+potentiellement appelée \emph{closure} si son corps dépend d'un des paramètres
+passé lors de sa création qui va attendre le paramètre suivante de la fonction à
+plusieurs paramètres, etc.
+Jusqu'à ce qu'aucun paramètre ne manque.
+
+\begin{lstlisting}[language=haskell]
+add3 :: Int -> Int -> Int -> Int
+add3 a b c = a + b + c
+-- ou add3 = (\a -> (\b -> (\c -> (a + b + c))))
+
+add3 -- Int -> Int -> Int -> Int
+add3 1 -- Int -> Int -> Int
+add3 1 2 -- Int -> Int
+add3 1 2 3 -- Int
+\end{lstlisting}
+
+On parle de currification ou \emph{currying}.
+
+Ainsi le fait ne fournir qu'une partie des paramètres attendus créera une fonction
+valide et manipulable par le programme.
 
 \end{document}
