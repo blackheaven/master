@@ -26,11 +26,115 @@ sous la forme d'une synthèse bibliographique, en proposant quelques critères d
 comparaison des grandes familles de langage \emph{data-flow}.
 \end{abstract}
 
+% TODO : reformatter
+% objectif : chercher à savoir quels sont les changements de structures apportés par le DF
+% gain/pertes
+
+% contributions : à définir
+
+% exemple de monitoring : le flux était là avant, mais pas monitoré
+% comment on le ferait en impératif, en fp et en DF ?
+% définir les trois avant d'expliquer comment le faire
+
+% détail du concept général
+% bien décrire un flux + flux tiré/poussé
+% description DÉTAILLÉ (autre doc) du fb (+ noeuds) du FB => faire que la bib corrobore fb -> vient de l'impératif
+% idem rp => idem fp
+% lien entre rp et fb (ci dessous)
+% 
+
+% rp => vient du fp
+% fb => vient de l'impératif
+% fb : 0 tools
+% rp set on tool to pre-proc flow
+% fb : has to known its output
+% rp : emet un event et le système de débrouille
 \section{Introduction}\label{introduction}
 
-Le \emph{data-flow programming}~\cite{dataflow} est décrit comme un paradigme de
-programmation faisant partie des paradigmes déclaratifs, par opposition
-aux paradigmes impératif.
+\subsection{Cas pratique}
+Si nous prennons un système quelconque et que nous souhatons mettre en place un
+ensemble de mécanismes de surveillances.
+
+Pour cela, nous allons, dans un premier temps, devoir ajouter un certain
+nombre de sondes pour nous faire remontrer un ensemble de métriques.
+
+Puis nous allons avoir un certain nombre de modifications et d'aggrégation des
+données récoltées pour obtenir des données qui correspondent à notre objectif
+de modélisation.
+
+Enfin nous allons produire des rapports à un instant données de ce système mettant
+en avant la caractéristique de celui-ci.
+
+\subsection{Approches de résolution}
+\subsubsection{Impérative}
+La base de la programmation impérative est la spécification séquentielle
+des calculs à effectuer sur une donnée d'entrée pour obtenir une donnée en sortie.
+
+Nous allons disposer d'un ensemble de données à un endroit de notre mémoire et
+nous lui appliquons une suite d'opération destructives pour lui donner une forme
+plus approprié à notre usage général de celle-ci dans tout le programme.
+
+Ainsi, pour atteindre notre objectif, nous allons avoir une première partie de
+récupération des données qui va se charger d'obtenir les métriques du système
+surveillé à un instant donné et faire un traitement minimal pour les structurer
+de manière à ce qu'elles soient manipulable simplement dans tout le reste du programme.
+
+Dans un second temps les données vont subir un ensemble de modifications, de
+taitements et d'aggregations, notament avec les traitements d'anciennes métriques,
+pour obtenir un ensemble de données modélisée de sorte à ce qu'elles mettent en
+valeur l'état du système que l'utilisateur veut observer.
+
+Enfin cet état dans le temps du système sera communiqué à l'utilisateur sous forme
+de diagrammes par exemple.
+
+L'utilisateur aura donc une vue du passée du système surveillé jusqu'à un moment donné.
+
+\subsubsection{Fonctionnelle}
+Lorsque l'on architecture un programme basé sur la programmation fonctionnelle,
+on spécification de l'ensemble des transformations à effectuer sur des données
+d'entrées pour obtenir les données de sortie.
+
+Conceptuellement, la donnée ne change pas, un certain nombre de filtres et de
+changes à opérer pour obtenir une nouvelle donnée sous un autre format.
+
+Pour traiter notre cas pratique, nous programme va recevoir les métriques et
+les stockers dans un format proche de leur formattage brute, aucun traitement
+ne sera effectué.
+
+Ensuite, ces métriques, se verront appliquer un certain nombre de filtres pour
+otenir des données formattées pour l'aggrégation.
+Puis, elles seront agrégées avec les anciennes métriques formattées pour l'aggrégation.
+Elles seront ensuite filtrées et transformées por obtenir des données propres à
+la communication avec l'utilisateur.
+
+Enfin les données seront affichées à l'utilisateur qui aura une vue du passée du
+système surveillé jusqu'à un moment donné.
+
+\subsubsection{Flux}
+L'approche flux vise à spécifier l'enchainement des transformations à partir
+d'un flux de données d'entrée pour obtenir une flux de données en sortie.
+
+Un flux est un ensemble de messages dont le début est inaccessible, ce qui
+implique que nous n'aurons jamais l'ensemble des messages.
+Un flux n'a pas de fin, ce qui signifie que nous ne pouvons pas obtenir une
+image fixe du monde décrit par le flux ayant une valeur constante dans le temps.
+Plus l'information est ancienne, moins elle a de valeur puisque le monde avance
+en permanence.
+
+Pour résoudre notre problème, nous allons faire un ensemble de parties de programme
+chargées de récupérer les flux de métriques entrants et de les transmettres,
+sous forme de flux modifiés, à d'autres parties du programme chargées de combiner,
+filtrer ou aggréger ces métriques.
+Ce qui entrainera la création de nouveaux flux qui seront affichés en temps-réel
+à l'utilisateur.
+
+Ainsi, l'utilisateur aura une vu du système présent, mais aucun historique.
+
+\subsection{Caractérisation}
+L'approche flux décrite précédemment se nomme \emph{data-flow programming}~\cite{dataflow}.
+
+Il est décrit comme un paradigme de programmation faisant partie des paradigmes
+déclaratifs, par opposition aux paradigmes impératif.
 Le \emph{data-flow} est une famille de \emph{design patterns} structurels,
 il s'agit d'articuler le programme sur l'enchaînement des
 traitements appliqués aux informations circulant dans le système.
