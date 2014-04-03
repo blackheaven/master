@@ -24,6 +24,9 @@ effectuer mais sur la circulation des données qu'il manipule.
 Le but de ce document est d'introduire les concepts du \emph{data-flow programming}
 sous la forme d'une synthèse bibliographique, en proposant quelques critères de
 comparaison des grandes familles de langage \emph{data-flow}.
+
+Il s'agit également de voir quels changements structurels le \emph{data-flow}
+entraine dans les systèmes qui se basent sur cette approche.
 \end{abstract}
 
 % TODO : reformatter
@@ -32,12 +35,12 @@ comparaison des grandes familles de langage \emph{data-flow}.
 
 % contributions : à définir
 
-% exemple de monitoring : le flux était là avant, mais pas monitoré
-% comment on le ferait en impératif, en fp et en DF ?
-% définir les trois avant d'expliquer comment le faire
+    % exemple de monitoring : le flux était là avant, mais pas monitoré
+    % comment on le ferait en impératif, en fp et en DF ?
+    % définir les trois avant d'expliquer comment le faire
 
-% détail du concept général
-% bien décrire un flux + flux tiré/poussé
+    % détail du concept général
+    % bien décrire un flux + flux tiré/poussé
 % description DÉTAILLÉ (autre doc) du fb (+ noeuds) du FB => faire que la bib corrobore fb -> vient de l'impératif
 % idem rp => idem fp
 % lien entre rp et fb (ci dessous)
@@ -47,8 +50,8 @@ comparaison des grandes familles de langage \emph{data-flow}.
 % fb => vient de l'impératif
 % fb : 0 tools
 % rp set on tool to pre-proc flow
-% fb : has to known its output
-% rp : emet un event et le système de débrouille
+    % fb : has to known its output
+    % rp : emet un event et le système de débrouille
 \section{Introduction}\label{introduction}
 
 \subsection{Cas pratique}
@@ -133,52 +136,32 @@ Ainsi, l'utilisateur aura une vu du système présent, mais aucun historique.
 \subsection{Caractérisation}
 L'approche flux décrite précédemment se nomme \emph{data-flow programming}~\cite{dataflow}.
 
-Il est décrit comme un paradigme de programmation faisant partie des paradigmes
-déclaratifs, par opposition aux paradigmes impératif.
 Le \emph{data-flow} est une famille de \emph{design patterns} structurels,
-il s'agit d'articuler le programme sur l'enchaînement des
-traitements appliqués aux informations circulant dans le système.
+il s'agit d'articuler le programme autour de flux infini de données.
+Ces flux sont manipulés par des noeuds qui vont effectuer des traitements sur
+les données de ces flux, ce qui va générer un nouveau flux de données.
 
 Le programme est réduit à un ensemble de noeuds qui
 manipulent les données et des arcs qui représentent les
-communications entre ces noeuds, ou plutôt le chemin des
-données et les traitements successifs de celles-ci par le système.
+communications entre ces noeuds.
 
 Il existe deux sous-familles de langages de programmation \emph{data-flow} :
 \emph{flow} et \emph{reactive}.
 
-Le \emph{flow-based programming} consiste à envoyer et recevoir des messages entre
-les parties d'un système.
+Le \emph{flow-based programming} consiste à recevoir, traiter et envoyer des messages de
+manière directe entre les parties d'un système.
 
-Le \emph{reactive-based programming} consiste à émettre et récupérer des événements,
-puis de leur appliquer des comportements.
+Le \emph{reactive-based programming} consiste à récupérer, appliquer des comportements
+et émettre et des événements dans le systèmes.
 
 Le \emph{flow-based programming} et le \emph{reactive-based programming} ont comme
-caractéristique commune de réagir dans le temps à une entrée qui n'a pas de fin.
+caractéristique commune de réagir dans le temps à une entrée qui n'a pas de fin et
+dont le début est inaccessible.
 
 Afin de comparer ces deux familles, arrêtons-nous d'abord sur quelques critères.
 Ces critères nous permettront de cibler le comportement des différentes familles présentes.
 
 \section{Critères}\label{criteres}
-\subsection{Synchronisme}
-On parle de message synchrone lors de l'appel d'un message d'une partie d'un système
-à une autre, la première est bloquée jusqu'à ce que la seconde ait traité ce message.
-
-À l'inverse, un message asynchrone ne provoquera pas de blocage, on ne s'attends pas
-à ce qu'il renvoit une réponse.
-
-\subsection{Cohérence}
-Il s'agit d'être en mesure de garantir, de manière plus ou moins forte, que lorsqu'une
-action est effectuée sur un ensemble de données, les invariants sont conservés.
-
-Par exemple, lors d'un transfère d'argent entre deux comptes bancaires, si le système
-est en mesure de garantir que la somme des soldes est égal au début et à la fin
-de l'opération, on parle de cohérence forte, on parle de cohérence faible.
-
-\subsection{Distribution}
-La distribution est la capacité du système à s'exécuter sur plusieurs machines en
-même temps, sans qu'il soit nécessaire de le construire dans ce sens.
-
 \subsection{Composabilité}
 La composabilité est la faciliter de modification de parties du système qui
 communiquent entre elles.
@@ -207,8 +190,8 @@ ce qui doit donner les mêmes résultats en sortie.
 \subsection{Principes}\label{principes}
 
 Le \emph{flow-based programming} reprend cette idée de noeuds
-communicants en ajoutant une notion de tamporisation des communications
-entre les noeuds. Les communications se font par passage de message.
+communicants. Les communications se font par passage de message, de noeud à noeud,
+sans intermédiaire.
 
 \subsection{Historique}\label{historique}
 L'exemple le plus important de \emph{flow-based programming} est le modèle à acteurs~\cite{actors}
@@ -246,26 +229,9 @@ Plus tard des implantations en bibliothèques ont vu le jour comme Akka~\cite{ak
 en Scala et celluloid~\cite{celluloid} en Ruby.
 
 \subsection{Bénéfices}\label{bénéfices}
-Cette asynchronicité permet de pouvoir distribuer le déroulement du programme,
-puisque l'asynchronicité permet un délai dans le traitement, ce délai pourra comprendre
-les latences réseaux.
-
-Cela permettra également de tamporiser les informations lorsque l'unité de
-traitement est suspendue ou arrêtée.
-
-Enfin, il est possible de traiter les messages par lots, aves des outils comme hadoop~\cite{hadoop},
-ce qui peut être intéressant si la consommation de ressources de l'unité de traitement
-est importante, notament à l'initialisation.
 
 \subsection{Comparaisons aux critères}
 \begin{itemize}
-    \item[Synchronisme] Cette approche est asynchrone, qui plus est les messages
-sont reçus de  manière non-déterministe.
-    \item[Cohérence] La cohérence est forte au sein d'un même message, en revanche
-plusieurs messages ne peuvent avoir de garantie de cohérence du fait de l'aspect
-non-déterministe de leur réception.
-    \item[Distribution] L'aspect asynchrone de cette approche permet de distribuer
-automatiquement les parties du système.  
     \item[Composabilité] Aucune aide n'est apportée à la composabilité, cela dépendra
 de la capacité de ceux qui façonnent le système à respecter des conventions et à
 faire des interface suffisament abstraite. Ce qui implique une composabilité variable
@@ -284,8 +250,9 @@ non-déterministe de la réception des messages par les différentes parties du 
 \subsection{Principes}\label{principes-1}
 
 La programmation vise à réagir à des événements en appliquant des
-comportements sur ceux-ci. Ces événements sont de plus ordonnés par
-leur date de création dans le système.
+comportements sur ceux-ci. Ces événements sont émits dans le système et celui-ci
+fait en sorte de faire parvenir ces événéments à toutes les parties qui ont un comportement
+à lui appliquer.
 
 \subsection{Historique}\label{historique-1}
 
@@ -344,11 +311,6 @@ au premier plan.
 
 \subsection{Comparaisons aux critères}
 \begin{itemize}
-    \item[Synchronisme] Cette approche est synchrone, qui plus est les messages
-sont reçus et traités de manière déterministe.
-    \item[Cohérence] La cohérence est forte au sein de l'ensemble du système.
-    \item[Distribution] L'aspect synchrone de cette approche rendent impossible la distribution  
-automatique des parties du système.
     \item[Composabilité] Le soin apporté aux interfaces et au système de types
 permet d'avoir des parties génériques et fortement composables.
     \item[Évolutivité] Pour ajouter une nouvelle partie au système, il suffit de
@@ -367,9 +329,6 @@ dans les sections suivantes, mais voici le récapitulatif :
 \begin{tabular}{r|c c}
 Critère & \emph{Flow} & \emph{Reactive} \\
 \hline
-Synchronisme & Non & Oui \\
-Cohérence & Faible & Fort \\
-Distribution & Oui & Non \\
 Composabilité & Mauvaise & Bonne \\
 Évolutivité & Mauvaise & Bonne \\
 Reproductibilité & Non & Oui \\
