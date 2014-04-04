@@ -41,32 +41,31 @@ entraine dans les systèmes qui se basent sur cette approche.
 
     % détail du concept général
     % bien décrire un flux + flux tiré/poussé
-% description DÉTAILLÉ (autre doc) du fb (+ noeuds) du FB => faire que la bib corrobore fb -> vient de l'impératif
-% idem rp => idem fp
-% lien entre rp et fb (ci dessous)
-% 
+    % description DÉTAILLÉ (autre doc) du fb (+ noeuds) du FB
+    % idem rp
+    % lien entre rp et fb (ci dessous)
 
 % rp => vient du fp
 % fb => vient de l'impératif
-% fb : 0 tools
-% rp set on tool to pre-proc flow
+    % fb : 0 tools
+    % rp set on tool to pre-proc flow
     % fb : has to known its output
     % rp : emet un event et le système de débrouille
 \section{Introduction}\label{introduction}
 
 \subsection{Cas pratique}
-Si nous prennons un système quelconque et que nous souhatons mettre en place un
-ensemble de mécanismes de surveillances.
+Nous souhatons mettre en place un ensemble de mécanismes de surveillances sur un
+système quelconque.
 
-Pour cela, nous allons, dans un premier temps, devoir ajouter un certain
-nombre de sondes pour nous faire remontrer un ensemble de métriques.
+Dans cette optique, nous allons commencer par ajouter un certain nombre de
+sondes pour nous faire remontrer les métriques que nous voulons surveiller.
 
-Puis nous allons avoir un certain nombre de modifications et d'aggrégation des
+Puis nous allons appliquer un ensemble de modifications et d'aggrégation des
 données récoltées pour obtenir des données qui correspondent à notre objectif
 de modélisation.
 
-Enfin nous allons produire des rapports à un instant données de ce système mettant
-en avant la caractéristique de celui-ci.
+Enfin nous allons produire des rapports de ce système à un instant donnée mettant
+en avant les caractéristiques de celui-ci.
 
 \subsection{Approches de résolution}
 \subsubsection{Impérative}
@@ -228,7 +227,47 @@ après une erreur, sans perdre d'informations et sans devoir suspendre le systè
 Plus tard des implantations en bibliothèques ont vu le jour comme Akka~\cite{akka}
 en Scala et celluloid~\cite{celluloid} en Ruby.
 
+\subsection{Noeuds primaires}
+Les seules capacités du noeud sont la réception et l'émission pair-à-pair de messages.
+
+Il existe cependant un nombre de motifs récurrents décrits ci-dessous.
+
+\subsubsection{Famille sans état}
+\paragraph{\emph{Identity}}
+Le noeud ne fait que transmettre le message sans le modifier.
+
+\paragraph{\emph{Map}}
+Le noeud change le type et le contenu du message.
+
+\paragraph{\emph{Tee}}
+Le noeud transfert le message à deux autres noeuds sans le modifier.
+
+\paragraph{\emph{Filter}}
+Le noeud transfert ou non le message en fonction d'une condition.
+
+\subsubsection{Famille à état}
+Il s'agit d'une famille de noeuds ont besoin de connaitre le précédent message qu'ils
+ont envoyés pour calculer le message courant à envoyer.
+
+Ils envoient les évolutions de leur calcul au fur et à mesure des messages reçus
+
+\paragraph{\emph{Fold}}
+Le noeud va calculer une information à partir d'un ensemble de messages.
+
+\paragraph{\emph{Best}}
+Le noeud va constament renvoyer le meilleur message vis-à-vis d'une condition.
+
+\paragraph{\emph{Buffer}}
+Le noeud met les messages dans une file d'attente et les transferts au fur et à
+mesure que le noeud suivant est en mesure de les consommer.
+
+\paragraph{\emph{Join}}
+Le noeud attends la réception de plusieurs messages qu'il va concaténer en un seul,
+puis transférer le message créé à son successeur.
+
 \subsection{Bénéfices}\label{bénéfices}
+Le système est relativement simple à mettre en oeuvre puisqu'il se content de mettre
+en relation de manière directe et explicite des noeuds qui se connaissent.
 
 \subsection{Comparaisons aux critères}
 \begin{itemize}
@@ -294,6 +333,25 @@ comportement soit fortement couplé au temps; mais qui plus est les
 auteurs se sont aperçus que le coeur de leur code sont le même au nom
 près~\cite{sodium_talk}.
 
+\subsection{Actions disponibles}
+Les programmes consistent à déclarer des comportements à appliquer à des flux
+d'événements.
+
+\subsubsection{\emph{Subscribe / each / map}}
+Déclare un comportement sur un flux d'événements.
+
+\subsubsection{\emph{Filter}}
+Crée un nouveau flux d'événements respectant un certain nombre de conditions.
+
+Ce nouveau flux comprendra au plus le même nombre d'événements que le flux dont
+il est issu.
+
+\subsubsection{\emph{Join}}
+Crée un nouveau flux d'événements à partir de plusieurs flux.
+
+Les événements générés seront la concaténation des événements des flux sur lesquels
+le comportement est appliqué.
+
 \subsection{Bénéfices}\label{bénéfices-1}
 
 Le premier avantage de l'ordre des événements est la reproductibilité
@@ -334,6 +392,14 @@ Composabilité & Mauvaise & Bonne \\
 Reproductibilité & Non & Oui \\
 \end{tabular}
 \end{center}
+
+\section{Lien entre \emph{flow-based programming} et \emph{reactive programming}}
+Le \emph{reactive programming} est un sur-ensemble du \emph{flow-based programming}
+car il possède des fonctionnalités de bases qui ne sont pas présente en \emph{flow-based programming}.
+
+Ces fonctionnalités sont implantable en \emph{flow-based programming}, de tel sorte
+que nous pouvons partir d'un système en \emph{flow-based programming} et le transformer
+en système réactif.
 
 \section{Conclusions}\label{conclusions}
 
