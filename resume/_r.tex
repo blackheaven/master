@@ -54,17 +54,16 @@ entraine dans les systèmes qui se basent sur cette approche.
 \section{Introduction}\label{introduction}
 
 \subsection{Cas pratique}
-Nous souhatons mettre en place un ensemble de mécanismes de surveillances sur un
+Nous souhaitons mettre en place un ensemble de mécanismes de surveillances sur un
 système quelconque.
 
 Dans cette optique, nous allons commencer par ajouter un certain nombre de
 sondes pour nous faire remontrer les métriques que nous voulons surveiller.
 
-Puis nous allons appliquer un ensemble de modifications et d'aggrégation des
-données récoltées pour obtenir des données qui correspondent à notre objectif
-de modélisation.
+Puis nous allons appliquer un ensemble de modifications et d'aggrégations des
+métriques pour obtenir des données qui correspondent à notre objectif de modélisation.
 
-Enfin nous allons produire des rapports de ce système à un instant donnée mettant
+Enfin nous allons produire des rapports de ce système à un instant donné mettant
 en avant les caractéristiques de celui-ci.
 
 \subsection{Approches de résolution}
@@ -72,18 +71,19 @@ en avant les caractéristiques de celui-ci.
 La base de la programmation impérative est la spécification séquentielle
 des calculs à effectuer sur une donnée d'entrée pour obtenir une donnée en sortie.
 
-Nous allons disposer d'un ensemble de données à un endroit de notre mémoire et
-nous lui appliquons une suite d'opération destructives pour lui donner une forme
-plus approprié à notre usage général de celle-ci dans tout le programme.
+Nous allons disposer d'un ensemble de données localisées en mémoire sur lesquelles
+nous appliquons une suite d'opérations destructives pour leur donner une forme
+plus appropriée à notre usage général de celle-ci dans tout le programme.
 
 Ainsi, pour atteindre notre objectif, nous allons avoir une première partie de
 récupération des données qui va se charger d'obtenir les métriques du système
-surveillé à un instant donné et faire un traitement minimal pour les structurer
-de manière à ce qu'elles soient manipulable simplement dans tout le reste du programme.
+surveillé à un instant donné.
+Nous les traitons a minima pour les structurer de manière à ce qu'elles soient
+manipulable simplement dans tout le reste du programme.
 
 Dans un second temps les données vont subir un ensemble de modifications, de
-taitements et d'aggregations, notament avec les traitements d'anciennes métriques,
-pour obtenir un ensemble de données modélisée de sorte à ce qu'elles mettent en
+taitements et d'aggregations, notament avec les traitements d'anciennes métriques.
+De telle sorte que nous obtenons un ensemble de données modélisées qui mettent en
 valeur l'état du système que l'utilisateur veut observer.
 
 Enfin cet état dans le temps du système sera communiqué à l'utilisateur sous forme
@@ -92,20 +92,19 @@ de diagrammes par exemple.
 L'utilisateur aura donc une vue du passée du système surveillé jusqu'à un moment donné.
 
 \subsubsection{Fonctionnelle}
-Lorsque l'on architecture un programme basé sur la programmation fonctionnelle,
-on spécification de l'ensemble des transformations à effectuer sur des données
-d'entrées pour obtenir les données de sortie.
+La base de la programmation fonctionnelle consiste à spécifier l'ensemble des
+transformations à effectuer sur des données d'entrées pour obtenir les données de sortie.
 
 Conceptuellement, la donnée ne change pas, un certain nombre de filtres et de
-changes à opérer pour obtenir une nouvelle donnée sous un autre format.
+changements s'opèrent pour obtenir une nouvelle donnée sous un autre format.
 
 Pour traiter notre cas pratique, nous programme va recevoir les métriques et
-les stockers dans un format proche de leur formattage brute, aucun traitement
+les stocker dans un format proche de leur formattage brute, aucun traitement
 ne sera effectué.
 
-Ensuite, ces métriques, se verront appliquer un certain nombre de filtres pour
+Ensuite, ces métriques se verront appliquer un certain nombre de filtres pour
 otenir des données formattées pour l'aggrégation.
-Puis, elles seront agrégées avec les anciennes métriques formattées pour l'aggrégation.
+Puis, elles seront agrégées avec les anciennes métriques sous le même format.
 Elles seront ensuite filtrées et transformées por obtenir des données propres à
 la communication avec l'utilisateur.
 
@@ -120,11 +119,11 @@ Un flux est un ensemble de messages dont le début est inaccessible, ce qui
 implique que nous n'aurons jamais l'ensemble des messages.
 Un flux n'a pas de fin, ce qui signifie que nous ne pouvons pas obtenir une
 image fixe du monde décrit par le flux ayant une valeur constante dans le temps.
-Plus l'information est ancienne, moins elle a de valeur puisque le monde avance
-en permanence.
+Plus l'information est ancienne, moins elle a de valeur puisque le monde change
+en même temps que le temps se déroule.
 
 Pour résoudre notre problème, nous allons faire un ensemble de parties de programme
-chargées de récupérer les flux de métriques entrants et de les transmettres,
+chargées de récupérer les flux de métriques entrants et de les transmettre,
 sous forme de flux modifiés, à d'autres parties du programme chargées de combiner,
 filtrer ou aggréger ces métriques.
 Ce qui entrainera la création de nouveaux flux qui seront affichés en temps-réel
@@ -158,16 +157,16 @@ caractéristique commune de réagir dans le temps à une entrée qui n'a pas de 
 dont le début est inaccessible.
 
 Afin de comparer ces deux familles, arrêtons-nous d'abord sur quelques critères.
-Ces critères nous permettront de cibler le comportement des différentes familles présentes.
+Ces critères nous permettrons de cibler le comportement des différentes familles présentes.
 
 \section{Critères}\label{criteres}
 \subsection{Composabilité}
-La composabilité est la faciliter de modification de parties du système qui
-communiquent entre elles.
+La composabilité est la faciliter avec laquelle on peut combiner deux parties d'un
+système pour en créer une nouvelle.
 
-Plus le nombre de changements est important pour faire communiquer deux parties
-d'un système qui ne communicaient pas entre elles, plus la composabilité est mauvaise.
-Inversement, moins le nombre de changements est important, meilleure est la composabilité.
+Plus le nombre d'adaptations est important pour joindre deux parties
+d'un système qui n'intergissent pas entre elles, plus la composabilité est mauvaise.
+Inversement, moins le nombre d'adaptations est important, meilleure est la composabilité.
 
 \subsection{Évolutivité}
 L'évolutivité est la facilité d'ajout de nouvelles parties dans un système et notamment
@@ -393,8 +392,8 @@ Reproductibilité & Non & Oui \\
 \end{tabular}
 \end{center}
 
-\section{Lien entre \emph{flow-based programming} et \emph{reactive programming}}
-Le \emph{reactive programming} est un sur-ensemble du \emph{flow-based programming}
+\section{Lien entre \emph{flow-based programming} et \emph{reactive-based programming}}
+Le \emph{reactive-based programming} est un sur-ensemble du \emph{flow-based programming}
 car il possède des fonctionnalités de bases qui ne sont pas présente en \emph{flow-based programming}.
 
 Ces fonctionnalités sont implantable en \emph{flow-based programming}, de tel sorte
