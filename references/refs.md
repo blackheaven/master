@@ -35,86 +35,98 @@
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# 6. 
- * Fichier : 
- * Auteurs : 
- * Année : 
+# 6. Virtualizing Real-World Objects in FRP
+ * Fichier : VROinFRP-TR1446.pdf
+ * Auteurs : Daniel Winograd-Cort, Hai Liu, Paul Hudak
+ * Année : 2011
+ * Provenance : Paul Hudak
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
- * Fichier : 
- * Auteurs : 
- * Année : 
+# 7. Causal Commutative Arrows
+ * Fichier : FromJFP.pdf
+ * Auteurs : Hai (Paul) Liu, Eric Chang, Paul Hudak
+ * Année : 2011
+ * Provenance : Paul Hudak
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
- * Fichier : 
- * Auteurs : 
- * Année : 
+# 8. Causal Commutative Arrows and Their Optimization
+ * Fichier : ICFP-CCA.pdf
+ * Auteurs : Hai Liu, Eric Cheng, Paul Hudak
+ * Année : 2009
+ * Provenance : Paul Hudak
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
- * Fichier : 
- * Auteurs : 
- * Année : 
+# 9. Functional Reactive Programming, Continued
+ * Fichier : workshop-02.pdf
+ * Auteurs : Henrik Nilsson, Antony Courtney, John Peterson
+ * Année : 2002
+ * Provenance : Paul Hudak
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 10. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 11. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 12. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 13. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 14. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 15. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 16. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# N. 
+# 17. 
  * Fichier : 
  * Auteurs : 
  * Année : 
+ * Provenance : 
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
