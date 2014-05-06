@@ -69,14 +69,13 @@
  * Intérets :
  * Etat : lu, recherche par refs/auteurs
 
-============================================================================================================
 # 10. Functional reactive animation
  * Fichier : icfp97.pdf
  * Auteurs : Conal Elliott, Paul Hudak
  * Année : 1997
  * Provenance : [1, 4, 6]
- * Intérets : !! PREMIÈRE APPARITION DE "FRP"
- * Etat : partiellement lu, pas de recherche par refs/auteurs
+ * Intérets : !! PREMIÈRE APPARITION DE "FRP" => Functionnal Reactive Animation, utilisé pour modéliser le temps de manière continu
+ * Etat : lu, recherche par refs/auteurs
 
 # 11.  Functional Reactive Programming for Real-Time Reactive Systems
  * Fichier : wan-thesis.pdf
@@ -92,8 +91,11 @@
  * Année : 1998
  * Provenance : [3, 9]
  * Intérets :
+   * 2. (p3) Interactive and Reactive Systems : defs
+   * ...
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
+============================================================================================================
 # 13. Lustre: A declarative language for programming synchronous systems
  * Fichier : 
  * Auteurs : P. Caspi, N. Halbwachs, D. Pilaud, J.A. Plaice
@@ -190,31 +192,99 @@
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# 25. 
- * Fichier : 
- * Auteurs : 
- * Année : 
- * Provenance : 
+# 25. MediaFlow, A Framework for Distributed Integrated Media
+ * Fichier : MediaFlow.pdf
+ * Auteurs : Conal Elliott, Greg Schechter, Salim Abi-Ezzi
+ * Année : 1994
+ * Provenance : [10]
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# 26. 
- * Fichier : 
- * Auteurs : 
- * Année : 
- * Provenance : 
+# 26. A Brief Introduction to ActiveVRML
+ * Fichier : ActiveVRML.pdf
+ * Auteurs : Conal Elliott
+ * Année : 1994
+ * Provenance : [10]
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# 27. 
+# 27. The Esterel synchronous programming language and its mathematical semantics
  * Fichier : 
- * Auteurs : 
- * Année : 
- * Provenance : 
+ * Auteurs : Gerard Berry, Laurent Cosserat
+ * Année : 1985
+ * Provenance : [11]
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
 # 28. 
+[47] Christopher Strachey. The varieties of programming language. Technical Report
+Technical monograph PRG-10, Programming research group, Oxford University
+computing laboratory, 1973.
+
+ * Fichier : 
+ * Auteurs : 
+ * Année : 1973
+ * Provenance : [11]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 29. Lucid, the Dataflow Programming Language
+ * Fichier : 
+ * Auteurs : William W. Wadge, Edward A. Ashcroft
+ * Année : 1985
+ * Provenance : [11]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 30. The synchronous dataflow programming language language Lustre
+ * Fichier : 
+ * Auteurs : N. Halbwachs, P. Caspi, D. Pilaud
+ * Année : 1991
+ * Provenance : [12]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 31. The Esterel synchronous programming language: Design, semantics, implementation
+ * Fichier : 
+ * Auteurs : G. Berry, G. Gonthier
+ * Année : 1992
+ * Provenance : [12]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 32. Esterel: Towards a synchronous and semantically sound high-level language for real-time applications
+ * Fichier : 
+ * Auteurs : G. Berry, S. Moisan, J-P. Rigault
+ * Année : 1983
+ * Provenance : [12]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 33. Representation and analysis of reactive behaviors: A synchronous approach
+ * Fichier : 
+ * Auteurs :  C. André
+ * Année : 1996
+ * Provenance : [12]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 34. Programming real time applications with Signal. Another Look at Real Time Program- ming
+ * Fichier : 
+ * Auteurs : P. Le Guernic, M. Le Borgne, T. Gauthier, C. Le Maire
+ * Année : 1991
+ * Provenance : [12]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 35. The Argos language: graphical representation of automata and description of reactive systems
+ * Fichier : 
+ * Auteurs : F. Maraninchi
+ * Année : 1991
+ * Provenance : [12]
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 36. 
  * Fichier : 
  * Auteurs : 
  * Année : 
@@ -222,7 +292,7 @@
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# 29. 
+# 37. 
  * Fichier : 
  * Auteurs : 
  * Année : 
@@ -230,7 +300,23 @@
  * Intérets :
  * Etat : partiellement lu, pas de recherche par refs/auteurs
 
-# 30. 
+# 38. 
+ * Fichier : 
+ * Auteurs : 
+ * Année : 
+ * Provenance : 
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 39. 
+ * Fichier : 
+ * Auteurs : 
+ * Année : 
+ * Provenance : 
+ * Intérets :
+ * Etat : partiellement lu, pas de recherche par refs/auteurs
+
+# 40. 
  * Fichier : 
  * Auteurs : 
  * Année : 
