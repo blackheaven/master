@@ -4,19 +4,28 @@
 %http://www.springer.com/lncs
 
 \documentclass{llncs}
+\usepackage[frenchb]{babel}
+\usepackage[utf8]{inputenc}
 %Use this line instead if you want to use running heads (i.e. headers on each page):
 %\documentclass[runningheads]{llncs}
 
+\newcommand{\DF}{\emph{Data-Flow}}
+\newcommand{\SA}{\emph{Super-Arrow}}
+\newcommand{\SAs}{\emph{Super-Arrows}}
+\newcommand{\FB}{\emph{Flow-based programming}}
+\newcommand{\RP}{\emph{Reactive-based programming}}
+\newcommand{\FRP}{\emph{Functional reactive programming}}
+
 
 \begin{document}
-\title{\emph{Data-Flow} : Devenez le Super-Arrow du rythme}
+\title{\DF : Devenez le \SA du rythme}
 
 %If you're using runningheads you can add an abreviated title for the running head on odd pages using the following
 %\titlerunning{abreviated title goes here}
 %and an alternative title for the table of contents:
 %\toctitle{table of contents title}
 
-\subtitle{Modélisation du rythme de traitement et du changement de structure des flux dans un contexte \emph{Data-Flow}}
+\subtitle{Modélisation du rythme de traitement et du changement de structure des flux dans un contexte \DF}
 
 %For a single author
 %\author{Author Name}
@@ -43,27 +52,33 @@
 \maketitle
 
 \begin{abstract}
-Le Data-Flow avait pour objectif initial de modéliser le continu dans les
-systèmes informatiques.
+Nous allons retracer l'histoire du \DF, quels en ont été les usages et les enjeux.
+
+Puis nous verrons un cas pratique où nous chercherons à transposer un algorithme
+classique en \DF.
+Le but étant de mettre en avant le modèle actuel et de proposer une solution pour
+le renforcer.
+\end{abstract}
+
+\section{Introduction}
+Le \DF avait pour objectif initial de modéliser le continu dans les
+programmes informatiques.
 
 Au fil des années, il a été utlisé pour faire des animations de manière à ne se
 concentrer que sur les formules mathématiques des formes géométriques affichées.
 
-Récemment, suite à l'exploision du volume de données à traiter, le \emph{Data-Flow}
+Récemment, suite à l'explosion du volume de données à traiter, le \DF
 est devenu un moyen simple de raisonner sur des données incomplète, c'est-à-dire,
 qu'on ne peut avoir en intégralité, dont on ne connait ni le début ni la fin.
 
 Notre objectif est de proposer des outils pour manipuler des flux ayant des
 rythmes et des structures différent explicitement modélisés.
-\end{abstract}
-
-\section{Introduction}
 
 \section{Historique}
 \subsection{Réseaux de Khan}
-\subsection{Prémisses de la modélisation du continu avec le \emph{Flow-based programming}}
+\subsection{Prémisses de la modélisation du continu avec le \FB}
 Lucid, Lustre, Signal et Esterel
-\subsection{L'avènement des environnements interactifs avec le \emph{Reactive-based programming}}
+\subsection{L'avènement des environnements interactifs avec le \RP}
 \subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
 
 \section{Modélisation du rythme et de la structure des flux}
@@ -72,7 +87,7 @@ Lucid, Lustre, Signal et Esterel
 \subsubsection{Modélisation avec de rythme}
 \subsection{Mise en oeuvre avec Haskell}
 Introduction à Haskell et des arrows/comonad
-\subsection{Introduction des Super-arrows}
+\subsection{Introduction des \SAs}
 
 \section{Conclusion}
 
