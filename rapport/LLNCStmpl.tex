@@ -4,6 +4,7 @@
 %http://www.springer.com/lncs
 
 \documentclass{llncs}
+\usepackage[T1]{fontenc}
 \usepackage[frenchb]{babel}
 \usepackage[utf8]{inputenc}
 %Use this line instead if you want to use running heads (i.e. headers on each page):
@@ -52,39 +53,55 @@
 \maketitle
 
 \begin{abstract}
-Nous allons retracer l'histoire du \DF, quels en ont été les usages et les enjeux.
+Nous allons retracer l'histoire du \DF, quels sont les usages et les enjeux.
 
-Puis nous verrons un cas pratique où nous chercherons à transposer un algorithme
+Nous verrons un cas pratique où nous chercherons à transposer un algorithme
 classique en \DF.
-Le but étant de mettre en avant le modèle actuel et de proposer une solution pour
-le renforcer.
+Le but étant de mettre en avant une faiblesse dans le modèle actuel et de
+proposer une solution pour le renforcer.
 \end{abstract}
 
 \section{Introduction}
-Le \DF avait pour objectif initial de modéliser le continu dans les
-programmes informatiques.
+Le \DF a pour objectif de modéliser le continu dans les programmes informatiques.
 
 Au fil des années, il a été utlisé pour faire des animations de manière à ne se
 concentrer que sur les formules mathématiques des formes géométriques affichées.
 
 Récemment, suite à l'explosion du volume de données à traiter, le \DF
-est devenu un moyen simple de raisonner sur des données incomplète, c'est-à-dire,
+est devenu un moyen simple de raisonner sur des données incomplètes, c'est-à-dire,
 qu'on ne peut avoir en intégralité, dont on ne connait ni le début ni la fin.
 
 Notre objectif est de proposer des outils pour manipuler des flux ayant des
 rythmes et des structures différent explicitement modélisés.
 
 \section{Historique}
+Lorsque Strachey \cite{Strachey73} décrit l'état du monde de la programmation
+informatique, il oppose deux paradigmes : la programmation fonctionnelle et impérative.
+
 \subsection{Réseaux de Kahn}
-\cite{kahn}
+Lorsque Kahn \cite{Kahn74} fournit un langage pour effectuer des calculs en parllèle,
+il fait en sorte que les programmes soient articulés autour des données, plutôt que
+des traitements.
+
+Chaque partie du programme ne pouvant communiquer avec les autres uniquement via
+des \emph{channel}s, qui sont des listes \emph{FIFO} infines ayant une taille de
+tampon fixe.
+
 \subsection{Prémisses de la modélisation du continu avec le \FB}
-Lucid, Lustre, Signal et Esterel
+Lucid [50, 76], Lustre [30, 91], Signal [42/38, 85] et Esterel [42/36/32, 83], MediaFlow [25, 91]
+[49, 79]
 \subsection{L'avènement des environnements interactifs avec le \RP}
+33
 \subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
+[16, 94] [14, 98] [10, 97] FRA
+[11, 02] [10] [9, 02] FRP
 
 \section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
 \subsubsection{Modélisation sans notion de rythme}
+24 : comonad
+20 : stream fusion
+
 \subsubsection{Modélisation avec de rythme}
 \subsection{Mise en oeuvre avec Haskell}
 Introduction à Haskell et des arrows/comonad
@@ -96,20 +113,21 @@ Introduction à Haskell et des arrows/comonad
 %This is the old BibTeX style for use with llncs.cls
 \bibliographystyle{splncs}
 
-%Alternative bibliography styles:
-%the following does the same as above except with alphabetic sorting
-%\bibliographystyle{splncs_srt}
-%the following is the current LNCS BibTex with alphabetic sorting
-%\bibliographystyle{splncs03}
-%If you want to use a different BibTex style include [oribibl] in the document class line
+% %Alternative bibliography styles:
+% %the following does the same as above except with alphabetic sorting
+% %\bibliographystyle{splncs_srt}
+% %the following is the current LNCS BibTex with alphabetic sorting
+% %\bibliographystyle{splncs03}
+% %If you want to use a different BibTex style include [oribibl] in the document class line
 
-\begin{thebibliography}{1}
-%add each reference in here like this:
-\bibitem[Kahn74]{kahn}
-Gilles Kahn:
-The Semantics of Simple Language for Parallel Programming.
-IFIP Congress, (1974) 471-475.
-\end{thebibliography}
+% \begin{thebibliography}{1}
+% %add each reference in here like this:
+% \bibitem[Kahn74]{Kahn74}
+% Gilles Kahn:
+% The Semantics of Simple Language for Parallel Programming.
+% IFIP Congress, (1974) 471-475.
+% \end{thebibliography}
+\bibliography{LLNCStmpl}
 
 \end{document}
 
