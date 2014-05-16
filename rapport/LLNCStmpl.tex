@@ -10,12 +10,14 @@
 %Use this line instead if you want to use running heads (i.e. headers on each page):
 %\documentclass[runningheads]{llncs}
 
-\newcommand{\DF}{\emph{Data-Flow}}
-\newcommand{\SA}{\emph{Super-Arrow}}
-\newcommand{\SAs}{\emph{Super-Arrows}}
-\newcommand{\FB}{\emph{Flow-based programming}}
-\newcommand{\RP}{\emph{Reactive-based programming}}
-\newcommand{\FRP}{\emph{Functional reactive programming}}
+\newcommand{\DF}{\emph{Data-Flow} }
+\newcommand{\SA}{\emph{Super-Arrow} }
+\newcommand{\SAs}{\emph{Super-Arrow}s }
+\newcommand{\FB}{\emph{Flow-based programming} }
+\newcommand{\RP}{\emph{Reactive-based programming} }
+\newcommand{\FRP}{\emph{Functional reactive programming} }
+\newcommand{\Arr}{\emph{Arrow} }
+\newcommand{\Arrs}{\emph{Arrow}s }
 
 
 \begin{document}
@@ -53,52 +55,85 @@
 \maketitle
 
 \begin{abstract}
-Nous allons retracer l'histoire du \DF, quels sont les usages et les enjeux.
+Le \DF est un outil de programmation permettant d'exprimr des flux de
+données circulant entre des entités d'exécutions.
 
-Nous verrons un cas pratique où nous chercherons à transposer un algorithme
-classique en \DF.
-Le but étant de mettre en avant une faiblesse dans le modèle actuel et de
-proposer une solution pour le renforcer.
+Après avoir présenté ses usages et ses enjeux, nous montrerons, à l'aide d'un
+cas pratique, une faiblesse dans le modèle actuel.
+
+Nous fournirons une généralisation des \Arrs en théorie des catégories pour
+renforcer le modèle.
 \end{abstract}
 
 \section{Introduction}
-Le \DF a pour objectif de modéliser le continu dans les programmes informatiques.
+Le \DF modélise le "continu" dans les programmes informatiques.
 
-Au fil des années, il a été utlisé pour faire des animations de manière à ne se
+Il est utlisé pour faire des animations de manière à ne se
 concentrer que sur les formules mathématiques des formes géométriques affichées.
 
-Récemment, suite à l'explosion du volume de données à traiter, le \DF
-est devenu un moyen simple de raisonner sur des données incomplètes, c'est-à-dire,
-qu'on ne peut avoir en intégralité, dont on ne connait ni le début ni la fin.
+Récemment, suite à l'explosion du volume de données à traiter, dans l'internet
+par exemple, le \DF est devenu un moyen simple de raisonner sur des données
+incomplètes, c'est-à-dire, qu'on ne peut avoir en intégralité, dont on ne connait ni le début ni la fin.
 
 Notre objectif est de proposer des outils pour manipuler des flux ayant des
 rythmes et des structures différent explicitement modélisés.
 
 \section{Historique}
-Lorsque Strachey \cite{Strachey73} décrit l'état du monde de la programmation
-informatique, il oppose deux paradigmes : la programmation fonctionnelle et impérative.
+Strachey~\cite{Strachey73} décrit l'état du monde de la programmation
+informatique, en opposant deux paradigmes : la programmation fonctionnelle et impérative.
+
+Dennis et al.~\cite{Dennis72} définissent le \DF comme un modèle dont l'exécution
+est déclancher par la disponibilité des données.
+Il y a une dépendance du code vis-à-vis des données.
+
+L'une des premières implantation~\cite{Dennis72} est présenté comme une généralisation
+de LISP.
 
 \subsection{Réseaux de Kahn}
-Lorsque Kahn \cite{Kahn74} fournit un langage pour effectuer des calculs en parllèle,
+Kahn~\cite{Kahn74} fournit un langage pour effectuer des calculs en parllèle,
 il fait en sorte que les programmes soient articulés autour des données, plutôt que
 des traitements.
 
-Chaque partie du programme ne pouvant communiquer avec les autres uniquement via
-des \emph{channel}s, qui sont des listes \emph{FIFO} infines ayant une taille de
+Chaque partie du programme ne communique avec les autres que via des
+\emph{channel}s, qui sont des listes \emph{FIFO} infinies ayant une taille de
 tampon fixe.
 
 \subsection{Prémisses de la modélisation du continu avec le \FB}
-Lucid [50, 76], Lustre [30, 91], Signal [42/38, 85] et Esterel [42/36/32, 83], MediaFlow [25, 91]
-[49, 79]
+L'approche mathématiques de Lucid~\cite{AshcroftW76} s'articule
+autour de suites générées à partir d'un point défini.
+
+Pour obtenir un langage temps-réel aux exécutions déterministe, Esterel~\cite{Berry84}
+s'est basé sur un modèle synchrone.
+La notion de temps multiforme est intégré dans sor modèle afin de vérifier à la
+compilation si le temps d'exécution attendu sera respecté, lorsque celui-ci est contraint.
+Les programmes sont proches des filtres UNIX : ils n'ont qu'une entrée auxquels
+ils réagissent sur leur sortie.
+
+Les flux sont géré comme un ensemble à traiter en temps réel dans Signal~\cite{Benveniste85}.
+Les programmes sont des graphes acyclique orienté où les noeuds représentent des
+algorithmes élémentaires et les arcs les dépendances sur les données.
+
+Lustre~\cite{Caspi87} évalue ses programme sous forme de formules mathématiques
+dépendantes du temps et de données calculées en amont.
+Les formules sont référentiellement transparente, ce qui est du à une influence
+de la programmation fonctionnelle.
+
+MediaFlow~\cite{Elliott95} corrèle visuellement un ensemble de flux continus.
+
+StreamIT~\cite{Thies02} considère un ensemble de flux média auxquels il faut
+appliquer un certain nombre de traitements.
+
 \subsection{L'avènement des environnements interactifs avec le \RP}
 33
-\subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
 [16, 94] [14, 98] [10, 97] FRA
 [11, 02] [10] [9, 02] FRP
+
+\subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
 
 \section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
 \subsubsection{Modélisation sans notion de rythme}
+hughes : arrows
 24 : comonad
 20 : stream fusion
 
