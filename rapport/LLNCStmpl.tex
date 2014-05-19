@@ -124,16 +124,34 @@ StreamIT~\cite{Thies02} considère un ensemble de flux média auxquels il faut
 appliquer un certain nombre de traitements.
 
 \subsection{L'avènement des environnements interactifs avec le \RP}
-33
-[16, 94] [14, 98] [10, 97] FRA
-[11, 02] [10] [9, 02] FRP
+\cite{Andre96} conçoit les programmes comme une réaction à un ensemble de
+signaux. Un signal perçu déclenchera l'exécution d'un comportement, ce qui
+fait que le programme va réagir aux stimuli.
+
+TBAG~\cite{Elliott94} introduit la notion de variation temporelle.
+De manière graphique l'utilisateur va définir un ensemble de relation
+entre les objects qui vont variées au cours du temps.
+TBAG se charge d'évaluer ces relations à pour des valeurs temporelle
+significative afin que l'animation semble avoir été calculé depuis
+un flux continu.
+
+Fran~\cite{Elliott97}~\cite{Elliott98} est l'acronyme de \emph{Functional Reactive Animation}.
+Fran s'appuie sur une spécification programmatique des relations entre des objets
+et en fonction du temps.
+Il effectue ensuite de manière dynamique son rendu graphique.
+
+Fran~\cite{Elliott97} est le point de départ de nombreux papiers comme RT-FRP~\cite{Wan02}
+qui ajout une aspect temps-réel ou \cite{Nilsson2002a} qui se base sur la déclaration
+de l'enchaînement des traitements.
+Fran est la source d'une famille d'approche appelée \FRP en raison de leurs liens
+étroits avec la programmation fonctionnelle.
 
 \subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
 
 \section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
 \subsubsection{Modélisation sans notion de rythme}
-hughes : arrows
+4,7,8,15 : arrows
 24 : comonad
 20 : stream fusion
 
