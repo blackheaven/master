@@ -147,6 +147,38 @@ Fran est la source d'une famille d'approche appelée \FRP en raison de leurs lie
 étroits avec la programmation fonctionnelle.
 
 \subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
+La hausse du volume de données généré, échangé, traité et stocké augmente de
+plus en plus.
+
+Notre hypothèse est que les moyens de traitement et de stockage ne soient plus
+suffisant dans un avenir plus ou moins proche.
+
+Nous devons mettre en place des mécanismes pour permettre de diminuer le nombre
+de traitements à effectuer.
+
+Le choix que nous avons fait est de considérer que l'information n'est pas complète.
+Nous n'en possèdons pas la fin, il n'y a pas de fin, et nous ne possédons pas
+nécessairement le début.
+
+Ainsi, nos calculs sont effectués sur une information incomplète, ce qui nous
+donne un calcul incomplet ou partiel.
+Ainsi, lorsque nous avons une nouvelle information, nous reprennons le calcul
+déjà effectué et nous le complétons.
+
+Il y a donc une diminution du nombre de calculs, puisque ceux-ci ne sont effectués
+que partiellement.
+
+\subsubsection{Rythme et nature du flux}
+Le fait d'aggréger les informations d'un flux à un autre va changer la nature et
+le rythme du flux.
+
+La nature va changer car au lieu d'avoir une donnée unitaire, nous aurons une
+donnée qui va dépendre de son historique, des données précédament envoyées.
+
+Le rythme peut également changer, si le calcul est plus efficient lors du
+traitement de N données en même temps, le calcul peut être lancé toutes les N
+réceptions.
+Ainsi le flux de sortie aura N fois moins de message que le flux d'entrée.
 
 \section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
