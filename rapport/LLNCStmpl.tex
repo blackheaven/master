@@ -147,7 +147,7 @@ Fran est la source d'une famille d'approche appelée \FRP en raison de leurs lie
 étroits avec la programmation fonctionnelle.
 
 \subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
-La hausse du volume de données généré, échangé, traité et stocké augmente de
+La hausse du volume de données générées, échangées, traitées et stockées augmente de
 plus en plus.
 
 Notre hypothèse est que les moyens de traitement et de stockage ne soient plus
@@ -162,8 +162,8 @@ nécessairement le début.
 
 Ainsi, nos calculs sont effectués sur une information incomplète, ce qui nous
 donne un calcul incomplet ou partiel.
-Ainsi, lorsque nous avons une nouvelle information, nous reprennons le calcul
-déjà effectué et nous le complétons.
+Lorsque nous avons une nouvelle information, nous reprennons le résultat du
+précédent calculé pour le compléter avec la nouvelle donnée.
 
 Il y a donc une diminution du nombre de calculs, puisque ceux-ci ne sont effectués
 que partiellement.
@@ -172,13 +172,11 @@ que partiellement.
 Le fait d'aggréger les informations d'un flux à un autre va changer la nature et
 le rythme du flux.
 
-La nature va changer car au lieu d'avoir une donnée unitaire, nous aurons une
-donnée qui va dépendre de son historique, des données précédament envoyées.
+La nature change car nous obtenons une donnée qui va dépendre de son historique
+à paritr d'une donnée unitaire, par exemple.
 
-Le rythme peut également changer, si le calcul est plus efficient lors du
-traitement de N données en même temps, le calcul peut être lancé toutes les N
-réceptions.
-Ainsi le flux de sortie aura N fois moins de message que le flux d'entrée.
+Le rythme est modifié si, par exemple, le calcul est lancé uniquement toutes les
+N nouvelles données, le flux de sortie aura N fois moins de message que le flux d'entrée.
 
 \section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
