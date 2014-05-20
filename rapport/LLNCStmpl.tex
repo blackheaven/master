@@ -180,6 +180,19 @@ N nouvelles données, le flux de sortie aura N fois moins de message que le flux
 
 \section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
+Nous disposons d'un flux de tickets de cinéma contenant le nom du film du ticket.
+
+Nous souhaitons avoir un premier flux contenant une liste des films ordonnés par
+nombre d'entrées décroissant.
+Ce qui implique un changement de nature du flux.
+Le rythme du flux ne change pas puisque la liste est mise à jour à chaque nouveau
+ticket.
+
+À partir de ce flux, nous voulons limiter le débit en le divisant par 100 pour
+que la donnée puisse être affichée de manière stable.
+Nous opérons un changement de rythme.
+
+
 \subsubsection{Modélisation sans notion de rythme}
 4,7,8,15 : arrows
 24 : comonad
