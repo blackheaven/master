@@ -11,6 +11,7 @@
 %\documentclass[runningheads]{llncs}
 
 \newcommand{\DF}{\emph{Data-Flow} }
+\newcommand{\DFp}{\emph{Data-Flow}. }
 \newcommand{\SA}{\emph{Super-Arrow} }
 \newcommand{\SAs}{\emph{Super-Arrow}s }
 \newcommand{\FB}{\emph{Flow-based programming} }
@@ -34,7 +35,7 @@
 %\author{Author Name}
 
 %For multiple authors:
-\author{Gautier DI FOLCO\inst{1}}
+\author{Gautier DI FOLCO}
 
 
 %If using runnningheads you can abbreviate the author name on even pages:
@@ -46,7 +47,7 @@
 %\institute{Institute Name \email{email address}}
 
 % If authors are from different institutes 
-\institute{INRIA \email{gdifolco@ens-lyon.fr}}
+\institute{INRIA, équipe DICE, \email{gdifolco@ens-lyon.fr}}
 
 %to remove your email just remove '\email{email address}'
 % you can also remove the thanks footnote by removing '\thanks{Thank you to...}'
@@ -55,43 +56,49 @@
 \maketitle
 
 \begin{abstract}
-Le \DF est un outil de programmation permettant d'exprimr des flux de
+Le \DF est un outil de programmation permettant d'exprimer des flux de
 données circulant entre des entités d'exécutions.
 
 Après avoir présenté ses usages et ses enjeux, nous montrons, à l'aide d'un
 cas pratique, une faiblesse dans le modèle actuel.
-
 Nous fournissons une généralisation des \Arrs en théorie des catégories pour
 renforcer le modèle.
 \end{abstract}
 
 \section{Introduction}
 Le \DF modélise le "continu" dans les programmes informatiques.
+Ce qui permet de décrire des animations graphiques sous l'aspect de formules mathématiques
+sans gérer la manière dont elles seront interprêtées.
 
-Il est utlisé pour faire des animations de manière à ne se
-concentrer que sur les formules mathématiques des formes géométriques affichées.
-
-Récemment, suite à l'explosion du volume de données à traiter, dans l'internet
-par exemple, le \DF est devenu un moyen simple de raisonner sur des données
-incomplètes, c'est-à-dire, qu'on ne peut avoir en intégralité, dont on ne connait ni le début ni la fin.
+Il en découle une notion d'infini ce qui force le calcul sur des données incomplètes
+entrainnant des calculs partiel.
+L'explosion du volume de données à traiter dans l'Internet est un bon cas pratique
+puisque, lorsqu'on modélise un flux, il est déjà existant, donc nous n'avons pas
+accès au début et le flux n'a pas de fin. Nous sommes donc obligé de produire
+des résultats partielle, ce qui diminu la charge de traitement qui augmente
+avec le volume croissant des données produites.
 
 Notre objectif est de proposer des outils pour manipuler des flux ayant des
-rythmes et des structures différent explicitement modélisés.
+rythmes et des structures différents explicitement modélisés.
 
 \section{Historique}
+Notre but est de mettre en avant l'importance du rythme dans les systèmes \DFp
+Pour cela nous exposons l'historique des langages \DF afin de justifier sa
+pertinence.
+
 Strachey~\cite{Strachey73} décrit l'état du monde de la programmation
 informatique, en opposant deux paradigmes : la programmation fonctionnelle et impérative.
 
-Dennis et al.~\cite{Dennis72} définissent le \DF comme un modèle dont l'exécution
-est déclancher par la disponibilité des données.
-Il y a une dépendance du code vis-à-vis des données.
+Lorsque l'une des premières implantation du \DF~\cite{Dennis72} est réalisée, elle
+est présentée comme une généralisation de LISP, qui est un langage fonctionnel.
 
-L'une des premières implantation~\cite{Dennis72} est présenté comme une généralisation
-de LISP.
+Le \DF est définit par Dennis et al.~\cite{Dennis72} définissent le \DF comme un modèle dont l'exécution
+est déclencher par la disponibilité des données.
+Il y a une dépendance du code vis-à-vis des données.
 
 \subsection{Réseaux de Kahn}
 Kahn~\cite{Kahn74} fournit un langage pour effectuer des calculs en parllèle,
-il fait en sorte que les programmes soient articulés autour des données, plutôt que
+il fait en sorte que les programmes sont articulés autour des données, plutôt que
 des traitements.
 
 Chaque partie du programme ne communique avec les autres que via des
@@ -99,35 +106,21 @@ Chaque partie du programme ne communique avec les autres que via des
 tampon fixe.
 
 \subsection{Prémisses de la modélisation du continu avec le \FB}
-L'approche mathématiques de Lucid~\cite{AshcroftW76} s'articule
-autour de suites générées à partir d'un point défini.
+Lucid~\cite{AshcroftW76} modélise l'infini en se basant sur les suites mathématiques.
 
-Pour obtenir un langage temps-réel aux exécutions déterministe, Esterel~\cite{Berry84}
-s'est basé sur un modèle synchrone.
-La notion de temps multiforme est intégré dans sor modèle afin de vérifier à la
-compilation si le temps d'exécution attendu sera respecté, lorsque celui-ci est contraint.
+Une notion de temps a été ajouté au flux par Esterel~\cite{Berry84}.
 Les programmes sont proches des filtres UNIX : ils n'ont qu'une entrée auxquels
 ils réagissent sur leur sortie.
 
-Les flux sont géré comme un ensemble à traiter en temps réel dans Signal~\cite{Benveniste85}.
+Les flux sont considéré comme un ensemble et plus comme un flux unique dans Signal~\cite{Benveniste85}.
+Ce qui permet, comme dans StreamIT~\cite{Thies02}, le mettre en relation des flux
+pour en créer de nouveaux.
+
 Les programmes sont des graphes acyclique orienté où les noeuds représentent des
-algorithmes élémentaires et les arcs les dépendances sur les données.
-
-Lustre~\cite{Caspi87} évalue ses programme sous forme de formules mathématiques
-dépendantes du temps et de données calculées en amont.
-Les formules sont référentiellement transparente, ce qui est du à une influence
-de la programmation fonctionnelle.
-
-MediaFlow~\cite{Elliott95} corrèle visuellement un ensemble de flux continus.
-
-StreamIT~\cite{Thies02} considère un ensemble de flux média auxquels il faut
-appliquer un certain nombre de traitements.
+algorithmes élémentaires et les arcs les dépendances sur les données, comme dans
+Lustre~\cite{Caspi87}.
 
 \subsection{L'avènement des environnements interactifs avec le \RP}
-\cite{Andre96} conçoit les programmes comme une réaction à un ensemble de
-signaux. Un signal perçu déclenchera l'exécution d'un comportement, ce qui
-fait que le programme va réagir aux stimuli.
-
 TBAG~\cite{Elliott94} introduit la notion de variation temporelle.
 De manière graphique l'utilisateur va définir un ensemble de relation
 entre les objects qui vont variées au cours du temps.
@@ -135,16 +128,23 @@ TBAG se charge d'évaluer ces relations à pour des valeurs temporelle
 significative afin que l'animation semble avoir été calculé depuis
 un flux continu.
 
+Par la suite, MediaFlow~\cite{Elliott95} va permettre la combinaison visuelle
+de flux continus.
+
 Fran~\cite{Elliott97}~\cite{Elliott98} est l'acronyme de \emph{Functional Reactive Animation}.
 Fran s'appuie sur une spécification programmatique des relations entre des objets
 et en fonction du temps.
 Il effectue ensuite de manière dynamique son rendu graphique.
 
 Fran~\cite{Elliott97} est le point de départ de nombreux papiers comme RT-FRP~\cite{Wan02}
-qui ajout une aspect temps-réel ou \cite{Nilsson2002a} qui se base sur la déclaration
+qui ajoute un aspect temps-réel où \cite{Nilsson2002a} qui se base sur la déclaration
 de l'enchaînement des traitements.
-Fran est la source d'une famille d'approche appelée \FRP en raison de leurs liens
+
+Fran est la source d'une famille d'approches appelée \FRP en raison de leurs liens
 étroits avec la programmation fonctionnelle.
+Cette famille considère, comme dans André~\cite{Andre96}, les programmes comme
+une réaction à un ensemble de signaux. Un signal perçu déclenchera l'exécution
+d'un comportement, le programme réagit à un principe de stimuli.
 
 \subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
 La hausse du volume de données générées, échangées, traitées et stockées augmente de
@@ -158,14 +158,14 @@ de traitements à effectuer.
 
 Le choix que nous avons fait est de considérer que l'information n'est pas complète.
 Nous n'en possèdons pas la fin, il n'y a pas de fin, et nous ne possédons pas
-nécessairement le début.
+souvent le début.
 
 Ainsi, nos calculs sont effectués sur une information incomplète, ce qui nous
 donne un calcul incomplet ou partiel.
-Lorsque nous avons une nouvelle information, nous reprennons le résultat du
+Lorsque nous avons une nouvelle information, nous reprenons le résultat du
 précédent calculé pour le compléter avec la nouvelle donnée.
 
-Il y a donc une diminution du nombre de calculs, puisque ceux-ci ne sont effectués
+Il y a une diminution du nombre de calculs, puisque ceux-ci ne sont effectués
 que partiellement.
 
 \subsubsection{Rythme et nature du flux}
