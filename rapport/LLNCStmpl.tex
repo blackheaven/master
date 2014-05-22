@@ -7,6 +7,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[frenchb]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{listings}
+\lstset{breaklines=true, breakatwhitespace=true}
 %Use this line instead if you want to use running heads (i.e. headers on each page):
 %\documentclass[runningheads]{llncs}
 
@@ -131,14 +133,14 @@ un flux continu.
 Par la suite, MediaFlow~\cite{Elliott95} va permettre la combinaison visuelle
 de flux continus.
 
-Fran~\cite{Elliott97}~\cite{Elliott98} est l'acronyme de \emph{Functional Reactive Animation}.
-Fran s'appuie sur une spécification programmatique des relations entre des objets
+\emph{Functional Reactive Animation} (Fran~\cite{Elliott97}~\cite{Elliott98})
+s'appuie sur une spécification programmatique des relations entre des objets
 et en fonction du temps.
 Il effectue ensuite de manière dynamique son rendu graphique.
 
-Fran~\cite{Elliott97} est le point de départ de nombreux papiers comme RT-FRP~\cite{Wan02}
-qui ajoute un aspect temps-réel où \cite{Nilsson2002a} qui se base sur la déclaration
-de l'enchaînement des traitements.
+Fran est le point de départ de nombreux papiers comme RT-FRP~\cite{Wan02}
+qui ajoute un aspect temps-réel où Nilsson et al.\cite{Nilsson2002a} se basent
+sur la déclaration de l'enchaînement des traitements.
 
 Fran est la source d'une famille d'approches appelée \FRP en raison de leurs liens
 étroits avec la programmation fonctionnelle.
@@ -192,15 +194,46 @@ ticket.
 que la donnée puisse être affichée de manière stable.
 Nous opérons un changement de rythme.
 
+\subsection{Mise en oeuvre avec Haskell}
+Haskell~\cite{Haskell10} est un langage purement fonctionnel non-strict.
+
+Nous l'avons choisi car il est le support de nombreuses approches en \RP
+et en \FRP et qu'il dispose d'un système de types assez avancé pour modéliser
+notre domaine d'étude.
 
 \subsubsection{Modélisation sans notion de rythme}
-4,7,8,15 : arrows
-24 : comonad
-20 : stream fusion
+\paragraph{Arrows}
+Les Arrows~\cite{Hughes00} sont une généralisation des Monades~\cite{Wadler90}.
+Ils permettent de faire de la manipulation et de la composition de calculs.
+
+Ils sont définit en Haskell via le \emph{typeclass} suivant :
+\begin{lstlisting}[language=haskell]
+class Control.Category.Category a => Arrow a where
+    arr :: (b -> c) -> a b c
+    first :: a b c -> a (b, d) (c, d)
+    second :: a b c -> a (d, b) (d, c)
+    (***) :: a b c -> a b' c' -> a (b, b') (c, c')
+    (&&&) :: a b c -> a b c' -> a b (c, c')
+\end{lstlisting}
+
+La composition se fait via :
+\begin{lstlisting}[language=haskell]
+(>>>) :: Category cat => cat a b -> cat b c -> cat a c
+(<<<) :: Category cat => cat b c -> cat a b -> cat a c
+\end{lstlisting}
+
+\begin{lstlisting}[language=haskell]
+\end{lstlisting}
+
+\paragraph{CCA}
+CCA~\cite{CCA-JFP}
+\paragraph{Comonad}
+Comonad~\cite{Brookes91}~\cite{Coutts07}
+\paragraph{Stream fusion}
+Stream fusion~\cite{Yi05}
 
 \subsubsection{Modélisation avec de rythme}
-\subsection{Mise en oeuvre avec Haskell}
-Introduction à Haskell et des arrows/comonad
+
 \subsection{Introduction des \SAs}
 
 \section{Conclusion}
