@@ -11,3 +11,17 @@ voir ce qui ne colle plus avec l'approche FB
 voir les opérateurs primitifs (monoid) des flux
 voir la category theory
 méta-flux sur interruption du sort
+
+
+TODO :
+formliser les problèmes, les nommer, faire une taxonomie
+lister les boîtes primaires
+
+
+====
+Généralisation des Arrows (SuperArrows/SA) : a b c >>> x c d (changement de contexte de calcul, calculs hétérogènes)
+Généralisations des SA (Nested SA / NSA) : SA imbriqué : on peut exprimer un système en un seul type
+SA ou une généralisation : arr' :: a b c -> x b c
+
+
+faire comme le reverse de liste de longueur connu à compile-time d'andres pour les flux : un flux accumule N données, on connait son nombre de calcul, donc son débit au cours du temps et on peut prouver le débit du système !
