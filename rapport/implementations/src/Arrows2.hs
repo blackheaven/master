@@ -1,4 +1,4 @@
-module Arrows (
+module Arrows2 (
           Node(..)
         , Ticket(..)
         , Rank(..)
@@ -16,6 +16,8 @@ import Data.List (sortBy)
 import Data.Function (on)
 import Data.Maybe (catMaybes)
 import Prelude hiding (id,(.))
+import Control.Monad.Identity
+import Control.Monad.Trans.State
 
 
 data Node a b = Node { process :: a -> b }
@@ -33,8 +35,8 @@ type Ticket = String
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
 type Ranking = [Rank]
 
-genRanking :: Node (Ticket, Ranking) Ranking
-genRanking = arr $ uncurry updateRanking
+genRanking :: Kleisli (StateT Ranking Identity) Ticket Ranking
+genRanking = Kleisli $ \t -> get >>= put . updateRanking t >> get
 
 updateRanking :: Ticket -> Ranking -> Ranking
 updateRanking t r = case b of
@@ -45,13 +47,13 @@ updateRanking t r = case b of
 stabilize :: Node (a, Int) (Maybe a, Int)
 stabilize = arr $ \(x, i) -> if i < 2 then (Nothing, i + 1) else (Just x, 0)
 
--- TODO : MT State Maybe into Kielsi arrow 
+-- TODO : MT State Maybe into Kleisli arrow 
 stabilizedRanking :: Node ((Ticket, Ranking), Int) (Maybe Ranking, Int)
-stabilizedRanking = first genRanking >>> stabilize
+stabilizedRanking = undefined -- first genRanking >>> stabilize
 
 -- helper
-processMany :: Node (a, b) b -> b -> [a] -> b
-processMany n = foldl (\a t -> process n (t, a))
+processMany :: Kleisli (StateT b Identity) a b -> b -> [a] -> b
+processMany n = foldl $ \a t -> runIdentity $ evalStateT (runKleisli n t) a
 
 processManyLoop :: Node (a, b) (Maybe a, b) -> b -> [a] -> [a]
 processManyLoop n i = reverse . catMaybes . fst . foldl l ([], i)

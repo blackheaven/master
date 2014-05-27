@@ -222,17 +222,64 @@ La composition se fait via :
 (<<<) :: Category cat => cat b c -> cat a b -> cat a c
 \end{lstlisting}
 
+L'implantation des noeuds \emph{genRanking} et \emph{stabilize} qui vont,
+respectivement, mettre à jour un classement et limiter le débit d'un flux,
+se fait de la façon suivante :
 \begin{lstlisting}[language=haskell]
+import Control.Arrow
+import Control.Category
+import Data.List (sortBy)
+import Data.Function (on)
+import Data.Maybe (catMaybes)
+import Prelude hiding (id,(.))
+
+
+data Node a b = Node { process :: a -> b }
+
+instance Category Node where
+    id = Node id
+    (Node g) . (Node f) = Node (g . f)
+
+
+instance Arrow Node where
+    arr = Node
+    first (Node f) = Node (\ ~(b, c) -> (f b, c))
+
+type Ticket = String
+data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
+type Ranking = [Rank]
+
+genRanking :: Node (Ticket, Ranking) Ranking
+genRanking = arr $ uncurry updateRanking
+
+updateRanking :: Ticket -> Ranking -> Ranking
+updateRanking t r = case b of
+                        []          -> a ++ [Rank t 1]
+                        (x : xs)    -> sortBy (flip compare `on` visitors) (Rank t (1 + visitors x) : a ++ xs)
+    where (a, b) = break (\(Rank i _) -> i == t) r
+
+stabilize :: Node (a, Int) (Maybe a, Int)
+stabilize = arr $ \(x, i) -> if i < 2 then (Nothing, i + 1) else (Just x, 0)
 \end{lstlisting}
 
-\paragraph{CCA}
-CCA~\cite{CCA-JFP}
+Nous combinons ensuite ces noeuds pour n'en avoir qu'un seul :
+\begin{lstlisting}[language=haskell]
+stabilizedRanking :: Node ((Ticket, Ranking), Int) (Maybe Ranking, Int)
+stabilizedRanking = first genRanking >>> stabilize
+\end{lstlisting}
+
+Cette implantation pose problème car elle ne permet pas de construire un classement
+complet, puisque \emph{genRanking} voit sa sortie non-conservée si \emph{stabilize}
+produit \texttt{(Nothing, \_)}.
+\emph{genRanking} est donc limité par \emph{stabilize}.
+
+
 \paragraph{Comonad}
 Comonad~\cite{Brookes91}~\cite{Coutts07}
 \paragraph{Stream fusion}
 Stream fusion~\cite{Yi05}
 
-\subsubsection{Modélisation avec de rythme}
+\subsubsection{Modélisation avec du rythme}
 
 \subsection{Introduction des \SAs}
 
