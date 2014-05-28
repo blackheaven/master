@@ -1,6 +1,5 @@
 module Arrows2 (
-          Node(..)
-        , Ticket(..)
+          Ticket(..)
         , Rank(..)
         , Ranking(..)
         , genRanking
@@ -16,26 +15,13 @@ import Data.List (sortBy)
 import Data.Function (on)
 import Data.Maybe (catMaybes)
 import Prelude hiding (id,(.))
-import Control.Monad.Identity
-import Control.Monad.Trans.State
-
-
-data Node a b = Node { process :: a -> b }
-
-instance Category Node where
-    id = Node id
-    (Node g) . (Node f) = Node (g . f)
-
-
-instance Arrow Node where
-    arr = Node
-    first (Node f) = Node (\ ~(b, c) -> (f b, c))
+import Control.Monad.State
 
 type Ticket = String
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
 type Ranking = [Rank]
 
-genRanking :: Kleisli (StateT Ranking Identity) Ticket Ranking
+genRanking :: Kleisli (State Ranking) Ticket Ranking
 genRanking = Kleisli $ \t -> get >>= put . updateRanking t >> get
 
 updateRanking :: Ticket -> Ranking -> Ranking
@@ -44,17 +30,26 @@ updateRanking t r = case b of
                         (x : xs)    -> sortBy (flip compare `on` visitors) (Rank t (1 + visitors x) : a ++ xs)
     where (a, b) = break (\(Rank i _) -> i == t) r
 
-stabilize :: Node (a, Int) (Maybe a, Int)
-stabilize = arr $ \(x, i) -> if i < 2 then (Nothing, i + 1) else (Just x, 0)
+stabilize :: Kleisli (State Int) a (Maybe a)
+stabilize = Kleisli $ \e -> get >>= \i ->  if i < 2
+                                            then put (i + 1) >> return Nothing
+                                            else put 0 >> return (Just e)
 
--- TODO : MT State Maybe into Kleisli arrow 
-stabilizedRanking :: Node ((Ticket, Ranking), Int) (Maybe Ranking, Int)
-stabilizedRanking = undefined -- first genRanking >>> stabilize
+stabilizedRanking :: Kleisli (State (Ranking, Int)) Ticket (Maybe Ranking)
+stabilizedRanking = Kleisli stabilizedRanking'
+
+stabilizedRanking' :: Ticket -> State (Ranking, Int) (Maybe Ranking)
+stabilizedRanking' e = do
+    (ir, is) <- get
+    let (rv, rs) = runState (runKleisli genRanking e) ir
+    let (sv, ss) = runState (runKleisli stabilize rv) is
+    put (rs, ss)
+    return sv
 
 -- helper
-processMany :: Kleisli (StateT b Identity) a b -> b -> [a] -> b
-processMany n = foldl $ \a t -> runIdentity $ evalStateT (runKleisli n t) a
+processMany :: Kleisli (State b) a b -> b -> [a] -> b
+processMany n = foldl $ \a t -> evalState (runKleisli n t) a
 
-processManyLoop :: Node (a, b) (Maybe a, b) -> b -> [a] -> [a]
-processManyLoop n i = reverse . catMaybes . fst . foldl l ([], i)
-    where  l (xs, s) x = let (a, ns) = process n (x, s) in (a : xs, ns)
+processManyLoop :: Kleisli (State s) a (Maybe b) -> s -> [a] -> [b]
+processManyLoop n i = reverse . catMaybes . fst . foldl f ([], i)
+    where f (a, s) x = let (e, t) = runState (runKleisli n x) s in (e:a, t)
