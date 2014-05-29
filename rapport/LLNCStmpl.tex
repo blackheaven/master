@@ -73,16 +73,20 @@ renforcer le modèle.
 Le \DF modélise le "continu" dans les programmes informatiques.
 Ce qui permet par exemple de décrire des animations graphiques sous l'aspect de
 formules mathématiques sans gérer la manière dont elles seront interprêtées.
-Les formules étant exprimmées selon des variables continues, elle seront ensuite
-discrétisées pour le rendu visuelle de manière automatique.
-Il en découle une notion d'infini ce qui force le calcul sur des données incomplètes
-entrainnant des calculs partiel.
+Les formules étant exprimées selon des variables continues, elle seront ensuite
+discrétisées pour le rendu visuel de manière automatiquement.
+Il en découle une notion d'infini qui force le calcul sur des données incomplètes
+entrainant des calculs partiels.
 
-L'explosion du volume de données à traiter dans l'Internet est un bon cas pratique
-puisque, lorsqu'on modélise un flux, il est déjà existant, donc nous n'avons pas
-accès au début et le flux n'a pas de fin. Nous sommes donc obligé de produire
-des résultats partiels, ce qui diminue la charge de traitement qui augmente
-avec le volume croissant des données produites.
+Cette notion d'incomplétude des données est utilisé pour répondre à un problème
+de charge de traitements.
+Par exemple l'afflux de données provenant de l'Iternet a tellement augmenté qu'il
+devient trop coûteux en ressources de lancer un calcul donné sur l'ensemble des
+données.
+De plus, lorsqu'on modélise un flux, il est déjà existant, donc nous n'avons pas
+accès au début et le flux n'a pas de fin.
+Ainsi des calculs partiels sont effectués et complétés au fur et à mesure de la
+réception de nouvelles données.
 
 Notre objectif est de proposer des outils pour manipuler des flux ayant des
 rythmes et des structures différents explicitement modélisés.
@@ -94,30 +98,29 @@ de mettre en avant l'importance du rythme dans les systèmes \DFp
 Strachey~\cite{Strachey73} décrit l'état du monde de la programmation
 informatique, en opposant deux paradigmes : la programmation fonctionnelle et impérative.
 
-Lorsque l'une des premières implantation du \DFc~\cite{Dennis72} est réalisée, elle
+L'une des premières implantation du \DFc~\cite{Dennis72} réalisée
 est présentée comme une généralisation de LISP, qui est un langage fonctionnel.
 
 Le \DF est défini par Dennis et al.~\cite{Dennis72} comme un modèle dont l'exécution
 est déclenchée par la disponibilité des données.
-Il y a une dépendance du code vis-à-vis des données.
+Il y a une dépendance explicitement modélisée du code vis-à-vis des données.
 
 \subsection{Réseaux de Kahn}
 Kahn~\cite{Kahn74} fournit un langage pour effectuer des calculs en parallèle,
-il fait en sorte que les programmes sont articulés autour des données, plutôt que
-des traitements.
-
-Chaque partie du programme ne communique avec les autres que via des
+où les programmes sont découpés en entités communiquant entre elles via des
 \emph{channel}s, qui sont des listes \emph{FIFO} infinies ayant une taille de
 tampon fixe.
 
 \subsection{Prémisses de la modélisation du continu avec le \FB}
 Lucid~\cite{AshcroftW76} modélise l'infini en se basant sur les suites mathématiques.
+L'infini est modélisé par une valeur de départ et un code pour calculer les valeurs
+suivantes.
 
-Une notion de temps a été ajouté au flux par Esterel~\cite{Berry84}.
+Une notion de temps a été ajoutée au flux par Esterel~\cite{Berry84}.
 Les programmes sont proches des filtres UNIX : ils n'ont qu'une entrée auxquels
 ils réagissent sur leur sortie.
 
-Les flux sont considéré comme un ensemble et plus comme un flux unique dans Signal~\cite{Benveniste85}.
+Les flux sont considérés comme un ensemble et plus comme un flux unique dans Signal~\cite{Benveniste85}.
 Ce qui permet, comme dans StreamIT~\cite{Thies02}, de mettre en relation des flux
 pour en créer de nouveaux.
 
@@ -127,10 +130,10 @@ Lustre~\cite{Caspi87}.
 
 \subsection{L'avènement des environnements interactifs avec le \RP}
 TBAG~\cite{Elliott94} introduit la notion de variation temporelle.
-De manière graphique l'utilisateur va définir un ensemble de relation
-entre les objects qui vont variées au cours du temps.
-TBAG se charge d'évaluer ces relations à pour des valeurs temporelle
-significative afin que l'animation semble avoir été calculé depuis
+De manière graphique l'utilisateur va définir un ensemble de relations
+entre les objects qui vont varier au cours du temps.
+TBAG se charge d'évaluer ces relations pour des valeurs temporelles
+significatives afin que l'animation semble avoir été calculée depuis
 un flux continu.
 
 Par la suite, MediaFlow~\cite{Elliott95} va permettre la combinaison visuelle
@@ -138,25 +141,25 @@ de flux continus.
 
 \emph{Functional Reactive Animation} (Fran)~\cite{Elliott97}~\cite{Elliott98}
 s'appuie sur une spécification programmatique des relations entre des objets
-et en fonction du temps.
-Il effectue ensuite de manière dynamique son rendu graphique.
+en fonction du temps.
+Il effectue ensuite son rendu graphique dynamiquement.
 
 Fran est le point de départ de nombreux papiers comme RT-FRP~\cite{Wan02}
-qui ajoutent un aspect temps-réel où Nilsson et al.\cite{Nilsson2002a} se basent
+qui ajoute un aspect temps-réel où Nilsson et al.\cite{Nilsson2002a} qui se base
 sur la déclaration de l'enchaînement des traitements.
 
 Le \FRP considère, comme dans André~\cite{Andre96}, les programmes comme
 une réaction à un ensemble de signaux. Un signal perçu déclenche l'exécution
 d'un comportement, le programme réagit à un principe de stimuli.
 
-\subsection{Prise d'envol des besoins de traitements et perte de la vision complète des données}
+\subsection{Conclusion}
 La hausse du volume de données générées, échangées, traitées et stockées augmente de
 plus en plus.
 
 Notre hypothèse est que les moyens de traitement et de stockage ne sont plus
-suffisant.
+suffisants.
 
-Nous devons mettre en place des mécanismes pour permettre de diminuer le nombre
+Nous devons mettre en place des mécanismes pour permettre de diminuer la charge
 de traitements à effectuer.
 
 Le choix que nous avons fait est de considérer que l'information n'est pas complète.
@@ -171,14 +174,13 @@ Il y a une diminution du nombre de calculs, puisque ceux-ci ne sont effectués
 que partiellement.
 
 \subsubsection{Rythme et nature du flux}
-Le fait d'aggréger les informations d'un flux à un autre va changer la nature
-de ce flux.
-
-La nature change car nous obtenons une donnée qui va dépendre de son historique
-à paritr d'une donnée unitaire, par exemple.
+Nous appelons nature d'un flux la méthode de construction des données sortantes.
+Par exemple, le fait d'aggréger les informations d'un flux à un autre va changer
+sa nature car nous obtenons une donnée qui va dépendre de son historique
+à partir d'une donnée unitaire.
 
 Le rythme est modifié si, par exemple, le calcul est lancé uniquement toutes les
-N nouvelles données, le flux de sortie aura N fois moins de message que le flux d'entrée.
+N nouvelles données, le flux de sortie aura N fois moins de messages que le flux d'entrée.
 
 \section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
@@ -198,7 +200,7 @@ Nous opérons un changement de rythme.
 \subsection{Mise en oeuvre avec Haskell}
 Haskell~\cite{Haskell10} est un langage purement fonctionnel non-strict.
 
-Nous l'avons choisi car il est le support de nombreuses approches en \RP
+Nous l'avons choisi car il est le support de nombreuses approches à la fois \RP
 et en \FRP et qu'il dispose d'un système de types assez avancé pour modéliser
 notre domaine d'étude.
 
@@ -207,9 +209,55 @@ notre domaine d'étude.
 La méthode classique pour gérer le \DF en Haskell sont les \emph{Arrows}.
 
 Les \emph{Arrows}~\cite{Hughes00} sont une généralisation des Monades~\cite{Wadler90}.
-Ils permettent de faire de la manipulation et de la composition de calculs.
 
-Ils sont définit en Haskell via le \emph{typeclass} suivant :
+Les Monades sont définies en Haskell via le \emph{typeclass} suivant :
+\begin{lstlisting}[language=haskell]
+class Monad (m :: * -> *) where
+  (>>=) :: m a -> (a -> m b) -> m b
+  (>>) :: m a -> m b -> m b
+  return :: a -> m a
+  fail :: String -> m a
+\end{lstlisting}
+
+En Haskell un \emph{typeclass} représente une capacité à appeler un ensemble
+de fonctions sur un ensemble de type de données.
+Il s'agit d'un mécanisme proche des \emph{template}s spécialisées du C++.
+Les interfaces JAVA sont similaires mais sont plus éloignées.
+
+Ici il s'agit de la capacité pour un type de données \texttt{m} ayant un type
+paramétrique à être manipulé par des fonctions ayant besoin de l'information
+contextuelle de ce type donné et générant une nouvelle donnée dans un contexte,
+comme un type de données, potentiellement différent mais de même type.
+
+Par exemple la fonction \texttt{return} va attendre un paramètre de type quelconque
+\texttt{a} et va l'encapsuler, transmettre cette valeur à un constructeur, dans
+un type de donnée \texttt{m} paramétré par le type de la valeur de son argument
+\texttt{a}, il aura donc pour type de retour \texttt{m a}.
+
+L'opérateur, un fonction n'ayant pas de caractères alphabétiques, important ici
+est \texttt{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
+position de préfixe.
+Il va attendre une valeur de type \texttt{a} dans un contexte \texttt{m}, soit
+le type \texttt{m a}, puis une fonction ayant un paramètre de type \texttt{a}
+et renvoyant une valeur de type \texttt{b} encapsulé dans le même contexte \texttt{m}
+que le premier arguement de l'opérateur, la fonction attendue va donc retourner
+une valeur de type \texttt{m b}. L'opérateur va ensuite retourner une valeur de
+type \texttt{m b}.
+L'implantation triviale est de renvoyer le retour de la fonction attendue à
+laquelle on a transmis la valeur de type \texttt{a} désencapsulé de son contexte
+\texttt{m a}.
+
+Les \emph{Arrows} permettent de faire de la manipulation et de la composition de calculs.
+Ils représentent la possibilité pour un calcul, comme une fonction, contenu dans un
+type de données avec deux types paramétriques, son type d'entrées et son type de sortie,
+à être composé avec d'autres calculs du même contexte.
+
+La différence entre les \emph{Arrows} et les Monades est que nous pouvons
+uniquement manipuler le type de sortie d'une Monade alors que nous pouvons
+manipuler le type d'entrées et le type de sortie d'un \emph{Arrow}.
+C'est ce qui les rend plus composable que les Monades.
+
+Les \emph{Arrows} sont définis en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}[language=haskell]
 class Control.Category.Category a => Arrow a where
     arr :: (b -> c) -> a b c
@@ -219,11 +267,45 @@ class Control.Category.Category a => Arrow a where
     (&&&) :: a b c -> a b c' -> a b (c, c')
 \end{lstlisting}
 
+On voit ici que \texttt{Arrow} est définit en fonction de \texttt{Category} et non pas
+de \texttt{Monad}, car \texttt{Category} définit les relations de compositions entre
+les types de données, comme les fonctions.
+
+Ici la fonction \texttt{arr} va construire un contexte \texttt{a b c} à partir d'une
+fonction \texttt{b -> c}.
+Typiquement il s'agit de stocker la fonction dans un type de données.
+
+\texttt{first} et \texttt{second} vont changer le type d'entrée et de sortie
+en tuple ayant un type supplémentaire dont la valeur sera simplement recopiée
+lors de l'évaluation du calcul, respectivement en seconde et en première position
+d'un tuple.
+
+\texttt{***} va aggréger deux calculs qui seront effectués sans interaction l'un
+avec l'autre.
+
+\texttt{\&\&\&} va créer un calcul qui appliquera un même argument à deux calculs ayant
+le même type d'entrée et retournera ensuite leur résultat respectif dans un tuple.
+
 La composition se fait via :
 \begin{lstlisting}[language=haskell]
 (>>>) :: Category cat => cat a b -> cat b c -> cat a c
 (<<<) :: Category cat => cat b c -> cat a b -> cat a c
 \end{lstlisting}
+
+$>>>$ va créer une nouvelle catégorie ayant pour premier type paramétrique
+\texttt{a} et pour second \texttt{c} à partir de deux catégories.
+La première ayant un type doublement paramétrique \texttt{a b} et la seconde
+\texttt{b c}.
+
+$<<<$ va en faire de même avec ses arguments inversé.
+$<<<$ est un alias de l'opérateur de composition \texttt{.} qui, dans le cas
+des fonctions aura la forme suivante :
+\begin{lstlisting}[language=haskell]
+(.) :: (b -> c) -> (a -> b) -> (a -> c)
+\end{lstlisting}
+Son rôle sera de prendre deux fonctions, le type de sortie \texttt{b} de la seconde
+étant le même que le type d'entrée de la première et de créer une nouvelle fonction
+appliquant le résultat de la seconde fonction à la première.
 
 Nous modélisons la notion de noeud de calcul par un type de données
 \texttt{Node}.
@@ -360,13 +442,13 @@ Stream fusion~\cite{Yi05}
 
 %The bibliography, done here without a bib file
 %This is the old BibTeX style for use with llncs.cls
-\bibliographystyle{splncs}
+% \bibliographystyle{splncs}
 
 % %Alternative bibliography styles:
 % %the following does the same as above except with alphabetic sorting
-% %\bibliographystyle{splncs_srt}
+% \bibliographystyle{splncs_srt}
 % %the following is the current LNCS BibTex with alphabetic sorting
-% %\bibliographystyle{splncs03}
+\bibliographystyle{splncs03}
 % %If you want to use a different BibTex style include [oribibl] in the document class line
 
 % \begin{thebibliography}{1}
