@@ -20,8 +20,9 @@
 \newcommand{\FB}{\emph{Flow-based programming} }
 \newcommand{\RP}{\emph{Reactive-based programming} }
 \newcommand{\FRP}{\emph{Functional reactive programming} }
-\newcommand{\Arr}{\emph{Arrow} }
-\newcommand{\Arrs}{\emph{Arrow}s }
+\newcommand{\Arr}{\texttt{Arrow} }
+\newcommand{\Arrp}{\texttt{Arrow}. }
+\newcommand{\Arrs}{\texttt{Arrow}s }
 
 
 \begin{document}
@@ -75,8 +76,9 @@ Ce qui permet par exemple de décrire des animations graphiques sous l'aspect de
 formules mathématiques sans gérer la manière dont elles seront interprêtées.
 Les formules étant exprimées selon des variables continues, elle seront ensuite
 discrétisées pour le rendu visuel de manière automatiquement.
-Il en découle une notion d'infini qui force le calcul sur des données incomplètes
-entrainant des calculs partiels.
+Du fait que le continu est représenté par une infinité de valeur entre deux bornes,
+il en découle une notion d'infini, les bornes étant inacessibles.
+Ce qui force le calcul sur des données incomplètes entrainant des calculs partiels.
 
 Cette notion d'incomplétude des données est utilisé pour répondre à un problème
 de charge de traitements.
@@ -205,12 +207,12 @@ et en \FRP et qu'il dispose d'un système de types assez avancé pour modéliser
 notre domaine d'étude.
 
 \subsubsection{Modélisation sans notion de rythme}
-\paragraph{\emph{Arrows}}
+\paragraph{\Arrs}
 La méthode classique pour gérer le \DF en Haskell sont les \emph{Arrows}.
 
-Les \emph{Arrows}~\cite{Hughes00} sont une généralisation des Monades~\cite{Wadler90}.
+Les \Arrs~\cite{Hughes00} sont une généralisation des \texttt{Monad}s~\cite{Wadler90}.
 
-Les Monades sont définies en Haskell via le \emph{typeclass} suivant :
+Les \texttt{Monad}s sont définies en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}[language=haskell]
 class Monad (m :: * -> *) where
   (>>=) :: m a -> (a -> m b) -> m b
@@ -247,17 +249,17 @@ L'implantation triviale est de renvoyer le retour de la fonction attendue à
 laquelle on a transmis la valeur de type \texttt{a} désencapsulé de son contexte
 \texttt{m a}.
 
-Les \emph{Arrows} permettent de faire de la manipulation et de la composition de calculs.
+Les \Arrs permettent de faire de la manipulation et de la composition de calculs.
 Ils représentent la possibilité pour un calcul, comme une fonction, contenu dans un
 type de données avec deux types paramétriques, son type d'entrées et son type de sortie,
 à être composé avec d'autres calculs du même contexte.
 
-La différence entre les \emph{Arrows} et les Monades est que nous pouvons
-uniquement manipuler le type de sortie d'une Monade alors que nous pouvons
-manipuler le type d'entrées et le type de sortie d'un \emph{Arrow}.
-C'est ce qui les rend plus composable que les Monades.
+La différence entre les \Arrs et les \texttt{Monad}s est que nous pouvons
+uniquement manipuler le type de sortie d'une \texttt{Monad} alors que nous pouvons
+manipuler le type d'entrées et le type de sortie d'un \Arrp
+C'est ce qui les rend plus composable que les \texttt{Monad}s.
 
-Les \emph{Arrows} sont définis en Haskell via le \emph{typeclass} suivant :
+Les \Arrs sont définis en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}[language=haskell]
 class Control.Category.Category a => Arrow a where
     arr :: (b -> c) -> a b c
@@ -267,7 +269,7 @@ class Control.Category.Category a => Arrow a where
     (&&&) :: a b c -> a b c' -> a b (c, c')
 \end{lstlisting}
 
-On voit ici que \texttt{Arrow} est définit en fonction de \texttt{Category} et non pas
+On voit ici que \Arr est définit en fonction de \texttt{Category} et non pas
 de \texttt{Monad}, car \texttt{Category} définit les relations de compositions entre
 les types de données, comme les fonctions.
 
@@ -312,7 +314,7 @@ Nous modélisons la notion de noeud de calcul par un type de données
 Il contient une fonction transformant un \texttt{a} en un \texttt{b} en fonction
 de ses types paramétriques.
 Nous définissons ensuite les fonctions nécessaires pour que \texttt{Node} soit
-une instance du \emph{typeclass} \texttt{Arrow}.
+une instance du \emph{typeclass} \Arrp
 
 L'implantation des noeuds \texttt{genRanking} et \texttt{stabilize} qui vont,
 respectivement, mettre à jour un classement et limiter le débit d'un flux,
@@ -355,7 +357,7 @@ stabilize = arr $ \(x, i) -> if i < 2 then (Nothing, i + 1) else (Just x, 0)
 \end{lstlisting}
 
 Nous combinons ensuite ces noeuds pour n'en avoir qu'un seul, via les fonctions
-de compositions disponible puisque \texttt{Node} implante le \emph{typeclass} \texttt{Arrow}.
+de compositions disponible puisque \texttt{Node} implante le \emph{typeclass} \Arrp
 \begin{lstlisting}[language=haskell]
 stabilizedRanking :: Node ((Ticket, Ranking), Int) (Maybe Ranking, Int)
 stabilizedRanking = first genRanking >>> stabilize
@@ -366,10 +368,10 @@ complet. \texttt{genRanking} voit sa sortie non-conservée si \texttt{stabilize}
 produit \texttt{(Nothing, \_)}.
 \texttt{genRanking} est donc limité par \texttt{stabilize}.
 
-Nous devons donc ajouter une Monade \texttt{State} pour conserver l'état d'un exécution à l'autre.
+Nous devons donc ajouter une \texttt{Monad} \texttt{State} pour conserver l'état d'un exécution à l'autre.
 Nous obtenons un \emph{Kielsi Arrow}~\cite{Hughes00}.
 \texttt{Node} devient alors inutile puisque \texttt{Kleisli} implante déjà les
-\emph{typeclass} \texttt{Arrow} et \texttt{Monad}.
+\emph{typeclass} \Arr et \texttt{Monad}.
 
 
 \begin{lstlisting}[language=haskell]
