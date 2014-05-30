@@ -226,10 +226,8 @@ de fonctions sur un ensemble de type de données.
 Il s'agit d'un mécanisme proche des \emph{template}s spécialisées du C++.
 Les interfaces JAVA sont similaires mais sont plus éloignées.
 
-Ici il s'agit de la capacité pour un type de données \texttt{m} ayant un type
-paramétrique à être manipulé par des fonctions ayant besoin de l'information
-contextuelle de ce type donné et générant une nouvelle donnée dans un contexte,
-comme un type de données, potentiellement différent mais de même type.
+Ici on se place dans le cas d'un type de données \texttt{m} avec un paramètre
+\texttt{m :: * -> *}.
 
 Par exemple la fonction \texttt{return} va attendre un paramètre de type quelconque
 \texttt{a} et va l'encapsuler, transmettre cette valeur à un constructeur, dans
@@ -248,6 +246,83 @@ type \texttt{m b}.
 L'implantation triviale est de renvoyer le retour de la fonction attendue à
 laquelle on a transmis la valeur de type \texttt{a} désencapsulé de son contexte
 \texttt{m a}.
+
+Par exemple prenons le type de données \texttt{Maybe} :
+\begin{lstlisting}[language=haskell]
+data Maybe a = Nothing | Just a
+\end{lstlisting}
+
+\texttt{Maybe} est un type paramétrique.
+\texttt{Maybe} possède deux constructeur : \texttt{Nothing}, qui n'attends pas
+de valeur et \texttt{Just} qui attends une valeur de type \texttt{a}, \texttt{a}
+pouvant être de n'importe quel type.
+Ainsi \texttt{Nothing} et \texttt{Just 1} auront le même type \texttt{Maybe Int}.
+Mais \texttt{Just 1} et \texttt{Just 'a'} auront un type différent, respectivement
+\texttt{Maybe Int} et \texttt{Maybe Char}.
+
+Il nous faut ensuite définir l'instance \texttt{Maybe} du \emph{typeclass}
+\texttt{Monad} :
+\begin{lstlisting}[language=haskell]
+instance Monad Maybe where
+    Just x  >>= f = f x
+    Nothing >>= _ = Nothing
+
+    return x = Just x
+
+    a >> b = a >>= \_ -> b
+
+    fail _ = Nothing
+\end{lstlisting}
+
+Les lignes 2 et 3 définissent le corps de $>>=$.
+La ligne 2 se lit : pour le constructeur \texttt{Just} contenant une valeur
+\texttt{x} et un second paramètre f, la valeur de retour sera la valeur de retour
+de la fonction \texttt{f} à laquelle \texttt{x} lui aura été appliqués.
+La ligne 3 se lit : pour le constructeur \texttt{Nothing}, je ne tiens pas compte
+de mon second argument \texttt{\_} et je renvoie \texttt{Nothing}.
+
+La ligne 5 prend une valeur et la passe au constructeur \texttt{Just} que je revoie.
+
+La ligne 7 va appeler $>>=$ en lui passant son premier paramètre puis en créant
+une fonction anonyme, appelée \emph{lambda expression}, via \texttt{\textbackslash\_ ->} qui
+va ignorer son paramètre d'entrée et renvoyer le second paramètre de $>>$.
+
+La ligne 9 définit \texttt{fail} qui va ignorer son paramètre et renvoyer \texttt{Nothing}.
+
+Prenons l'exemple de cette fonction qui pour un entier donné, l'incrémente jusqu'à
+3 puis renvoie \texttt{Nothing}.
+\begin{lstlisting}[language=haskell]
+addUntil3 :: Int -> Maybe Int
+addUntil3 x = if x < 3
+              then Just (x + 1)
+              else Nothing
+\end{lstlisting}
+
+Notre objectif est de pouvoir chaîner les appels à cette fonction.
+Si nous faisons \texttt{addUntil3 1} nous obtenons \texttt{Just 2} du type \texttt{Maybe Int}.
+Impossible alors d'appeler directement la fonction sur ce résultat.
+Nous sommes obligés de sortir \texttt{2} de son contexte.
+C'est le rôle de $>>=$.
+Ainsi, \texttt{addUntil3 1 >>= addUntil3} renverra \texttt{Just 3}.
+De plus, si nous l'appliquons encore, elle renverra toujours \texttt{Nothing},
+sans que \texttt{addUntil3} soit évaluée.
+
+Nous pouvons réécrire \texttt{addUntil3' 1 >>= addUntil3} en \texttt{Just 1 >>= addUntil3 >>= addUntil3}
+puisque $>>=$ va extraire \texttt{1} de \texttt{Just}.
+
+Si nous regardons l'implantation de l'interface, \texttt{Just 1 >>= addUntil3 >>= addUntil3}
+est équivalent à \texttt{return 1 >>= addUntil3 >>= addUntil3} et \texttt{addUntil3}
+peut être réécrit de cette manière :
+\begin{lstlisting}[language=haskell]
+addUntil3' :: (Monad m) => Int -> m Int
+addUntil3' x = if x < 3
+                then return (x + 1)
+                else fail "too big"
+\end{lstlisting}
+
+Comme nous le voyons dans la signature \texttt{addUntil3'} n'est plus liée au type
+de donnée \texttt{Maybe}, à n'importe quelle type de données implantant le \emph{typeclass}
+\texttt{Monad}.
 
 Les \Arrs permettent de faire de la manipulation et de la composition de calculs.
 Ils représentent la possibilité pour un calcul, comme une fonction, contenu dans un
