@@ -8,15 +8,22 @@
 \usepackage[frenchb]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
-\lstset{breaklines=true, breakatwhitespace=true, language=haskell}
+\lstset{
+  basicstyle=\small\ttfamily,
+  frame=lrtb,
+  numbers=left,
+  breaklines=true,
+  breakatwhitespace=true,
+  language=haskell
+}
 %Use this line instead if you want to use running heads (i.e. headers on each page):
 %\documentclass[runningheads]{llncs}
 
 \newcommand{\DF}{\emph{Data-Flow} }
 \newcommand{\DFc}{\emph{Data-Flow}}
 \newcommand{\DFp}{\emph{Data-Flow}. }
-\newcommand{\SA}{\emph{Super-Arrow} }
-\newcommand{\SAs}{\emph{Super-Arrow}s }
+\newcommand{\SA}{\emph{Heterogeneous-Arrow} }
+\newcommand{\SAs}{\emph{Heterogeneous-Arrow}s }
 \newcommand{\FB}{\emph{Flow-based programming} }
 \newcommand{\RP}{\emph{Reactive-based programming} }
 \newcommand{\FRP}{\emph{Functional reactive programming} }
@@ -26,7 +33,7 @@
 
 
 \begin{document}
-\title{\DF : Devenez le \SA du rythme}
+\title{\SA : modéliser le rythme du \DF}
 
 %If you're using runningheads you can add an abreviated title for the running head on odd pages using the following
 %\titlerunning{abreviated title goes here}
@@ -66,8 +73,7 @@ données circulant entre des entités d'exécutions.
 Après avoir présenté ses usages et ses enjeux, nous montrons, à l'aide d'un
 cas pratique, une faiblesse dans le modèle actuel qui réside dans la difficulté
 de composer des contextes de calculs différents.
-Nous fournissons une généralisation des \Arrs en théorie des catégories pour
-renforcer le modèle.
+Nous fournissons une généralisation des \Arrs en Haskell.
 \end{abstract}
 
 \section{Introduction}
@@ -210,119 +216,187 @@ notre domaine d'étude.
 \paragraph{\Arrs}
 La méthode classique pour gérer le \DF en Haskell sont les \emph{Arrows}.
 
-Les \Arrs~\cite{Hughes00} sont une généralisation des \lstinline{Monad}s~\cite{Wadler90}.
-
-Les \lstinline{Monad}s sont définies en Haskell via le \emph{typeclass} suivant :
-\begin{lstlisting}
-class Monad (m :: * -> *) where
-  (>>=) :: m a -> (a -> m b) -> m b
-  (>>) :: m a -> m b -> m b
-  return :: a -> m a
-  fail :: String -> m a
-\end{lstlisting}
+Les \Arrs~\cite{Hughes00} sont une spécialisation des \lstinline{Category}
+qui définissent la notion de composition sous forme de \emph{typeclass}.
 
 En Haskell un \emph{typeclass} représente une capacité à appeler un ensemble
 de fonctions sur un ensemble de type de données.
 Il s'agit d'un mécanisme proche des \emph{template}s spécialisées du C++.
-Les interfaces JAVA sont similaires mais sont plus éloignées.
 
-Ici on se place dans le cas d'un type de données \lstinline{m} avec un paramètre
-\lstinline{m :: * -> *}.
-
-Par exemple la fonction \lstinline{return} va attendre un paramètre de type quelconque
-\lstinline{a} et va l'encapsuler, transmettre cette valeur à un constructeur, dans
-un type de donnée \lstinline{m} paramétré par le type de la valeur de son argument
-\lstinline{a}, il aura donc pour type de retour \lstinline{m a}.
-
-L'opérateur, un fonction n'ayant pas de caractères alphabétiques, important ici
-est \lstinline{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
-position de préfixe.
-Il va attendre une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
-le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
-et renvoyant une valeur de type \lstinline{b} encapsulé dans le même contexte \lstinline{m}
-que le premier arguement de l'opérateur, la fonction attendue va donc retourner
-une valeur de type \lstinline{m b}. L'opérateur va ensuite retourner une valeur de
-type \lstinline{m b}.
-L'implantation triviale est de renvoyer le retour de la fonction attendue à
-laquelle on a transmis la valeur de type \lstinline{a} désencapsulé de son contexte
-\lstinline{m a}.
-
-Par exemple prenons le type de données \lstinline{Maybe} :
 \begin{lstlisting}
-data Maybe a = Nothing | Just a
+class Category cat where
+  id :: cat a a
+  (.) :: cat b c -> cat a b -> cat a c
 \end{lstlisting}
 
-\lstinline{Maybe} est un type paramétrique.
-\lstinline{Maybe} possède deux constructeur : \lstinline{Nothing}, qui n'attends pas
-de valeur et \lstinline{Just} qui attends une valeur de type \lstinline{a}, \lstinline{a}
-pouvant être de n'importe quel type.
-Ainsi \lstinline{Nothing} et \lstinline{Just 1} auront le même type \lstinline{Maybe Int}.
-Mais \lstinline{Just 1} et \lstinline{Just 'a'} auront un type différent, respectivement
-\lstinline{Maybe Int} et \lstinline{Maybe Char}.
+Ici nous déclarons le \emph{typeclass} \lstinline{Category}.
+Pour un type arbitraire \lstinline{cat}, deux fonctions lui sont associées.
+Seul leur type sont déclarés ici, par leurs implantations.
 
-Il nous faut ensuite définir l'instance \lstinline{Maybe} du \emph{typeclass}
-\lstinline{Monad} :
+La fonction \lstinline{id}, qui va représenter l'identité, c'est à dire
+que  \lstinline{cat} aura ses deux paramètre de même type, le type \lstinline{a}.
+
+L'opérateur de composition \lstinline{(.)} qui va créer une \lstinline{Category}
+ayant pour types paramétriques \lstinline{a c} en rediregeant la d'une \lstinline{Category}
+\lstinline{b c} vers l'entrée d'une \lstinline{Category} \lstinline{a b}.
+
+On distingue deux types de fonction en Haskell : les fonctions classiques et les opérateurs.
+Les fonctions ckassiques sont nommées avec des caractères alphanumériques et commencent
+toujours par une minuscule.
+Les opérateurs ne sont composés que de caractères non-alphanumériques.
+
+La différence entre les deux est visible au niveau de la position par défaut lors
+de l'appel.
+Les fonctions classiques ont une position préfixe :
 \begin{lstlisting}
-instance Monad Maybe where
-    Just x  >>= f = f x
-    Nothing >>= _ = Nothing
-
-    return x = Just x
-
-    a >> b = a >>= \_ -> b
-
-    fail _ = Nothing
+add 4 5
 \end{lstlisting}
 
-Les lignes 2 et 3 définissent le corps de \lstinline{>>=}.
-La ligne 2 se lit : pour le constructeur \lstinline{Just} contenant une valeur
-\lstinline{x} et un second paramètre f, la valeur de retour sera la valeur de retour
-de la fonction \lstinline{f} à laquelle \lstinline{x} lui aura été appliqués.
-La ligne 3 se lit : pour le constructeur \lstinline{Nothing}, je ne tiens pas compte
-de mon second argument \lstinline{\_} et je renvoie \lstinline{Nothing}.
+ici, \lstinline{add} est une fonction classique, elle est donc placé devant ses
+arguments.
 
-La ligne 5 prend une valeur et la passe au constructeur \lstinline{Just} que je revoie.
-
-La ligne 7 va appeler \lstinline{>>=} en lui passant son premier paramètre puis en créant
-une fonction anonyme, appelée \emph{lambda expression}, via \lstinline{\textbackslash\_ ->} qui
-va ignorer son paramètre d'entrée et renvoyer le second paramètre de \lstinline{>>}.
-
-La ligne 9 définit \lstinline{fail} qui va ignorer son paramètre et renvoyer \lstinline{Nothing}.
-
-Prenons l'exemple de cette fonction qui pour un entier donné, l'incrémente jusqu'à
-3 puis renvoie \lstinline{Nothing}.
+Les opérateurs ont une position infixe :
 \begin{lstlisting}
-addUntil3 :: Int -> Maybe Int
-addUntil3 x = if x < 3
-              then Just (x + 1)
-              else Nothing
+4 + 5
 \end{lstlisting}
 
-Notre objectif est de pouvoir chaîner les appels à cette fonction.
-Si nous faisons \lstinline{addUntil3 1} nous obtenons \lstinline{Just 2} du type \lstinline{Maybe Int}.
-Impossible alors d'appeler directement la fonction sur ce résultat.
-Nous sommes obligés de sortir \lstinline{2} de son contexte.
-C'est le rôle de \lstinline{>>=}.
-Ainsi, \lstinline{addUntil3 1 >>= addUntil3} renverra \lstinline{Just 3}.
-De plus, si nous l'appliquons encore, elle renverra toujours \lstinline{Nothing},
-sans que \lstinline{addUntil3} soit évaluée.
+ici, \lstinline{+} est un opérateur, il est donc placé entre ses deux premiers
+arguments.
 
-Nous pouvons réécrire \lstinline{addUntil3' 1 >>= addUntil3} en \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
-puisque \lstinline{>>=} va extraire \lstinline{1} de \lstinline{Just}.
-
-Si nous regardons l'implantation de l'interface, \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
-est équivalent à \lstinline{return 1 >>= addUntil3 >>= addUntil3} et \lstinline{addUntil3}
-peut être réécrit de cette manière :
+Nous pouvons changer la position des fonctions classiques et des opérateurs en
+les entourant, respectivement, de \emph{back-quotes} (\lstinline{`}) et de paranthèses.
+Ainsi, voici l'équivalent des deux exemples précédents en inversant les positions :
 \begin{lstlisting}
-addUntil3' :: (Monad m) => Int -> m Int
-addUntil3' x = if x < 3
-                then return (x + 1)
-                else fail "too big"
+4 `add` 5
+(+) 4 5
 \end{lstlisting}
 
-Comme nous le voyons dans la signature \lstinline{addUntil3'} n'est plus liée au type
-de donnée \lstinline{Maybe}, à n'importe quelle type de données implantant le \emph{typeclass}
-\lstinline{Monad}.
+Cette distinction est importante car, lorsque nous mentionnons une fonction en position
+préfixe et que nous omettons un ou plusieurs de ses dernier arguments, une fonction
+est automatiquement créée.
+Cette fonction aura pour paramètres, les paramètres omis.
+On parle de currification ou \emph{currying} ou d'application partielle.
+De manière plus général, en Haskell, toutes les fonctions n'attendent qu'un argument
+et ne renvoie qu'une valeur.
+Ainsi, conceptuellement, losqu'une fonction attends plusieurs arguments, lors de
+chacun de ses appels, une nouvelle fonction est retournée :
+\begin{lstlisting}
+add :: Int -> Int -> Int
+add 4 :: Int -> Int
+add 4 5 :: Int
+\end{lstlisting}
+
+Le type de \lstinline{add} peut être ré-écrit de la manière suivante :
+\begin{lstlisting}
+add :: Int -> (Int -> Int)
+\end{lstlisting}
+
+Alors que les fonctions en position préfixes créent automatiquement des fonctions
+lorsqu'elles ne sont que partiellement appliquées, si un des deux premiers arguments
+manquent à un opérateur, une erreur de syntaxe est levée.
+Les exemples suivants ne sont pas syntaxiquement valide :
+\begin{lstlisting}
+`add`
+`add` 5
+4 `add`
++
++ 5
+4 +
+\end{lstlisting}
+
+Pour les rendres valide, il faut les entourer de paranthèses :
+\begin{lstlisting}
+(`add`)
+(`add` 5)
+(4 `add`)
+(+)
+(+ 5)
+(4 +)
+\end{lstlisting}
+
+C'est la raison pour laquelle, lorsque l'on déclare le type d'un opérateur, comme
+l'opérateur de composition \lstinline{(.)}, nous sommes obligés de le paranthèsés,
+puisque nous ne lui passons aucune valeur.
+
+Un exemple d'implantation de \lstinline{Category} est pour le type des fonctions.
+Le type fonction est un type à part entère noté \lstinline{(->)}.
+Ainsi, à partir de la déclaration du \emph{typeclass} \lstinline{Category}, nous
+remplaçons toutes les occurences de \lstinline{cat} par \lstinline{(->)}.
+\begin{lstlisting}
+instance Category (->) where
+-- Version prefixe : id :: (->) a a
+  id :: a -> a
+  id x = x
+
+-- Version prefixe : (.) :: (->) b c -> (->) a b -> (->) a c
+  (.) :: (b -> c) -> (a -> b) -> (a -> c)
+  f . g = \x -> f (g x)
+\end{lstlisting}
+
+\lstinline{id}, ligne 4, attent un argument \lstinline{x} et le retourner.
+Le type de \lstinline{x} est quelconque, noté \lstinline{a}, et le type de retour
+de \lstinline{id} est le même que le type de son paramètre, soit \lstinline{a}.
+
+\lstinline{(.)}, ligne 8, attent deux fonctions pour en produire une troisième.
+Son premier argument, \lstinline{f}, est une fonction attendant un type quelconque
+noté \lstinline{b} et renvoyant un type quelconque \lstinline{c}, le tout est
+noté \lstinline{b -> c}.
+Son second argument, \lstinline{g}, est une fonction attendant un type quelconque
+noté \lstinline{a} et renvoyant un type quelconque \lstinline{b}, le tout est
+noté \lstinline{a -> b}.
+\lstinline{(.)} crée une \emph{lambda expression}, une sorte de fonction anonyme,
+via \lstinline{\x ->} attendant un paramètre \lstinline{x}.
+Il va appliquer ce paramètre à la fonction \lstinline{g}, via \lstinline{g x}.
+Puis le résultat de cette application sera appliqué à la fonction \lstinline{f}.
+Par conséquent, la fonction résultante aura un paramètre du type de celui de la
+fonction \lstinline{g}, ie. \lstinline{a}, et un type de retour de sa fonction \lstinline{f},
+ie. \lstinline{c}.
+Donc, c'est une fonction qui prend deux fonctions, l'un prenant un \lstinline{a}
+et renvoyant un \lstinline{b}, l'autre prenant un \lstinline{b} et renvoyant un \lstinline{c}.
+Elle renvoie une fonction prenant un \lstinline{a} et renvoyant un \lstinline{c},
+qui est bien la notion de composition.
+
+Par exemple, si nous disposons de deux fonctions \lstinline{add3} et \lstinline{prod2},
+qui, respectivement, ajoute \lstinline{3} à un nombre et le multiplie par \lstinline{2},
+nous pouvons les combiner de la manière suivante :
+\begin{lstlisting}
+add3 :: Int -> Int
+add3 x = x + 3
+
+prod2 :: Int -> Int
+prod2 x = x * 2
+
+prod2Add3 :: Int -> Int
+prod2Add3 = add3 . prod2
+\end{lstlisting}
+
+Ainsi \lstinline{prod2Add3 1} renvoie \lstinline{5}.
+Nous aurions put l'ecrire \lstinline{prod2Add3 x = prod2 (add3 x)}.
+En fait il se passe le mécanisme de substitution suivant :
+\begin{lstlisting}
+prod2Add3 = add3 . prod2
+-- f . g = \x -> f (g x)
+-- f est remplace par add3 et g par prod2
+prod2Add3 = \x -> add3 (prod2 x)
+-- lorsque 1 est applique a prod2Add3 :
+prod2Add3 1
+(\x -> add3 (prod2 x)) 1
+-- x est remplace par 1
+add3 (prod2 1)
+add3 (1 * 2)
+add3 2
+2 + 3
+5
+\end{lstlisting}
+
+La composition se fait via :
+\begin{lstlisting}
+(>>>) :: Category cat => cat a b -> cat b c -> cat a c
+(<<<) :: Category cat => cat b c -> cat a b -> cat a c
+\end{lstlisting}
+
+\lstinline{<<<} est un alias de l'opérateur de composition \lstinline{(.)}.
+\lstinline{>>>} est aussi un alias mais dont les paramètres ont été inversés.
 
 Les \Arrs permettent de faire de la manipulation et de la composition de calculs.
 Ils représentent la possibilité pour un calcul, comme une fonction, contenu dans un
@@ -336,7 +410,7 @@ C'est ce qui les rend plus composable que les \lstinline{Monad}s.
 
 Les \Arrs sont définis en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}
-class Control.Category.Category a => Arrow a where
+class Category a => Arrow a where
     arr :: (b -> c) -> a b c
     first :: a b c -> a (b, d) (c, d)
     second :: a b c -> a (d, b) (d, c)
@@ -362,27 +436,6 @@ avec l'autre.
 
 \lstinline{&&&} va créer un calcul qui appliquera un même argument à deux calculs ayant
 le même type d'entrée et retournera ensuite leur résultat respectif dans un tuple.
-
-La composition se fait via :
-\begin{lstlisting}
-(>>>) :: Category cat => cat a b -> cat b c -> cat a c
-(<<<) :: Category cat => cat b c -> cat a b -> cat a c
-\end{lstlisting}
-
-\lstinline{>>>} va créer une nouvelle catégorie ayant pour premier type paramétrique
-\lstinline{a} et pour second \lstinline{c} à partir de deux catégories.
-La première ayant un type doublement paramétrique \lstinline{a b} et la seconde
-\lstinline{b c}.
-
-\lstinline{<<<} va en faire de même avec ses arguments inversé.
-\lstinline{<<<} est un alias de l'opérateur de composition \lstinline{.} qui, dans le cas
-des fonctions aura la forme suivante :
-\begin{lstlisting}
-(.) :: (b -> c) -> (a -> b) -> (a -> c)
-\end{lstlisting}
-Son rôle sera de prendre deux fonctions, le type de sortie \lstinline{b} de la seconde
-étant le même que le type d'entrée de la première et de créer une nouvelle fonction
-appliquant le résultat de la seconde fonction à la première.
 
 Nous modélisons la notion de noeud de calcul par un type de données
 \lstinline{Node}.
@@ -447,6 +500,114 @@ Nous devons donc ajouter une \lstinline{Monad} \lstinline{State} pour conserver 
 Nous obtenons un \emph{Kielsi Arrow}~\cite{Hughes00}.
 \lstinline{Node} devient alors inutile puisque \lstinline{Kleisli} implante déjà les
 \emph{typeclass} \Arr et \lstinline{Monad}.
+
+% Les \Arrs~\cite{Hughes00} sont une généralisation des \lstinline{Monad}s~\cite{Wadler90}.
+% Les \lstinline{Monad}s sont définies en Haskell via le \emph{typeclass} suivant :
+% \begin{lstlisting}
+% class Monad (m :: * -> *) where
+%   (>>=) :: m a -> (a -> m b) -> m b
+%   (>>) :: m a -> m b -> m b
+%   return :: a -> m a
+%   fail :: String -> m a
+% \end{lstlisting}
+
+% Ici on se place dans le cas d'un type de données \lstinline{m} avec un paramètre
+% \lstinline{m :: * -> *}.
+
+% Par exemple la fonction \lstinline{return} va attendre un paramètre de type quelconque
+% \lstinline{a} et va l'encapsuler, transmettre cette valeur à un constructeur, dans
+% un type de donnée \lstinline{m} paramétré par le type de la valeur de son argument
+% \lstinline{a}, il aura donc pour type de retour \lstinline{m a}.
+
+% L'opérateur, un fonction n'ayant pas de caractères alphabétiques, important ici
+% est \lstinline{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
+% position de préfixe.
+% Il va attendre une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
+% le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
+% et renvoyant une valeur de type \lstinline{b} encapsulé dans le même contexte \lstinline{m}
+% que le premier arguement de l'opérateur, la fonction attendue va donc retourner
+% une valeur de type \lstinline{m b}. L'opérateur va ensuite retourner une valeur de
+% type \lstinline{m b}.
+% L'implantation triviale est de renvoyer le retour de la fonction attendue à
+% laquelle on a transmis la valeur de type \lstinline{a} désencapsulé de son contexte
+% \lstinline{m a}.
+
+% Par exemple prenons le type de données \lstinline{Maybe} :
+% \begin{lstlisting}
+% data Maybe a = Nothing | Just a
+% \end{lstlisting}
+
+% \lstinline{Maybe} est un type paramétrique.
+% \lstinline{Maybe} possède deux constructeur : \lstinline{Nothing}, qui n'attends pas
+% de valeur et \lstinline{Just} qui attends une valeur de type \lstinline{a}, \lstinline{a}
+% pouvant être de n'importe quel type.
+% Ainsi \lstinline{Nothing} et \lstinline{Just 1} auront le même type \lstinline{Maybe Int}.
+% Mais \lstinline{Just 1} et \lstinline{Just 'a'} auront un type différent, respectivement
+% \lstinline{Maybe Int} et \lstinline{Maybe Char}.
+
+% Il nous faut ensuite définir l'instance \lstinline{Maybe} du \emph{typeclass}
+% \lstinline{Monad} :
+% \begin{lstlisting}
+% instance Monad Maybe where
+%     Just x  >>= f = f x
+%     Nothing >>= _ = Nothing
+
+%     return x = Just x
+
+%     a >> b = a >>= \_ -> b
+
+%     fail _ = Nothing
+% \end{lstlisting}
+
+% Les lignes 2 et 3 définissent le corps de \lstinline{>>=}.
+% La ligne 2 se lit : pour le constructeur \lstinline{Just} contenant une valeur
+% \lstinline{x} et un second paramètre f, la valeur de retour sera la valeur de retour
+% de la fonction \lstinline{f} à laquelle \lstinline{x} lui aura été appliqués.
+% La ligne 3 se lit : pour le constructeur \lstinline{Nothing}, je ne tiens pas compte
+% de mon second argument \lstinline{\_} et je renvoie \lstinline{Nothing}.
+
+% La ligne 5 prend une valeur et la passe au constructeur \lstinline{Just} que je revoie.
+
+% La ligne 7 va appeler \lstinline{>>=} en lui passant son premier paramètre puis en créant
+% une fonction anonyme, appelée \emph{lambda expression}, via \lstinline{\textbackslash\_ ->} qui
+% va ignorer son paramètre d'entrée et renvoyer le second paramètre de \lstinline{>>}.
+
+% La ligne 9 définit \lstinline{fail} qui va ignorer son paramètre et renvoyer \lstinline{Nothing}.
+
+% Prenons l'exemple de cette fonction qui pour un entier donné, l'incrémente jusqu'à
+% 3 puis renvoie \lstinline{Nothing}.
+% \begin{lstlisting}
+% addUntil3 :: Int -> Maybe Int
+% addUntil3 x = if x < 3
+%               then Just (x + 1)
+%               else Nothing
+% \end{lstlisting}
+
+% Notre objectif est de pouvoir chaîner les appels à cette fonction.
+% Si nous faisons \lstinline{addUntil3 1} nous obtenons \lstinline{Just 2} du type \lstinline{Maybe Int}.
+% Impossible alors d'appeler directement la fonction sur ce résultat.
+% Nous sommes obligés de sortir \lstinline{2} de son contexte.
+% C'est le rôle de \lstinline{>>=}.
+% Ainsi, \lstinline{addUntil3 1 >>= addUntil3} renverra \lstinline{Just 3}.
+% De plus, si nous l'appliquons encore, elle renverra toujours \lstinline{Nothing},
+% sans que \lstinline{addUntil3} soit évaluée.
+
+% Nous pouvons réécrire \lstinline{addUntil3' 1 >>= addUntil3} en \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
+% puisque \lstinline{>>=} va extraire \lstinline{1} de \lstinline{Just}.
+
+% Si nous regardons l'implantation de l'interface, \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
+% est équivalent à \lstinline{return 1 >>= addUntil3 >>= addUntil3} et \lstinline{addUntil3}
+% peut être réécrit de cette manière :
+% \begin{lstlisting}
+% addUntil3' :: (Monad m) => Int -> m Int
+% addUntil3' x = if x < 3
+%                 then return (x + 1)
+%                 else fail "too big"
+% \end{lstlisting}
+
+% Comme nous le voyons dans la signature \lstinline{addUntil3'} n'est plus liée au type
+% de donnée \lstinline{Maybe}, à n'importe quelle type de données implantant le \emph{typeclass}
+% \lstinline{Monad}.
 
 
 \begin{lstlisting}
