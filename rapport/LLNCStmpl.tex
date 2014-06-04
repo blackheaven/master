@@ -407,22 +407,185 @@ add3 2
 5
 \end{lstlisting}
 
-La composition se fait via :
+Pour représenter notre cas pratique, nous modélisons la notion de noeud de calcul
+par un type de données \lstinline{Node}, ligne 1.
+Il contient une fonction transformant un \lstinline{a} en un \lstinline{b} en fonction
+de ses types paramétriques.
+
+Le mot clef \lstinline{data} permet de définir de nouveau types de données.
+Il est suivit de l'indentifieur de type, qui commence toujours par une lettre
+majuscule lorsqu'il est alphanumérique, ici \lstinline{Node}.
+Il peut être ensuite suivit d'un ou plusieurs paramètres de types, ici
+\lstinline{a} et \lstinline{b}.
+L'identifieur de type est utilisé uniquement dans les déclaration de types.
+
+Ensuite, après le \lstinline{=} vient le ou les constructeurs, ici \lstinline{Node}.
+Ils suivent les mêmes convention de nommage que les identifieurs de types, mais
+l'identifieur de type et le constructeur n'ont pas obligatoirement le même nom.
+Un construteur peut attendre des valeurs ou non, ici il attend une fonction de
+type \lstinline{a -> b}.
+Qui plus est, nous demandons qu'un accesseur \lstinline{process} soit créé,
+Ce qui permettra par la suite de ne pas utiliser le \emph{pattern matching} pour
+extraire la fonction.
+
+Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
+une instance du \emph{typeclass} \lstinline{Category}, ligne 4 et 5.
+Nous n'avons pas besoin d'indiquer le type des fonctions, Haskell le déduit automatiquement
+via \emph{typeclass} qu'il implante.
+\lstinline{id}, ligne 4, est un appel au constructeur \lstinline{Node} avec la
+fonction générique \lstinline{id}.
+Ainsi le type de cette fonction est \lstinline{Node a a}.
+
+L'opérateur de composition, ligne 5, extrait, par déconstruction, filtrage par motifs
+ou \emph{pattern matching}, les valeurs du constructeur de \lstinline{Node} de chacun de ses argument.
+\lstinline{g} et \lstinline{f} sont deux fonctions qui sont recomposées au sein
+d'un nouveau \lstinline{Node}.
+
 \begin{lstlisting}
-(>>>) :: Category cat => cat a b -> cat b c -> cat a c
-(<<<) :: Category cat => cat b c -> cat a b -> cat a c
+data Node a b = Node { process :: a -> b }
+
+instance Category Node where
+    id = Node id
+    (Node g) . (Node f) = Node (g . f)
 \end{lstlisting}
 
-\lstinline{<<<} est un alias de l'opérateur de composition \lstinline{(.)}.
-\lstinline{>>>} est aussi un alias mais dont les paramètres ont été inversés.
+Ensuite viennent les types plus spécifiques à notre problème :
 
-Les \Arrs ajoutent la possibilité de combiner de manière standard des fonctions
-au sein d'une \lstinline{Category}.
-Ils représentent la possibilité pour un calcul, comme une fonction, contenu dans un
-type de données avec deux types paramétriques, son type d'entrées et son type de sortie,
-à être composé avec d'autres calculs du même contexte.
+\begin{lstlisting}
+data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
+type Ticket = String
+type Ranking = [Rank]
+\end{lstlisting}
 
-Les \Arrs sont définis en Haskell via le \emph{typeclass} suivant :
+Ici, nous définissons un type \lstinline{Rank}, ligne 1,
+composé d'une chaine de caractère, \lstinline{String}, et d'un entier, \lstinline{Int}.
+Nous lui ajoutons deux \emph{typeclass} qui seront automatiquement implanter par
+le compilateur : \lstinline{Show}, pour pouvoir afficher les valeurs et \lstinline{Eq},
+pour faire des comparaisons entre deux valeurs.
+Le compilateur est en mesure de déduire les implantations naives pour un certain
+nombre de \emph{typeclass}.
+
+Puis, deux alias de types : \lstinline{Ticket} et \lstinline{Ranking} qui sont,
+respectivement, les alias de \lstinline{String} et de \lstinline{[Rank]}.
+Les alias ne font qu'améliorer la lisibilité des types, ils n'influent pas sur
+la compilation ou l'exécution.
+
+\lstinline{[Char]} représente une liste de \lstinline{Char}.
+Il est définie de la manière suivante :
+\begin{lstlisting}
+data [] a = []
+          | a : [a]
+\end{lstlisting}
+
+Le type liste est composé de deux constructeurs, séparés par un \lstinline{|}.
+Le premier, ligne 1, \lstinline{[]}, ne prend aucun valeur et représente l'élément
+liste vide.
+Le second, ligne 2, est l'opérateur \lstinline{(:)}, qui attends deux arguments :
+le premier est une valeur de type \lstinline{a} et le second est une autre liste de
+type \lstinline{a}, noté \lstinline{[a]}.
+Il s'agit d'un type récursif puisqu'un de ses constructeurs a un de ses paramètres
+de son propre type.
+
+Nous implémentons notre noeud \lstinline{stabilize} qui limite le débit d'un flux.
+Pour cela nous avons besoin d'une valeur quelconque et d'un compteur en entrée,
+nous utilisons un tuple \lstinline{a, Int}.
+Le noued va produire une nouvelle valeur pour le compteur et peut-être une valeur,
+en fonction de l'état de son compteur.
+
+La possibilité de présence ou de l'absence d'une valeur est représenté par le type
+suivant :
+
+\begin{lstlisting}
+data Maybe a = Nothing
+             | Just a
+\end{lstlisting}
+
+Le constructeur \lstinline{Nothing}, ligne 1, représente l'absence de valeur.
+Tandis que \lstinline{Just}, ligne 2, représente la présence d'une valeur de type
+\lstinline{a} qu'il va contenir.
+
+Nous implémentons \lstinline{stabilize} de cette manière :
+\begin{lstlisting}
+stabilize :: Node (a, Int) (Maybe a, Int)
+stabilize = Node $ \(x, i) -> if i < 2
+                             then (Nothing, i + 1)
+                             else (Just x, 0)
+\end{lstlisting}
+
+Nous faisons appel au constructeur \lstinline{Node}, ligne 2, en lui fournissant
+une \emph{lambda expression}.
+Le \lstinline{$} est une alternative au paranthèsage jusqu'à la fin de la ligne.
+Celle-ci possède un paramètre qui doit être une paire d'une valeur de type arbitraire
+nommée \lstinline{x} et un entier nommé \lstinline{i}.
+Si l'entier, le compteur, \lstinline{i} est inférieur à 2, nous renvoyons, ligne 3,
+une paire dont le premier élément est \lstinline{Nothing}, car nous souhaitons
+ne renvoyer qu'une valeur sur 3, et nous incrémentons le compteur \lstinline{i}.
+Si non, ligne 4, nous renvoyons une paire contenant la valeur et nous remettons
+le compteur à 0.
+
+L'implantation des noeuds \lstinline{genRanking} qui met à jour un classement
+nécessite un classement et un ticket et un classement pour générer un nouveau classement.
+Comme pour \lstinline{stabilize}, \lstinline{genRanking} va attendre une paire en
+entrée, comprenant un \lstinline{Ticket} et un \lstinline{Ranking} et produira
+un \lstinline{Ranking}.
+\begin{lstlisting}
+genRanking :: Node (Ticket, Ranking) Ranking
+genRanking = Node $ uncurry updateRanking
+\end{lstlisting}
+\lstinline{uncurry} est une fonction qui transforme une fonction attendant deux éléments
+en fonction attendant une paire, elle est définie de la manière suivante :
+\begin{lstlisting}
+uncurry :: (a -> b -> c) -> ((a, b) -> c)
+uncurry f (a, b) =  f a b
+\end{lstlisting}
+
+\lstinline{updateRanking} va attendre un \lstinline{Ticket} \lstinline{t} et un
+\lstinline{Ranking} \lstinline{r}.
+\begin{lstlisting}
+updateRanking :: Ticket -> Ranking -> Ranking
+updateRanking t r = case b of
+                        []          -> a ++ [Rank t 1]
+                        (x : xs)    -> sortBy (flip compare `on` visitors) (Rank t (1 + visitors x) : a ++ xs)
+    where (a, b) = break (\ (Rank i _) -> i == t) r
+\end{lstlisting}
+La fonction \lstinline{break} va être appelée à la ligne 5.
+Son rôle est de, à partir d'une fonction, renvoyant un booléen en fonction d'un
+élément de son second paramètre, une liste, ici les \lstinline{Rank}s \lstinline{r}.
+\lstinline{break} parcourt sa liste, de gauche à droite et lorsque la fonction passé
+en première argument renvoie \lstinline{True}, \lstinline{break} va générer une
+paire de tableau dans lequel son premier membre sera l'ensemble des éléments déjà
+parcourus et son membre de gauche sera le tableau contenant l'élement courant et
+le reste de la liste.
+La fonction donnée à \lstinline{break} va renvoyer \lstinline{True} lorsque le titre
+du film \lstinline{i} de l'élément courant est égale au titre du film sur le
+\lstinline{Ticket} \lstinline{t}.
+Le résultat de \lstinline{break} est séparé en \lstinline{a} et \lstinline{b}.
+
+Nous distinguons deux cas pour \lstinline{b}.
+
+S'il est vide, ligne 3, \lstinline{[]}, c'est que c'est le premier \lstinline{Ticket}
+pour un film.
+Dans ce cas, nous ajoutons le film avec une entrée à la fin du \lstinline{Ranking}.
+
+Si non, ligne 4, nous extrayons le premier élément de \lstinline{b} dans \lstinline{x}
+et le reste de la liste dans \lstinline{xs}.
+\lstinline{x} est le \lstinline{Rank} correspondant au film de notre \lstinline{Ticket}.
+Nous ajoutons la première partie de la liste \lstinline{a}, au reste de la liste
+\lstinline{xs} au \lstinline{Rank} incrémenté, puis nous trions le tout pour obtenir
+un \lstinline{Ranking} ordonné.
+
+Si nous souhaitons composer ces deux noeuds nous sommes dans l'incapacité de le
+faire car le type de sortie de \lstinline{genRanking} n'est pas le même que le
+type d'entrée de \lstinline{stabilize} :
+\begin{lstlisting}
+genRanking :: Node (Ticket, Ranking) Ranking
+stabilize :: Node (a, Int) (Maybe a, Int)
+\end{lstlisting}
+
+Les \Arrs~\cite{Hughes00} ont été introduits pour pouvoir combiner de manière
+standard des fonctions au sein d'une \lstinline{Category}.
+Il s'agit d'une spécialisation des \lstinline{Category}.
+Ils \Arrs sont définis en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}
 class Category a => Arrow a where
     arr :: (b -> c) -> a b c
@@ -449,116 +612,46 @@ avec l'autre.
 \lstinline{&&&} crée un calcul qui applique un même argument à deux calculs ayant
 le même type d'entrée et retournera ensuite leur résultat respectif dans un tuple.
 
-Pour représenter notre cas pratique, nous modélisons la notion de noeud de calcul
-par un type de données \lstinline{Node}, ligne 9.
-Il contient une fonction transformant un \lstinline{a} en un \lstinline{b} en fonction
-de ses types paramétriques.
+De plus deux opérateurs de composition sont introduits :
+\begin{lstlisting}
+(>>>) :: Category cat => cat a b -> cat b c -> cat a c
+(<<<) :: Category cat => cat b c -> cat a b -> cat a c
+\end{lstlisting}
+
+\lstinline{<<<} est un alias de l'opérateur de composition \lstinline{(.)}.
+\lstinline{>>>} est aussi un alias mais dont les paramètres ont été inversés.
 
 Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
-une instance du \emph{typeclass} \lstinline{Category}, ligne 12 et 13.
-Nous n'avons pas besoin d'indiquer le type des fonctions, Haskell le déduit automatiquement
-via \emph{typeclass} qu'il implante.
-\lstinline{id}, ligne 12, est un appel au constructeur \lstinline{Node} avec la
-fonction générique \lstinline{id}.
-Ainsi le type de cette fonction est \lstinline{Node a a}.
-
-L'opérateur de composition, ligne 13, extrait, par déconstruction ou \emph{pattern matching},
-les valeurs du constructeur de \lstinline{Node} de chacun de ses argument.
-\lstinline{g} et \lstinline{f} sont deux fonctions qui sont recomposées au sein
-d'un nouveau \lstinline{Node}.
-
-Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
-une instance du \emph{typeclass} \Arrv ligne 17 et 18.
+une instance du \emph{typeclass} \Arrv ligne 2 et 3.
 Toutes les fonctions n'ont pas besoin d'être définies car certaines d'entre-elles
 disposent d'une implantation par défaut, qui repose sur d'autres fonctions du
 \emph{typeclass}, dans la définition du \emph{typeclass}.
 
-\lstinline{arr}, ligne 17, se contente d'appeler le constructeur de \lstinline{Node}.
-Par curryfication, cela revient à écrire \lstinline{arr x = Node x}.
-
-\lstinline{first}, ligne 18, va extraire la fonction \lstinline{f} de \lstinline{Node}.
-Il va ensuite créer un nouveau \lstinline{Node}, dont la fonction est définie par
-une \emph{lambda expression}.
-Celle-ci attend un tuple et va en renvoyer un dont le second membre, \lstinline{c},
-sera inchangé, mais dont le premier, \lstinline{b}, se voit appliqué à la fonction \lstinline{f}.
-
 \begin{lstlisting}
-import Control.Arrow
-import Control.Category
-import Data.List (sortBy)
-import Data.Function (on)
-import Data.Maybe (catMaybes)
-import Prelude hiding (id,(.))
-
-
-data Node a b = Node { process :: a -> b }
-
-instance Category Node where
-    id = Node id
-    (Node g) . (Node f) = Node (g . f)
-
-
 instance Arrow Node where
     arr = Node
     first (Node f) = Node (\ ~(b, c) -> (f b, c))
 \end{lstlisting}
 
-Ensuite viennent les types plus spécifiques à notre problème :
+\lstinline{arr}, ligne 2, se contente d'appeler le constructeur de \lstinline{Node}.
+Par curryfication, cela revient à écrire \lstinline{arr x = Node x}.
 
-\begin{lstlisting}
-data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
-type Ticket = String
-type Ranking = [Rank]
-\end{lstlisting}
+\lstinline{first}, ligne 3, va extraire la fonction \lstinline{f} de \lstinline{Node}.
+Il va ensuite créer un nouveau \lstinline{Node}, dont la fonction est définie par
+une \emph{lambda expression}.
+Celle-ci attend un tuple et va en renvoyer un dont le second membre, \lstinline{c},
+sera inchangé, mais dont le premier, \lstinline{b}, se voit appliqué à la fonction \lstinline{f}.
 
-Ici, nous définissons un type \lstinline{Rank}, ligne 1,
-composé d'une chaine de caractère, \lstinline{String}, et d'un entier, \lstinline{Int}.
-Nous lui ajoutons deux \emph{typeclass} qui seront automatiquement implanter par
-le compilateur : \lstinline{Show}, pour pouvoir afficher les valeurs et \lstinline{Eq},
-pour faire des comparaisons entre deux valeurs.
-
-Puis, deux alias de types : \lstinline{Ticket} et \lstinline{Ranking} qui sont,
-respectivement, les alias de \lstinline{String} et de \lstinline{[Rank]}.
-Les alias ne font qu'améliorer la lisibilité des types, ils n'influent pas plus sur
-la compilation ou l'exécution.
-
-\lstinline{[Char]} représente une liste de \lstinline{Char}.
-Il est définie de la manière suivante :
-\begin{lstlisting}
-data [] a = []
-          | a : [a]
-\end{lstlisting}
-
-Le type liste est composé de deux constructeurs, séparés par un \lstinline{|}.
-Le premier, ligne 1, \lstinline{[]}, ne prend aucun valeur et représente l'élément
-liste vide.
-Le second, ligne 2, est l'opérateur \lstinline{(:)}, qui attends deux arguments :
-le premier est une valeur de type \lstinline{a} et le second est une autre liste de
-type \lstinline{a}, noté \lstinline{[a]}.
-Il s'agit d'un type récursif puisqu'un de ses constructeurs a un de ses paramètres
-de son propre type.
-
-L'implantation des noeuds \lstinline{genRanking} et \lstinline{stabilize} qui vont,
-respectivement, mettre à jour un classement et limiter le débit d'un flux,
-se fait de la façon suivante :
-
-
+Ainsi, si nous appliquons \lstinline{first} à \lstinline{genRanking}, nous obtenons
+un type de sortie compatible au type d'entrée de \lstinline{stabilize} :
 \begin{lstlisting}
 genRanking :: Node (Ticket, Ranking) Ranking
-genRanking = arr $ uncurry updateRanking
-
-updateRanking :: Ticket -> Ranking -> Ranking
-updateRanking t r = case b of
-                        []          -> a ++ [Rank t 1]
-                        (x : xs)    -> sortBy (flip compare `on` visitors) (Rank t (1 + visitors x) : a ++ xs)
-    where (a, b) = break (\(Rank i _) -> i == t) r
-
+first genRanking :: Node ((Ticket, Ranking), a) (Ranking, a)
 stabilize :: Node (a, Int) (Maybe a, Int)
-stabilize = arr $ \(x, i) -> if i < 2 then (Nothing, i + 1) else (Just x, 0)
 \end{lstlisting}
 
-Nous combinons ensuite ces noeuds pour n'en avoir qu'un seul, via les fonctions
-de compositions disponible puisque \lstinline{Node} implante le \emph{typeclass} \Arrp
+Nous combinons ensuite ces noeuds pour n'en avoir qu'un seul, via la fonction
+de composition \lstinline{>>>} :
 \begin{lstlisting}
 stabilizedRanking :: Node ((Ticket, Ranking), Int) (Maybe Ranking, Int)
 stabilizedRanking = first genRanking >>> stabilize
@@ -566,8 +659,9 @@ stabilizedRanking = first genRanking >>> stabilize
 
 Cette implantation pose problème car elle ne permet pas de construire un classement
 complet. \lstinline{genRanking} voit sa sortie non-conservée si \lstinline{stabilize}
-produit \lstinline{(Nothing, \_)}.
+produit \lstinline{(Nothing, _)}.
 \lstinline{genRanking} est donc limité par \lstinline{stabilize}.
+
 
 Nous devons donc ajouter une \lstinline{Monad} \lstinline{State} pour conserver l'état d'un exécution à l'autre.
 Nous obtenons un \emph{Kielsi Arrow}~\cite{Hughes00}.
