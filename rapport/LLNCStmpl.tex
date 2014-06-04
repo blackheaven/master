@@ -30,6 +30,7 @@
 \newcommand{\Arr}{\lstinline{Arrow} }
 \newcommand{\Arrp}{\lstinline{Arrow}. }
 \newcommand{\Arrs}{\lstinline{Arrow}s }
+\newcommand{\Arrv}{\lstinline{Arrow}, }
 
 
 \begin{document}
@@ -236,12 +237,29 @@ Seul leur type sont déclarés ici, par leurs implantations.
 La fonction \lstinline{id}, qui va représenter l'identité, c'est à dire
 que  \lstinline{cat} aura ses deux paramètre de même type, le type \lstinline{a}.
 
+La ligne 3 comporte un nouveau type : \lstinline{->}.
+Il s'agit du type fonction.
+Il est fourni par le langage.
+Sa pseudo déclaration est la suivante :
+\begin{lstlisting}
+data i -> o = ...
+\end{lstlisting}
+Une fonction a un paramètre de type \lstinline{i} en entrée et retourne une
+valeur de type \lstinline{o}.
+Pour qu'une fonction prennent plusieurs arguments, il faut que, conceptuellement,
+à chaque nouvel argument appliqué, elle retourne une nouvelle fonction.
+Ainsi, les fonctions suivante ont le même type :
+\begin{lstlisting}
+f :: a -> b -> c -> d -> e
+g :: a -> (b -> (c -> (d -> e)))
+\end{lstlisting}
+
 L'opérateur de composition \lstinline{(.)} qui va créer une \lstinline{Category}
-ayant pour types paramétriques \lstinline{a c} en rediregeant la d'une \lstinline{Category}
-\lstinline{b c} vers l'entrée d'une \lstinline{Category} \lstinline{a b}.
+ayant pour types paramétriques \lstinline{a c} en redirigeant la sortie d'une
+\lstinline{Category} \lstinline{b c} vers l'entrée d'une \lstinline{Category} \lstinline{a b}.
 
 On distingue deux types de fonction en Haskell : les fonctions classiques et les opérateurs.
-Les fonctions ckassiques sont nommées avec des caractères alphanumériques et commencent
+Les fonctions classiques sont nommées avec des caractères alphanumériques et commencent
 toujours par une minuscule.
 Les opérateurs ne sont composés que de caractères non-alphanumériques.
 
@@ -276,8 +294,8 @@ préfixe et que nous omettons un ou plusieurs de ses dernier arguments, une fonc
 est automatiquement créée.
 Cette fonction aura pour paramètres, les paramètres omis.
 On parle de currification ou \emph{currying} ou d'application partielle.
-De manière plus général, en Haskell, toutes les fonctions n'attendent qu'un argument
-et ne renvoie qu'une valeur.
+Comme nous l'avons vu plus haut, de manière plus général, en Haskell, toutes les
+fonctions n'attendent qu'un argument et ne renvoie qu'une valeur.
 Ainsi, conceptuellement, losqu'une fonction attends plusieurs arguments, lors de
 chacun de ses appels, une nouvelle fonction est retournée :
 \begin{lstlisting}
@@ -398,15 +416,11 @@ La composition se fait via :
 \lstinline{<<<} est un alias de l'opérateur de composition \lstinline{(.)}.
 \lstinline{>>>} est aussi un alias mais dont les paramètres ont été inversés.
 
-Les \Arrs permettent de faire de la manipulation et de la composition de calculs.
+Les \Arrs ajoutent la possibilité de combiner de manière standard des fonctions
+au sein d'une \lstinline{Category}.
 Ils représentent la possibilité pour un calcul, comme une fonction, contenu dans un
 type de données avec deux types paramétriques, son type d'entrées et son type de sortie,
 à être composé avec d'autres calculs du même contexte.
-
-La différence entre les \Arrs et les \lstinline{Monad}s est que nous pouvons
-uniquement manipuler le type de sortie d'une \lstinline{Monad} alors que nous pouvons
-manipuler le type d'entrées et le type de sortie d'un \Arrp
-C'est ce qui les rend plus composable que les \lstinline{Monad}s.
 
 Les \Arrs sont définis en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}
@@ -418,35 +432,56 @@ class Category a => Arrow a where
     (&&&) :: a b c -> a b c' -> a b (c, c')
 \end{lstlisting}
 
-On voit ici que \Arr est définit en fonction de \lstinline{Category} et non pas
-de \lstinline{Monad}, car \lstinline{Category} définit les relations de compositions entre
-les types de données, comme les fonctions.
-
-Ici la fonction \lstinline{arr} va construire un contexte \lstinline{a b c} à partir d'une
-fonction \lstinline{b -> c}.
+Ici la fonction \lstinline{arr} construit un type de données
+\lstinline{a b c} à partir d'une fonction \lstinline{b -> c}.
 Typiquement il s'agit de stocker la fonction dans un type de données.
 
-\lstinline{first} et \lstinline{second} vont changer le type d'entrée et de sortie
-en tuple ayant un type supplémentaire dont la valeur sera simplement recopiée
-lors de l'évaluation du calcul, respectivement en seconde et en première position
-d'un tuple.
+\lstinline{first} et \lstinline{second} changent le type d'entrée et de sortie
+en tuple ayant un membre supplémentaire.
+Cette valeur a un type quelconque et sera simplement recopiée lors de l'évaluation
+du calcul.
+Cette valeur se situe en seconde position du tuple pour \lstinline{first} et en
+première position du tuple pour \lstinline{second}.
 
-\lstinline{***} va aggréger deux calculs qui seront effectués sans interaction l'un
+\lstinline{***} aggrége deux calculs qui seront effectués sans interaction l'un
 avec l'autre.
 
-\lstinline{&&&} va créer un calcul qui appliquera un même argument à deux calculs ayant
+\lstinline{&&&} crée un calcul qui applique un même argument à deux calculs ayant
 le même type d'entrée et retournera ensuite leur résultat respectif dans un tuple.
 
-Nous modélisons la notion de noeud de calcul par un type de données
-\lstinline{Node}.
+Pour représenter notre cas pratique, nous modélisons la notion de noeud de calcul
+par un type de données \lstinline{Node}, ligne 9.
 Il contient une fonction transformant un \lstinline{a} en un \lstinline{b} en fonction
 de ses types paramétriques.
-Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
-une instance du \emph{typeclass} \Arrp
 
-L'implantation des noeuds \lstinline{genRanking} et \lstinline{stabilize} qui vont,
-respectivement, mettre à jour un classement et limiter le débit d'un flux,
-se fait de la façon suivante :
+Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
+une instance du \emph{typeclass} \lstinline{Category}, ligne 12 et 13.
+Nous n'avons pas besoin d'indiquer le type des fonctions, Haskell le déduit automatiquement
+via \emph{typeclass} qu'il implante.
+\lstinline{id}, ligne 12, est un appel au constructeur \lstinline{Node} avec la
+fonction générique \lstinline{id}.
+Ainsi le type de cette fonction est \lstinline{Node a a}.
+
+L'opérateur de composition, ligne 13, extrait, par déconstruction ou \emph{pattern matching},
+les valeurs du constructeur de \lstinline{Node} de chacun de ses argument.
+\lstinline{g} et \lstinline{f} sont deux fonctions qui sont recomposées au sein
+d'un nouveau \lstinline{Node}.
+
+Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
+une instance du \emph{typeclass} \Arrv ligne 17 et 18.
+Toutes les fonctions n'ont pas besoin d'être définies car certaines d'entre-elles
+disposent d'une implantation par défaut, qui repose sur d'autres fonctions du
+\emph{typeclass}, dans la définition du \emph{typeclass}.
+
+\lstinline{arr}, ligne 17, se contente d'appeler le constructeur de \lstinline{Node}.
+Par curryfication, cela revient à écrire \lstinline{arr x = Node x}.
+
+\lstinline{first}, ligne 18, va extraire la fonction \lstinline{f} de \lstinline{Node}.
+Il va ensuite créer un nouveau \lstinline{Node}, dont la fonction est définie par
+une \emph{lambda expression}.
+Celle-ci attend un tuple et va en renvoyer un dont le second membre, \lstinline{c},
+sera inchangé, mais dont le premier, \lstinline{b}, se voit appliqué à la fonction \lstinline{f}.
+
 \begin{lstlisting}
 import Control.Arrow
 import Control.Category
@@ -466,11 +501,49 @@ instance Category Node where
 instance Arrow Node where
     arr = Node
     first (Node f) = Node (\ ~(b, c) -> (f b, c))
+\end{lstlisting}
 
-type Ticket = String
+Ensuite viennent les types plus spécifiques à notre problème :
+
+\begin{lstlisting}
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
+type Ticket = String
 type Ranking = [Rank]
+\end{lstlisting}
 
+Ici, nous définissons un type \lstinline{Rank}, ligne 1,
+composé d'une chaine de caractère, \lstinline{String}, et d'un entier, \lstinline{Int}.
+Nous lui ajoutons deux \emph{typeclass} qui seront automatiquement implanter par
+le compilateur : \lstinline{Show}, pour pouvoir afficher les valeurs et \lstinline{Eq},
+pour faire des comparaisons entre deux valeurs.
+
+Puis, deux alias de types : \lstinline{Ticket} et \lstinline{Ranking} qui sont,
+respectivement, les alias de \lstinline{String} et de \lstinline{[Rank]}.
+Les alias ne font qu'améliorer la lisibilité des types, ils n'influent pas plus sur
+la compilation ou l'exécution.
+
+\lstinline{[Char]} représente une liste de \lstinline{Char}.
+Il est définie de la manière suivante :
+\begin{lstlisting}
+data [] a = []
+          | a : [a]
+\end{lstlisting}
+
+Le type liste est composé de deux constructeurs, séparés par un \lstinline{|}.
+Le premier, ligne 1, \lstinline{[]}, ne prend aucun valeur et représente l'élément
+liste vide.
+Le second, ligne 2, est l'opérateur \lstinline{(:)}, qui attends deux arguments :
+le premier est une valeur de type \lstinline{a} et le second est une autre liste de
+type \lstinline{a}, noté \lstinline{[a]}.
+Il s'agit d'un type récursif puisqu'un de ses constructeurs a un de ses paramètres
+de son propre type.
+
+L'implantation des noeuds \lstinline{genRanking} et \lstinline{stabilize} qui vont,
+respectivement, mettre à jour un classement et limiter le débit d'un flux,
+se fait de la façon suivante :
+
+
+\begin{lstlisting}
 genRanking :: Node (Ticket, Ranking) Ranking
 genRanking = arr $ uncurry updateRanking
 
@@ -500,6 +573,11 @@ Nous devons donc ajouter une \lstinline{Monad} \lstinline{State} pour conserver 
 Nous obtenons un \emph{Kielsi Arrow}~\cite{Hughes00}.
 \lstinline{Node} devient alors inutile puisque \lstinline{Kleisli} implante déjà les
 \emph{typeclass} \Arr et \lstinline{Monad}.
+
+% La différence entre les \Arrs et les \lstinline{Monad}s est que nous pouvons
+% uniquement manipuler le type de sortie d'une \lstinline{Monad} alors que nous pouvons
+% manipuler le type d'entrées et le type de sortie d'un \Arrp
+% C'est ce qui les rend plus composable que les \lstinline{Monad}s.
 
 % Les \Arrs~\cite{Hughes00} sont une généralisation des \lstinline{Monad}s~\cite{Wadler90}.
 % Les \lstinline{Monad}s sont définies en Haskell via le \emph{typeclass} suivant :
