@@ -998,19 +998,17 @@ qui attend une pair \lstinline{(b, d)}.
 \lstinline{second} est construite comme \lstinline{first} mais dans l'ordre inverse
 au niveau des paires.
 
+Nous reprennons nos types précédants, sans \lstinline{Node} qui est devenu
+inutile avec \lstinline{Kleisli} :
 \begin{lstlisting}
-import Control.Arrow
-import Control.Category
-import Data.List (sortBy)
-import Data.Function (on)
-import Data.Maybe (catMaybes)
-import Prelude hiding (id,(.))
-import Control.Monad.State
-
-type Ticket = String
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
+type Ticket = String
 type Ranking = [Rank]
+\end{lstlisting}
 
+Pour que nos noeuds soient conforme à \lstinline{Kleisli}, nous encapsulons les
+versions monadiques dans le constructeur de \lstinline{Kleisli}.
+\begin{lstlisting}
 genRanking :: Kleisli (State Ranking) Ticket Ranking
 genRanking = Kleisli $ \t -> get >>= put . updateRanking t >> get
 
@@ -1022,8 +1020,24 @@ updateRanking t r = case b of
 
 stabilize :: Kleisli (State Int) a (Maybe a)
 stabilize = Kleisli $ \e -> get >>= \i ->  if i < 2
-                                            then put (i + 1) >> return Nothing
-                                            else put 0 >> return (Just e)
+                                           then put (i + 1) >> return Nothing
+                                           else put 0 >> return (Just e)
+\end{lstlisting}
+Comme nous l'avons vu, \lstinline{Kleisli} prend pour premier type paramétrique
+une \lstinline{Monad}, \lstinline{State Ranking} pour \lstinline{genRanking} et
+\lstinline{State Int} pour \lstinline{stabilize}, en fonction qu'ils doivent
+maintenir l'état d'un \lstinline{Ranking} ou d'un \lstinline{Int}.
+\lstinline{Kleisli} attend ensuite, comme tout \lstinline{Arrow}, un type d'entrée,
+\lstinline{Ticket} et \lstinline{a}, ainsi qu'un type de sortie, \lstinline{Ranking}
+et \lstinline{Maybe a}.
+Ce qui implique que \lstinline{runKleisli} aura les types suivants :
+\begin{lstlisting}
+Kleisli m               a         b         -- generique
+ runKleisli ::          a ->      m b
+Kleisli (State Ranking) Ticket    Ranking   -- genRanking
+ runKleisli ::          Ticket -> State Ranking Ranking
+Kleisli (State Int)     a         (Maybe a) -- stabilize
+ runKleisli ::          a ->      Maybe a
 \end{lstlisting}
 
 La composition ne peux plus se faire selon les fonctions classiques comme \lstinline{>>>}
@@ -1045,15 +1059,32 @@ stabilizedRanking' e = do
 
 Cette composition est coûteuse car nous devons définir nous-même la sémantique
 d'évaluation qui n'est pas propre à ces deux noeuds en particulier.
+
+Notre \lstinline{Monad} stocke un état qui est une paire comprennant les états
+des deux noeuds le composant, \lstinline{Ranking} et \lstinline{Int}.
+
+Nous récupérons et séparons les deux états ligne 6.
+
+Nous ajoutons, ligne 7, le nouveau \lstinline{Ticket} \lstinline{e} en appliquant \lstinline{e}
+au noeud \lstinline{genRanking}, via \lstinline{runKleisli genRanking e}.
+Nous obtenons un \lstinline{State Monad} que nous évaluons avec l'état \lstinline{Ranking}
+de la \lstinline{Monad} du niveau supérieur, via \lstinline{runState (runKleisli genRanking e) ir}.
+
+Nous faisons la même opération avec \lstinline{stabilize} et ses fonctions respectives,
+ligne 9.
+
+Nous changeons l'état de la \lstinline{Monad} du niveau supérieur avec les nouveaux
+états, ligne 9.
+
+Enfin nous renvoyons la valeur produite \lstinline{sv}, ligne 10, par l'évaluation
+du noeud \lstinline{stabilize}, ligne 8.
+
 Ce qui entraine une forte duplication qui ne va faire que s'accroitre de
 composition en composition.
 Le mécanisme ne passe pas à l'échelle puisque le tuple sera de plus en plus
 grand en fonction des composition.
 
 Ce mécanisme est adhoc est non pérein.
-
-\begin{lstlisting}
-\end{lstlisting}
 
 \paragraph{Comonad}
 Comonad~\cite{Brookes91}~\cite{Coutts07}
