@@ -429,7 +429,7 @@ Ce qui permettra par la suite de ne pas utiliser le \emph{pattern matching} pour
 extraire la fonction.
 
 Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
-une instance du \emph{typeclass} \lstinline{Category}, ligne 4 et 5.
+une \lstinline{instance} du \emph{typeclass} \lstinline{Category}, ligne 4 et 5.
 Nous n'avons pas besoin d'indiquer le type des fonctions, Haskell le déduit automatiquement
 via \emph{typeclass} qu'il implante.
 \lstinline{id}, ligne 4, est un appel au constructeur \lstinline{Node} avec la
@@ -622,7 +622,7 @@ De plus deux opérateurs de composition sont introduits :
 \lstinline{>>>} est aussi un alias mais dont les paramètres ont été inversés.
 
 Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
-une instance du \emph{typeclass} \Arrv ligne 2 et 3.
+une \lstinline{instance} du \emph{typeclass} \Arrv ligne 2 et 3.
 Toutes les fonctions n'ont pas besoin d'être définies car certaines d'entre-elles
 disposent d'une implantation par défaut, qui repose sur d'autres fonctions du
 \emph{typeclass}, dans la définition du \emph{typeclass}.
@@ -634,7 +634,7 @@ instance Arrow Node where
 \end{lstlisting}
 
 \lstinline{arr}, ligne 2, se contente d'appeler le constructeur de \lstinline{Node}.
-Par curryfication, cela revient à écrire \lstinline{arr x = Node x}.
+Par currification, cela revient à écrire \lstinline{arr x = Node x}.
 
 \lstinline{first}, ligne 3, va extraire la fonction \lstinline{f} de \lstinline{Node}.
 Il va ensuite créer un nouveau \lstinline{Node}, dont la fonction est définie par
@@ -662,125 +662,341 @@ complet. \lstinline{genRanking} voit sa sortie non-conservée si \lstinline{stab
 produit \lstinline{(Nothing, _)}.
 \lstinline{genRanking} est donc limité par \lstinline{stabilize}.
 
+Il faudrait être en mesure de stocker un état qui conserverait le dernier classement
+généré.
+Malheureusement Haskell étant un langage fonctionnel pur, cela signifie qu'il disppose
+de la transparence référentielle, ainsi, toute fonction appelée avec les mêmes arguments
+donnera toujours le même résultat.
 
-Nous devons donc ajouter une \lstinline{Monad} \lstinline{State} pour conserver l'état d'un exécution à l'autre.
-Nous obtenons un \emph{Kielsi Arrow}~\cite{Hughes00}.
+Ainsi, un mécanisme nommé \lstinline{Monad}~\cite{Wadler90} a été mis en place.
+Les \lstinline{Monad}s sont définies en Haskell via le \emph{typeclass} suivant :
+\begin{lstlisting}
+class Monad (m :: * -> *) where
+  (>>=) :: m a -> (a -> m b) -> m b
+  (>>) :: m a -> m b -> m b
+  return :: a -> m a
+  fail :: String -> m a
+\end{lstlisting}
+
+Ici on se place dans le cas d'un type de données \lstinline{m} avec un paramètre
+\lstinline{m :: * -> *}.
+
+Par exemple la fonction \lstinline{return} va attendre un paramètre de type quelconque
+\lstinline{a} et va l'encapsuler, transmettre cette valeur à un constructeur, dans
+un type de donnée \lstinline{m} paramétré par le type de la valeur de son argument
+\lstinline{a}, il aura donc pour type de retour \lstinline{m a}.
+
+L'opérateur, un fonction n'ayant pas de caractères alphabétiques, important ici
+est \lstinline{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
+position de préfixe.
+Il va attendre une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
+le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
+et renvoyant une valeur de type \lstinline{b} encapsulé dans le même contexte \lstinline{m}
+que le premier arguement de l'opérateur, la fonction attendue va donc retourner
+une valeur de type \lstinline{m b}. L'opérateur va ensuite retourner une valeur de
+type \lstinline{m b}.
+L'implantation triviale est de renvoyer le retour de la fonction attendue à
+laquelle on a transmis la valeur de type \lstinline{a} désencapsulé de son contexte
+\lstinline{m a}.
+
+Par exemple prenons le type de données \lstinline{Maybe} vu plus haut dont la définition
+est la suivante :
+\begin{lstlisting}
+data Maybe a = Nothing | Just a
+\end{lstlisting}
+
+Il nous faut ensuite définir l'\lstinline{instance} \lstinline{Maybe} du \emph{typeclass}
+\lstinline{Monad} :
+\begin{lstlisting}
+instance Monad Maybe where
+    Just x  >>= f = f x
+    Nothing >>= _ = Nothing
+
+    return x = Just x
+
+    a >> b = a >>= \_ -> b
+
+    fail _ = Nothing
+\end{lstlisting}
+
+Les lignes 2 et 3 définissent le corps de \lstinline{>>=}.
+Par \emph{pattern matching}, pour le constructeur \lstinline{Just}, ligne 2,
+la valeur de retour sera la valeur de retour de la fonction \lstinline{f} à
+laquelle la valeur contenue par le constructeur, \lstinline{x}, lui aura été appliquée.
+Pour le constructeur \lstinline{Nothing}, ligne 3, on ignore de le second argument
+\lstinline{\_} et on renvoie \lstinline{Nothing}.
+
+\lstinline{return}, ligne 5, prend une valeur et la passe au constructeur
+\lstinline{Just} et le revoie.
+
+\lstinline{>>}, ligne 7, appel \lstinline{>>=} en lui passant son premier paramètre
+puis en créant une \emph{lambda expression} qui va ignorer son paramètre d'entrée
+et renvoyer le second paramètre de \lstinline{>>}.
+
+\lstinline{fail}, ligne 9, ignore son paramètre et renvoye \lstinline{Nothing}.
+
+Prenons l'exemple de cette fonction qui pour un entier donné, l'incrémente jusqu'à
+3 puis renvoie \lstinline{Nothing}.
+\begin{lstlisting}
+addUntil3 :: Int -> Maybe Int
+addUntil3 x = if x < 3
+              then Just (x + 1)
+              else Nothing
+\end{lstlisting}
+
+Notre objectif est de pouvoir chaîner les appels à cette fonction.
+Si nous faisons \lstinline{addUntil3 1} nous obtenons \lstinline{Just 2} du type \lstinline{Maybe Int}.
+Impossible alors d'appeler directement la fonction sur ce résultat.
+Nous sommes obligés de sortir \lstinline{2} de son contexte.
+C'est le rôle de \lstinline{>>=}.
+Ainsi, \lstinline{addUntil3 1 >>= addUntil3} renverra \lstinline{Just 3}.
+De plus, si nous l'appliquons encore, elle renverra toujours \lstinline{Nothing},
+sans que \lstinline{addUntil3} soit évaluée.
+
+Nous pouvons réécrire \lstinline{addUntil3' 1 >>= addUntil3} en \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
+puisque \lstinline{>>=} va extraire \lstinline{1} de \lstinline{Just}.
+
+Si nous regardons l'implantation de l'interface, \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
+est équivalent à \lstinline{return 1 >>= addUntil3 >>= addUntil3} et \lstinline{addUntil3}
+peut être réécrit de cette manière :
+\begin{lstlisting}
+addUntil3' :: (Monad m) => Int -> m Int
+addUntil3' x = if x < 3
+               then return (x + 1)
+               else fail "too big"
+\end{lstlisting}
+
+Comme nous le voyons dans la signature \lstinline{addUntil3'} n'est plus liée au type
+de donnée \lstinline{Maybe}, à n'importe quelle type de données implantant le \emph{typeclass}
+\lstinline{Monad}.
+
+Notre but à présent est de créer une \lstinline{Monad} capable de stocker un état.
+Elle se nomme la \emph{State Monad}~\cite{PeytonJones95} et est définie de la manière
+suivante :
+\begin{lstlisting}
+newtype State s a = State { runState :: s -> (a, s) }
+\end{lstlisting}
+\lstinline{State} est un type qui n'aura pas d'existence réelle lors de l'exécution,
+\lstinline{newtype} est un mot-clef permettant d'indiquer au compilateur qu'un type
+existe uniquement pour distinguer certains expressions, sans qu'elles aient de
+structure particulière.
+Ainsi, \lstinline{State} réprésente certaines expressions qui sont des fonctions
+prenant un état de type \lstinline{s} et renvoyant une paire avec un état
+de type \lstinline{s} et une valeur générée de type \lstinline{a}.
+
+L'implantation de l'\lstinline{instance} de la \lstinline{Monad} \lstinline{State}
+est la suivante :
+\begin{lstlisting}
+instance Monad (State s) where
+  return v = State $ \s -> (v, s)
+  State v >>= f = State $ \s -> let (a, b) = v s
+                               in runState (f a) b
+\end{lstlisting}
+
+Nous avons vu que \lstinline{Monad} attendait des types ayant un et un seul paramètre.
+Or, \lstinline{State} en possède deux.
+Pour être en mesure de définir l'\lstinline{instance} \lstinline{Monad},
+nous utilisons la currification au niveau des types et nous fixons \lstinline{s},
+ligne 1, ce qui signifie que ce qui compte pour que \lstinline{State} soit une \lstinline{Monad},
+c'est le type de son état.
+
+\lstinline{return}, ligne 2, va prendre une valeur, qui sera produite lors de
+l'exécution de la fonction représentée par \lstinline{State}.
+Cette fonction se bornera à renvoyer l'état qui lui sera transmis.
+
+\lstinline{>>=}, ligne 3, va récupérer la fonction \lstinline{v} de \lstinline{State}.
+Il va ensuite créer une nouvelle fonction dans \lstinline{State} qui va prendre
+un argument d'état \lstinline{s}, il sera appliqué à \lstinline{v}, ce qui
+produira un couple \lstinline{(a, b)} où \lstinline{a} est la valeur produite
+et  \lstinline{b} le nouvel état.
+\lstinline{let} fonctionne comme le \lstinline{where} vu plus haut.
+Ensuite nous allons appliquer \lstinline{f} à la valeur produite \lstinline{a},
+nous donnant un nouveau \lstinline{State}.
+Nous appelons \lstinline{runState} qui va sortir la fonction de \lstinline{State}
+puis nous lui passons le nouvel etat \lstinline{b}.
+
+\lstinline{State} possède également des fonctions pour rendre sa manipulation
+plus simple :
+\begin{lstlisting}
+evalState :: State s a -> s -> a
+evalState act = fst . runState act
+
+execState :: State s a -> s -> s
+execState act = snd . runState act
+\end{lstlisting}
+\lstinline{evalState} récupère le premier membre de la paire générée par l'execution
+de la \lstinline{Monad}, via la fonction \lstinline{fst}.
+\lstinline{execState} récupère le second membre de la paire générée par l'execution
+de la \lstinline{Monad}, via la fonction \lstinline{snd}.
+
+Il faut également des fonctions pour récupérer et assigner l'état :
+\begin{lstlisting}
+get :: State s s
+get = State $ \x -> (x, x)
+
+put :: s -> State s ()
+put x = State $ \_ -> ((), x)
+\end{lstlisting}
+
+Les cas d'utilisations sont les suivants :
+\begin{lstlisting}
+runState (put 1) 2 -- ((),1)
+runState get 2 -- (2,2)
+\end{lstlisting}
+
+Nous souhaitons créer une fonction qui récupère l'état courant,
+l'incrémente et produise la valeur initial de l'état ajouté à lui-même.
+L'implantation est la suivante :
+\begin{lstlisting}
+incrIncr :: State Int Int
+incrIncr = do
+    i <- get
+    put $ i + 1
+    return $ i + i
+\end{lstlisting}
+À la ligne 2, nous récupérons la valeur de l'état avec \lstinline{get}, que nous
+représentons par \lstinline{i}.
+Nous mettons ensuite sa valeur incrémentée dans l'état avec \lstinline{put} à la
+ligne 3.
+Puis nous renvons l'état initial, \lstinline{i}, ajouté à lui-même.
+
+Cette notation est appelée \lstinline{do}-notation et est en fait du sucre syntaxique
+pour :
+\begin{lstlisting}
+incrIncr' :: State Int Int
+incrIncr' = get >>= \i -> put (i + 1) >> return (i + i)
+\end{lstlisting}
+Les \lstinline{->} sont remplacés par des \lstinline{>>= \v -> } et les retour à
+la ligne par des \lstinline{>>}.
+
+Ainsi, \lstinline{runState incrIncr 2} génère \lstinline{(4, 3)}.
+
+Nous pouvons les appliquer plusieurs fois pour que \lstinline{runState incr3 2} génère \lstinline{(8, 5)}.
+\begin{lstlisting}
+incr3 :: State Int Int
+incr3 = do
+    incrIncr -- (4, 3)
+    incrIncr -- (6, 4)
+    incrIncr -- (8, 5)
+\end{lstlisting}
+
+Nous pouvons réimplantés \lstinline{stabilize} et \lstinline{genRanking} en tant
+que \lstinline{State Monad} :
+\begin{lstlisting}
+stabilize :: a -> State Int (Maybe a)
+stabilize x = do
+    i <- get
+    if i < 2
+    then put (i + 1) >> return Nothing
+    else put 0 >> return (Just x)
+
+-- runState (stabilize 'a') 0
+-- => (Nothing,1)
+-- runState (stabilize 'a') 3
+-- => (Just 'a',0)
+
+genRanking :: Ticket -> State Ranking Ranking
+genRanking t = do
+    r <- get
+    put $ updateRanking t r
+    r' <- get
+    return r'
+
+-- runState (genRanking "a") []
+-- => ([Rank {title = "a", visitors = 1}],[Rank {title = "a", visitors = 1}])
+-- runState (genRanking "a") [Rank "b" 1, Rank "a" 1] 
+-- => ([Rank {title = "a", visitors = 2},Rank {title = "b", visitors = 1}],[Rank {title = "a", visitors = 2},Rank {title = "b", visitors = 1}])
+\end{lstlisting}
+
+Si nous tentons de les combiner en tant que \lstinline{Category}, c'est impossible
+car le second type de \lstinline{genRanking}, \lstinline{Ranking}, n'est pas le
+même que le premier type de \lstinline{stabilize}, \lstinline{Int}.
+
+Il en va de même pour les \lstinline{Monad}.
+En effet \lstinline{>>=} a le type suivant :
+\begin{lstlisting}
+(>>=) :: m a -> (a -> m b) -> m b
+\end{lstlisting}
+
+Et nous avons vu que \lstinline{State} était considéré comme une \lstinline{Monad}
+avec son premier paramètre de type, \lstinline{State s}.
+Ainsi \lstinline{State Ranking} et \lstinline{State Int} sont deux types distincts
+et \lstinline{>>=} nécessite deux \lstinline{Monad} du même type.
+
+La différence entre les \Arrs et les \lstinline{Monad}s est que nous pouvons
+uniquement manipuler le type de sortie d'une \lstinline{Monad} alors que nous pouvons
+manipuler le type d'entrées et le type de sortie d'un \Arrp
+C'est ce qui les rend plus composable que les \lstinline{Monad}s.
+
+Il nous faut donc combiner une \lstinline{State Monad} pour conserver l'état et un
+\lstinline{Arrow} pour la composition.
+
+Nous obtenons un \lstinline{Kielsi Arrow}~\cite{Hughes00}.
 \lstinline{Node} devient alors inutile puisque \lstinline{Kleisli} implante déjà les
 \emph{typeclass} \Arr et \lstinline{Monad}.
 
-% La différence entre les \Arrs et les \lstinline{Monad}s est que nous pouvons
-% uniquement manipuler le type de sortie d'une \lstinline{Monad} alors que nous pouvons
-% manipuler le type d'entrées et le type de sortie d'un \Arrp
-% C'est ce qui les rend plus composable que les \lstinline{Monad}s.
+Ils sont déclarés de la manière suivante :
+\begin{lstlisting}
+newtype Kleisli m a b = Kleisli { runKleisli :: a -> m b }
+\end{lstlisting}
 
-% Les \Arrs~\cite{Hughes00} sont une généralisation des \lstinline{Monad}s~\cite{Wadler90}.
-% Les \lstinline{Monad}s sont définies en Haskell via le \emph{typeclass} suivant :
-% \begin{lstlisting}
-% class Monad (m :: * -> *) where
-%   (>>=) :: m a -> (a -> m b) -> m b
-%   (>>) :: m a -> m b -> m b
-%   return :: a -> m a
-%   fail :: String -> m a
-% \end{lstlisting}
+\lstinline{Kleisli} représente donc une fonction prennant une valeur et renvoyant
+une valeur dans un type ayant un paramètre.
 
-% Ici on se place dans le cas d'un type de données \lstinline{m} avec un paramètre
-% \lstinline{m :: * -> *}.
+Si nous mettons côte-à-côte \lstinline{runKleisli}, \lstinline{genRanking} et
+\lstinline{stabilize}, nous nous rendons compte que \lstinline{Kleisli} est une
+généralisation.
+\begin{lstlisting}
+stabilize  :: a         -> State Int        (Maybe a)
+genRanking :: Ticket    -> State Ranking    Ranking
+runKleisli :: a         -> m                b
+\end{lstlisting}
 
-% Par exemple la fonction \lstinline{return} va attendre un paramètre de type quelconque
-% \lstinline{a} et va l'encapsuler, transmettre cette valeur à un constructeur, dans
-% un type de donnée \lstinline{m} paramétré par le type de la valeur de son argument
-% \lstinline{a}, il aura donc pour type de retour \lstinline{m a}.
+L'\lstinline{instance} \lstinline{Category} de \lstinline{Kleisli} est
+définie de la manière suivante :
+\begin{lstlisting}
+instance Monad m => Category (Kleisli m) where
+    id = Kleisli return
+    (Kleisli f) . (Kleisli g) = Kleisli (\b -> g b >>= f)
+\end{lstlisting}
+Le premier type paramétrique de \lstinline{Kleisli} doit être une \lstinline{Monad}.
+Comme nous l'avons vu pour la déclaration de l'\lstinline{instance} \lstinline{Monad}
+de \lstinline{State}, nous fixons le premier type paramétrique pour que ça corresponde
+au nombre de type paramétriques attendu, ici, 2.
 
-% L'opérateur, un fonction n'ayant pas de caractères alphabétiques, important ici
-% est \lstinline{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
-% position de préfixe.
-% Il va attendre une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
-% le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
-% et renvoyant une valeur de type \lstinline{b} encapsulé dans le même contexte \lstinline{m}
-% que le premier arguement de l'opérateur, la fonction attendue va donc retourner
-% une valeur de type \lstinline{m b}. L'opérateur va ensuite retourner une valeur de
-% type \lstinline{m b}.
-% L'implantation triviale est de renvoyer le retour de la fonction attendue à
-% laquelle on a transmis la valeur de type \lstinline{a} désencapsulé de son contexte
-% \lstinline{m a}.
+\lstinline{id}, ligne 2, va appeler le constructeur de \lstinline{Kleisli} avec
+l'équivalent monadique de la fonction identité, à savoir \lstinline{return}.
 
-% Par exemple prenons le type de données \lstinline{Maybe} :
-% \begin{lstlisting}
-% data Maybe a = Nothing | Just a
-% \end{lstlisting}
+La fonction de composition, \lstinline{(.)}, ligne 3, extrait les fonctions
+\lstinline{f} et \lstinline{g} des constructeurs \lstinline{Kleisli}.
+Il va ensuite créer une nouvelle valeur \lstinline{Kleisli} qui sera composé d'une
+\emph{lambda expression} attendant un argument qui sera appliqué à \lstinline{g}.
+La valeur résultante sera une \lstinline{Monad}, il faut donc la passer à \lstinline{g}
+en utilisant \lstinline{>>=}.
 
-% \lstinline{Maybe} est un type paramétrique.
-% \lstinline{Maybe} possède deux constructeur : \lstinline{Nothing}, qui n'attends pas
-% de valeur et \lstinline{Just} qui attends une valeur de type \lstinline{a}, \lstinline{a}
-% pouvant être de n'importe quel type.
-% Ainsi \lstinline{Nothing} et \lstinline{Just 1} auront le même type \lstinline{Maybe Int}.
-% Mais \lstinline{Just 1} et \lstinline{Just 'a'} auront un type différent, respectivement
-% \lstinline{Maybe Int} et \lstinline{Maybe Char}.
+Comme pour l'\lstinline{instance} \lstinline{Category} de \lstinline{Kleisli},
+l'\lstinline{instance} \lstinline{Arrow} fixe son premier type paramétrique qui
+est une \lstinline{Monad}.
+\begin{lstlisting}
+instance Monad m => Arrow (Kleisli m) where
+    arr f = Kleisli (return . f)
+    first (Kleisli f) = Kleisli (\ ~(b,d) -> f b >>= \c -> return (c,d))
+    second (Kleisli f) = Kleisli (\ ~(d,b) -> f b >>= \c -> return (d,c))
+\end{lstlisting}
+\lstinline{arr} attends un argument, une fonction \lstinline{f} et construit
+\lstinline{Kleisli} en mettant dans une \lstinline{Monad}, via \lstinline{return},
+le résultat de \lstinline{f}.
 
-% Il nous faut ensuite définir l'instance \lstinline{Maybe} du \emph{typeclass}
-% \lstinline{Monad} :
-% \begin{lstlisting}
-% instance Monad Maybe where
-%     Just x  >>= f = f x
-%     Nothing >>= _ = Nothing
+\lstinline{first} récupère la fonction \lstinline{f} de \lstinline{Kleisli} et
+construit un nouveau \lstinline{Kleisli} à l'aide d'une \emph{lambda expression}
+qui attend une pair \lstinline{(b, d)}.
+\lstinline{b} est appliqué à \lstinline{f} et sa valeur est extraite de la
+\lstinline{Monad} résultante pour être placé dans \lstinline{c}.
+\lstinline{return} va ensuite encapsuler une paire contenant le résultat produit,
+\lstinline{c}, et la valeur \lstinline{d} qui est inchangé.
 
-%     return x = Just x
-
-%     a >> b = a >>= \_ -> b
-
-%     fail _ = Nothing
-% \end{lstlisting}
-
-% Les lignes 2 et 3 définissent le corps de \lstinline{>>=}.
-% La ligne 2 se lit : pour le constructeur \lstinline{Just} contenant une valeur
-% \lstinline{x} et un second paramètre f, la valeur de retour sera la valeur de retour
-% de la fonction \lstinline{f} à laquelle \lstinline{x} lui aura été appliqués.
-% La ligne 3 se lit : pour le constructeur \lstinline{Nothing}, je ne tiens pas compte
-% de mon second argument \lstinline{\_} et je renvoie \lstinline{Nothing}.
-
-% La ligne 5 prend une valeur et la passe au constructeur \lstinline{Just} que je revoie.
-
-% La ligne 7 va appeler \lstinline{>>=} en lui passant son premier paramètre puis en créant
-% une fonction anonyme, appelée \emph{lambda expression}, via \lstinline{\textbackslash\_ ->} qui
-% va ignorer son paramètre d'entrée et renvoyer le second paramètre de \lstinline{>>}.
-
-% La ligne 9 définit \lstinline{fail} qui va ignorer son paramètre et renvoyer \lstinline{Nothing}.
-
-% Prenons l'exemple de cette fonction qui pour un entier donné, l'incrémente jusqu'à
-% 3 puis renvoie \lstinline{Nothing}.
-% \begin{lstlisting}
-% addUntil3 :: Int -> Maybe Int
-% addUntil3 x = if x < 3
-%               then Just (x + 1)
-%               else Nothing
-% \end{lstlisting}
-
-% Notre objectif est de pouvoir chaîner les appels à cette fonction.
-% Si nous faisons \lstinline{addUntil3 1} nous obtenons \lstinline{Just 2} du type \lstinline{Maybe Int}.
-% Impossible alors d'appeler directement la fonction sur ce résultat.
-% Nous sommes obligés de sortir \lstinline{2} de son contexte.
-% C'est le rôle de \lstinline{>>=}.
-% Ainsi, \lstinline{addUntil3 1 >>= addUntil3} renverra \lstinline{Just 3}.
-% De plus, si nous l'appliquons encore, elle renverra toujours \lstinline{Nothing},
-% sans que \lstinline{addUntil3} soit évaluée.
-
-% Nous pouvons réécrire \lstinline{addUntil3' 1 >>= addUntil3} en \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
-% puisque \lstinline{>>=} va extraire \lstinline{1} de \lstinline{Just}.
-
-% Si nous regardons l'implantation de l'interface, \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
-% est équivalent à \lstinline{return 1 >>= addUntil3 >>= addUntil3} et \lstinline{addUntil3}
-% peut être réécrit de cette manière :
-% \begin{lstlisting}
-% addUntil3' :: (Monad m) => Int -> m Int
-% addUntil3' x = if x < 3
-%                 then return (x + 1)
-%                 else fail "too big"
-% \end{lstlisting}
-
-% Comme nous le voyons dans la signature \lstinline{addUntil3'} n'est plus liée au type
-% de donnée \lstinline{Maybe}, à n'importe quelle type de données implantant le \emph{typeclass}
-% \lstinline{Monad}.
-
+\lstinline{second} est construite comme \lstinline{first} mais dans l'ordre inverse
+au niveau des paires.
 
 \begin{lstlisting}
 import Control.Arrow
