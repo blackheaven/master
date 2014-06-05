@@ -197,30 +197,27 @@ Nous disposons d'un flux de tickets de cinéma.
 Un ticket est identifié par un nom de film.
 
 Nous souhaitons avoir un premier flux contenant une liste des films ordonnés par
-nombre d'entrées décroissant.
+nombre d'entrées décroissant, obtenu via un noeud \lstinline{genRanking}.
 Ce qui implique un changement de nature du flux.
 Le rythme du flux ne change pas puisque la liste est mise à jour à chaque nouveau
 ticket.
 
 À partir de ce flux, nous voulons limiter le débit en le divisant par 100 pour
-que la donnée puisse être affichée de manière stable.
+que la donnée puisse être affichée de manière stable, obtenu via un noeud \lstinline{stabilize}.
 Nous opérons un changement de rythme.
 
 \subsection{Mise en oeuvre avec Haskell}
 Haskell~\cite{Haskell10} est un langage purement fonctionnel non-strict.
-
 Nous l'avons choisi car il est le support de nombreuses approches à la fois \RP
 et en \FRP et qu'il dispose d'un système de types assez avancé pour modéliser
 notre domaine d'étude.
 
 \subsubsection{Modélisation sans notion de rythme}
 \paragraph{\Arrs}
-La méthode classique pour gérer le \DF en Haskell sont les \emph{Arrows}.
-
-Les \Arrs~\cite{Hughes00} sont une spécialisation des \lstinline{Category}
+La méthode classique pour gérer le \DF en Haskell sont les \Arrs~\cite{Hughes00}.
+C'est une spécialisation des \lstinline{Category}
 qui définissent la notion de composition sous forme de \emph{typeclass}.
-
-En Haskell un \emph{typeclass} représente une capacité à appeler un ensemble
+Un \emph{typeclass} représente la capacité à appeler un ensemble
 de fonctions sur un ensemble de type de données.
 Il s'agit d'un mécanisme proche des \emph{template}s spécialisées du C++.
 
@@ -231,11 +228,11 @@ class Category cat where
 \end{lstlisting}
 
 Ici nous déclarons le \emph{typeclass} \lstinline{Category}.
-Pour un type arbitraire \lstinline{cat}, deux fonctions lui sont associées.
-Seul leur type sont déclarés ici, par leurs implantations.
+Pour un type arbitraire \lstinline{cat}, une fonction et un opérateur lui est
+associés.
 
-La fonction \lstinline{id}, qui va représenter l'identité, c'est à dire
-que  \lstinline{cat} aura ses deux paramètre de même type, le type \lstinline{a}.
+La fonction \lstinline{id}, qui représente l'identité, c'est à dire
+que \lstinline{cat} a ses deux paramètres de même type, le type \lstinline{a}.
 
 La ligne 3 comporte un nouveau type : \lstinline{->}.
 Il s'agit du type fonction.
@@ -244,7 +241,7 @@ Sa pseudo déclaration est la suivante :
 \begin{lstlisting}
 data i -> o = ...
 \end{lstlisting}
-Une fonction a un paramètre de type \lstinline{i} en entrée et retourne une
+Il a un paramètre de type \lstinline{i} en entrée et retourne une
 valeur de type \lstinline{o}.
 Pour qu'une fonction prennent plusieurs arguments, il faut que, conceptuellement,
 à chaque nouvel argument appliqué, elle retourne une nouvelle fonction.
@@ -258,7 +255,6 @@ L'opérateur de composition \lstinline{(.)} qui va créer une \lstinline{Categor
 ayant pour types paramétriques \lstinline{a c} en redirigeant la sortie d'une
 \lstinline{Category} \lstinline{b c} vers l'entrée d'une \lstinline{Category} \lstinline{a b}.
 
-On distingue deux types de fonction en Haskell : les fonctions classiques et les opérateurs.
 Les fonctions classiques sont nommées avec des caractères alphanumériques et commencent
 toujours par une minuscule.
 Les opérateurs ne sont composés que de caractères non-alphanumériques.
@@ -295,18 +291,13 @@ est automatiquement créée.
 Cette fonction aura pour paramètres, les paramètres omis.
 On parle de currification ou \emph{currying} ou d'application partielle.
 Comme nous l'avons vu plus haut, de manière plus général, en Haskell, toutes les
-fonctions n'attendent qu'un argument et ne renvoie qu'une valeur.
-Ainsi, conceptuellement, losqu'une fonction attends plusieurs arguments, lors de
+fonctions n'attendent qu'un argument et ne renvoient qu'une valeur.
+Ainsi, conceptuellement, lorsqu'une fonction attends plusieurs arguments, lors de
 chacun de ses appels, une nouvelle fonction est retournée :
 \begin{lstlisting}
 add :: Int -> Int -> Int
 add 4 :: Int -> Int
 add 4 5 :: Int
-\end{lstlisting}
-
-Le type de \lstinline{add} peut être ré-écrit de la manière suivante :
-\begin{lstlisting}
-add :: Int -> (Int -> Int)
 \end{lstlisting}
 
 Alors que les fonctions en position préfixes créent automatiquement des fonctions
@@ -322,7 +313,7 @@ Les exemples suivants ne sont pas syntaxiquement valide :
 4 +
 \end{lstlisting}
 
-Pour les rendres valide, il faut les entourer de paranthèses :
+Pour les rendres valide, il faut les entourer de parenthèses :
 \begin{lstlisting}
 (`add`)
 (`add` 5)
@@ -333,11 +324,11 @@ Pour les rendres valide, il faut les entourer de paranthèses :
 \end{lstlisting}
 
 C'est la raison pour laquelle, lorsque l'on déclare le type d'un opérateur, comme
-l'opérateur de composition \lstinline{(.)}, nous sommes obligés de le paranthèsés,
+l'opérateur de composition \lstinline{(.)}, nous sommes obligés de le parenthésés,
 puisque nous ne lui passons aucune valeur.
 
-Un exemple d'implantation de \lstinline{Category} est pour le type des fonctions.
-Le type fonction est un type à part entère noté \lstinline{(->)}.
+Un exemple d'\lstinline{instance} de \lstinline{Category} concerne le type des fonctions.
+Le type fonction est un type à part entière noté \lstinline{(->)}.
 Ainsi, à partir de la déclaration du \emph{typeclass} \lstinline{Category}, nous
 remplaçons toutes les occurences de \lstinline{cat} par \lstinline{(->)}.
 \begin{lstlisting}
@@ -351,11 +342,11 @@ instance Category (->) where
   f . g = \x -> f (g x)
 \end{lstlisting}
 
-\lstinline{id}, ligne 4, attent un argument \lstinline{x} et le retourner.
+\lstinline{id}, ligne 4, attend un argument \lstinline{x} et le retourne.
 Le type de \lstinline{x} est quelconque, noté \lstinline{a}, et le type de retour
 de \lstinline{id} est le même que le type de son paramètre, soit \lstinline{a}.
 
-\lstinline{(.)}, ligne 8, attent deux fonctions pour en produire une troisième.
+\lstinline{(.)}, ligne 8, attend deux fonctions pour en produire une troisième.
 Son premier argument, \lstinline{f}, est une fonction attendant un type quelconque
 noté \lstinline{b} et renvoyant un type quelconque \lstinline{c}, le tout est
 noté \lstinline{b -> c}.
@@ -409,8 +400,8 @@ add3 2
 
 Pour représenter notre cas pratique, nous modélisons la notion de noeud de calcul
 par un type de données \lstinline{Node}, ligne 1.
-Il contient une fonction transformant un \lstinline{a} en un \lstinline{b} en fonction
-de ses types paramétriques.
+Il contient une fonction transformant un \lstinline{a} en un \lstinline{b} qui
+sont représentés par ses types paramétriques.
 
 Le mot clef \lstinline{data} permet de définir de nouveau types de données.
 Il est suivit de l'indentifieur de type, qui commence toujours par une lettre
@@ -420,13 +411,12 @@ Il peut être ensuite suivit d'un ou plusieurs paramètres de types, ici
 L'identifieur de type est utilisé uniquement dans les déclaration de types.
 
 Ensuite, après le \lstinline{=} vient le ou les constructeurs, ici \lstinline{Node}.
-Ils suivent les mêmes convention de nommage que les identifieurs de types, mais
+Ils suivent les mêmes conventions de nommage que les identifieurs de types, mais
 l'identifieur de type et le constructeur n'ont pas obligatoirement le même nom.
 Un construteur peut attendre des valeurs ou non, ici il attend une fonction de
 type \lstinline{a -> b}.
-Qui plus est, nous demandons qu'un accesseur \lstinline{process} soit créé,
-Ce qui permettra par la suite de ne pas utiliser le \emph{pattern matching} pour
-extraire la fonction.
+\lstinline{process} est une fonction créé automatiquement, elle a le type
+\lstinline{Node -> a -> b}.
 
 Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
 une \lstinline{instance} du \emph{typeclass} \lstinline{Category}, ligne 4 et 5.
@@ -459,8 +449,8 @@ type Ranking = [Rank]
 
 Ici, nous définissons un type \lstinline{Rank}, ligne 1,
 composé d'une chaine de caractère, \lstinline{String}, et d'un entier, \lstinline{Int}.
-Nous lui ajoutons deux \emph{typeclass} qui seront automatiquement implanter par
-le compilateur : \lstinline{Show}, pour pouvoir afficher les valeurs et \lstinline{Eq},
+Nous demandons au compilateur d'instancier automatiquement deux \emph{typeclass} :
+\lstinline{Show}, pour pouvoir afficher les valeurs et \lstinline{Eq},
 pour faire des comparaisons entre deux valeurs.
 Le compilateur est en mesure de déduire les implantations naives pour un certain
 nombre de \emph{typeclass}.
@@ -471,7 +461,7 @@ Les alias ne font qu'améliorer la lisibilité des types, ils n'influent pas sur
 la compilation ou l'exécution.
 
 \lstinline{[Char]} représente une liste de \lstinline{Char}.
-Il est définie de la manière suivante :
+Il est défini de la manière suivante :
 \begin{lstlisting}
 data [] a = []
           | a : [a]
@@ -486,10 +476,10 @@ type \lstinline{a}, noté \lstinline{[a]}.
 Il s'agit d'un type récursif puisqu'un de ses constructeurs a un de ses paramètres
 de son propre type.
 
-Nous implémentons notre noeud \lstinline{stabilize} qui limite le débit d'un flux.
+Nous implémentons un noeud \lstinline{stabilize} qui limite le débit d'un flux.
 Pour cela nous avons besoin d'une valeur quelconque et d'un compteur en entrée,
 nous utilisons un tuple \lstinline{a, Int}.
-Le noued va produire une nouvelle valeur pour le compteur et peut-être une valeur,
+Le noeud va produire une nouvelle valeur pour le compteur et peut-être une valeur,
 en fonction de l'état de son compteur.
 
 La possibilité de présence ou de l'absence d'une valeur est représenté par le type
@@ -514,9 +504,11 @@ stabilize = Node $ \(x, i) -> if i < 2
 
 Nous faisons appel au constructeur \lstinline{Node}, ligne 2, en lui fournissant
 une \emph{lambda expression}.
-Le \lstinline{$} est une alternative au paranthèsage jusqu'à la fin de la ligne.
+Le \lstinline{$} est une alternative au parenthésage jusqu'à la fin de la ligne.
 Celle-ci possède un paramètre qui doit être une paire d'une valeur de type arbitraire
-nommée \lstinline{x} et un entier nommé \lstinline{i}.
+nommée \lstinline{x} et un entier nommé \lstinline{i}, soit le type
+\lstinline{(Maybe a, Int)}.
+
 Si l'entier, le compteur, \lstinline{i} est inférieur à 2, nous renvoyons, ligne 3,
 une paire dont le premier élément est \lstinline{Nothing}, car nous souhaitons
 ne renvoyer qu'une valeur sur 3, et nous incrémentons le compteur \lstinline{i}.
@@ -533,11 +525,7 @@ genRanking :: Node (Ticket, Ranking) Ranking
 genRanking = Node $ uncurry updateRanking
 \end{lstlisting}
 \lstinline{uncurry} est une fonction qui transforme une fonction attendant deux éléments
-en fonction attendant une paire, elle est définie de la manière suivante :
-\begin{lstlisting}
-uncurry :: (a -> b -> c) -> ((a, b) -> c)
-uncurry f (a, b) =  f a b
-\end{lstlisting}
+en fonction attendant une paire.
 
 \lstinline{updateRanking} va attendre un \lstinline{Ticket} \lstinline{t} et un
 \lstinline{Ranking} \lstinline{r}.
