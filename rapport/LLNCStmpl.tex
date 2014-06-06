@@ -221,6 +221,41 @@ Un \emph{typeclass} représente la capacité à appeler un ensemble
 de fonctions sur un ensemble de type de données.
 Il s'agit d'un mécanisme proche des \emph{template}s spécialisées du C++.
 
+En Haskell, tout est expression, le type d'expressions le plus courant est le type
+fonction noté \lstinline{->}.
+Il est fourni par le langage.
+Sa pseudo déclaration est la suivante :
+\begin{lstlisting}
+data i -> o = ...
+\end{lstlisting}
+Il a un paramètre de type \lstinline{i} en entrée et retourne une
+valeur de type \lstinline{o}.
+Le type d'une fonction \lstinline{f} attendant un entier, noté \lstinline{Int}, et
+produisant un caractère noté \lstinline{Char} sera noté :
+\begin{lstlisting}
+f :: Int -> Char
+\end{lstlisting}
+
+Les types de données sont nommés par une lettre commençant en majuscule.
+Les types de données commençant en minuscule sont des types qui seront déterminés
+en fonction de leur(s) usage(s), comme les \emph{template}s C++.
+Lorsque deux types commençant en miniscule sont les mêmes, le type assigné à
+l'usage sera le même.
+\begin{lstlisting}
+f :: a    -> a    -- Definition
+f :: Int  -> Int  -- Legal
+f :: Char -> Char -- Legal
+f :: Char -> Int  -- Illegal
+\end{lstlisting}
+
+Pour qu'une fonction prennent plusieurs arguments, il faut que, conceptuellement,
+à chaque nouvel argument appliqué, elle retourne une nouvelle fonction.
+Ainsi, les fonctions suivante ont le même type :
+\begin{lstlisting}
+f :: a -> b -> c -> d -> e
+g :: a -> (b -> (c -> (d -> e)))
+\end{lstlisting}
+
 \begin{lstlisting}
 class Category cat where
   id :: cat a a
@@ -233,23 +268,6 @@ associés.
 
 La fonction \lstinline{id}, qui représente l'identité, c'est à dire
 que \lstinline{cat} a ses deux paramètres de même type, le type \lstinline{a}.
-
-La ligne 3 comporte un nouveau type : \lstinline{->}.
-Il s'agit du type fonction.
-Il est fourni par le langage.
-Sa pseudo déclaration est la suivante :
-\begin{lstlisting}
-data i -> o = ...
-\end{lstlisting}
-Il a un paramètre de type \lstinline{i} en entrée et retourne une
-valeur de type \lstinline{o}.
-Pour qu'une fonction prennent plusieurs arguments, il faut que, conceptuellement,
-à chaque nouvel argument appliqué, elle retourne une nouvelle fonction.
-Ainsi, les fonctions suivante ont le même type :
-\begin{lstlisting}
-f :: a -> b -> c -> d -> e
-g :: a -> (b -> (c -> (d -> e)))
-\end{lstlisting}
 
 L'opérateur de composition \lstinline{(.)} qui va créer une \lstinline{Category}
 ayant pour types paramétriques \lstinline{a c} en redirigeant la sortie d'une
@@ -334,11 +352,11 @@ remplaçons toutes les occurences de \lstinline{cat} par \lstinline{(->)}.
 \begin{lstlisting}
 instance Category (->) where
 -- Version prefixe : id :: (->) a a
-  id :: a -> a
+-- Version infixe  : id :: a -> a
   id x = x
 
 -- Version prefixe : (.) :: (->) b c -> (->) a b -> (->) a c
-  (.) :: (b -> c) -> (a -> b) -> (a -> c)
+-- Version infixe  : (.) :: (b -> c) -> (a -> b) -> (a -> c)
   f . g = \x -> f (g x)
 \end{lstlisting}
 
@@ -439,11 +457,21 @@ instance Category Node where
     (Node g) . (Node f) = Node (g . f)
 \end{lstlisting}
 
+\lstinline{Node} peut se manipuler de la manière suivante :
+\begin{lstlisting}
+-- Pour : f :: Int -> Char
+Node f :: Node Int Char
+
+process' :: Node a b -> a -> b -- equivalent de process
+process' (Node f) = f
+\end{lstlisting}
+
 Ensuite viennent les types plus spécifiques à notre problème :
 
 \begin{lstlisting}
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
 type Ticket = String
+type Counter = Int
 type Ranking = [Rank]
 \end{lstlisting}
 
@@ -455,8 +483,9 @@ pour faire des comparaisons entre deux valeurs.
 Le compilateur est en mesure de déduire les implantations naives pour un certain
 nombre de \emph{typeclass}.
 
-Puis, deux alias de types : \lstinline{Ticket} et \lstinline{Ranking} qui sont,
-respectivement, les alias de \lstinline{String} et de \lstinline{[Rank]}.
+Puis, trois alias de types : \lstinline{Ticket}, \lstinline{Ticket} et
+\lstinline{Ranking} qui sont, respectivement, les alias de \lstinline{String},
+\lstinline{Int} et de \lstinline{[Rank]}.
 Les alias ne font qu'améliorer la lisibilité des types, ils n'influent pas sur
 la compilation ou l'exécution.
 
@@ -496,20 +525,19 @@ Tandis que \lstinline{Just}, ligne 2, représente la présence d'une valeur de t
 
 Nous implémentons \lstinline{stabilize} de cette manière :
 \begin{lstlisting}
-stabilize :: Node (a, Int) (Maybe a, Int)
-stabilize = Node $ \(x, i) -> if i < 2
-                             then (Nothing, i + 1)
-                             else (Just x, 0)
+stabilize :: Node (a, Counter) (Maybe a, Counter)
+stabilize = Node (\ (x, i) -> if i < 2
+                              then (Nothing, i + 1)
+                              else (Just x, 0))
 \end{lstlisting}
 
 Nous faisons appel au constructeur \lstinline{Node}, ligne 2, en lui fournissant
 une \emph{lambda expression}.
-Le \lstinline{$} est une alternative au parenthésage jusqu'à la fin de la ligne.
 Celle-ci possède un paramètre qui doit être une paire d'une valeur de type arbitraire
-nommée \lstinline{x} et un entier nommé \lstinline{i}, soit le type
-\lstinline{(Maybe a, Int)}.
+nommée \lstinline{x} et un \lstinline{Counter} nommé \lstinline{i}, soit le type
+\lstinline{(Maybe a, Counter)}.
 
-Si l'entier, le compteur, \lstinline{i} est inférieur à 2, nous renvoyons, ligne 3,
+Si le compteur, \lstinline{i}, est inférieur à 2, nous renvoyons, ligne 3,
 une paire dont le premier élément est \lstinline{Nothing}, car nous souhaitons
 ne renvoyer qu'une valeur sur 3, et nous incrémentons le compteur \lstinline{i}.
 Si non, ligne 4, nous renvoyons une paire contenant la valeur et nous remettons
@@ -522,7 +550,7 @@ entrée, comprenant un \lstinline{Ticket} et un \lstinline{Ranking} et produira
 un \lstinline{Ranking}.
 \begin{lstlisting}
 genRanking :: Node (Ticket, Ranking) Ranking
-genRanking = Node $ uncurry updateRanking
+genRanking = Node (uncurry updateRanking)
 \end{lstlisting}
 \lstinline{uncurry} est une fonction qui transforme une fonction attendant deux éléments
 en fonction attendant une paire.
@@ -567,7 +595,7 @@ faire car le type de sortie de \lstinline{genRanking} n'est pas le même que le
 type d'entrée de \lstinline{stabilize} :
 \begin{lstlisting}
 genRanking :: Node (Ticket, Ranking) Ranking
-stabilize :: Node (a, Int) (Maybe a, Int)
+stabilize :: Node (a, Counter) (Maybe a, Counter)
 \end{lstlisting}
 
 Les \Arrs~\cite{Hughes00} ont été introduits pour pouvoir combiner de manière
@@ -608,6 +636,9 @@ De plus deux opérateurs de composition sont introduits :
 
 \lstinline{<<<} est un alias de l'opérateur de composition \lstinline{(.)}.
 \lstinline{>>>} est aussi un alias mais dont les paramètres ont été inversés.
+Ce sont des fonctions qui dépendent d'un \emph{typeclass}, mais qui n'en font pas
+partie, elles n'ont qu'une définition et ne sont pas sont pas spécialisation par
+type.
 
 Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
 une \lstinline{instance} du \emph{typeclass} \Arrv ligne 2 et 3.
@@ -635,13 +666,13 @@ un type de sortie compatible au type d'entrée de \lstinline{stabilize} :
 \begin{lstlisting}
 genRanking :: Node (Ticket, Ranking) Ranking
 first genRanking :: Node ((Ticket, Ranking), a) (Ranking, a)
-stabilize :: Node (a, Int) (Maybe a, Int)
+stabilize :: Node (a, Counter) (Maybe a, Counter)
 \end{lstlisting}
 
 Nous combinons ensuite ces noeuds pour n'en avoir qu'un seul, via la fonction
 de composition \lstinline{>>>} :
 \begin{lstlisting}
-stabilizedRanking :: Node ((Ticket, Ranking), Int) (Maybe Ranking, Int)
+stabilizedRanking :: Node ((Ticket, Ranking), Counter) (Maybe Ranking, Counter)
 stabilizedRanking = first genRanking >>> stabilize
 \end{lstlisting}
 
@@ -776,9 +807,9 @@ L'implantation de l'\lstinline{instance} de la \lstinline{Monad} \lstinline{Stat
 est la suivante :
 \begin{lstlisting}
 instance Monad (State s) where
-  return v = State $ \s -> (v, s)
-  State v >>= f = State $ \s -> let (a, b) = v s
-                               in runState (f a) b
+  return v = State (\s -> (v, s))
+  State v >>= f = State (\s -> let (a, b) = v s
+                               in runState (f a) b)
 \end{lstlisting}
 
 Nous avons vu que \lstinline{Monad} attendait des types ayant un et un seul paramètre.
@@ -820,10 +851,10 @@ de la \lstinline{Monad}, via la fonction \lstinline{snd}.
 Il faut également des fonctions pour récupérer et assigner l'état :
 \begin{lstlisting}
 get :: State s s
-get = State $ \x -> (x, x)
+get = State (\x -> (x, x))
 
 put :: s -> State s ()
-put x = State $ \_ -> ((), x)
+put x = State (\_ -> ((), x))
 \end{lstlisting}
 
 Les cas d'utilisations sont les suivants :
@@ -839,8 +870,8 @@ L'implantation est la suivante :
 incrIncr :: State Int Int
 incrIncr = do
     i <- get
-    put $ i + 1
-    return $ i + i
+    put (i + 1)
+    return (i + i)
 \end{lstlisting}
 À la ligne 2, nous récupérons la valeur de l'état avec \lstinline{get}, que nous
 représentons par \lstinline{i}.
@@ -871,7 +902,7 @@ incr3 = do
 Nous pouvons réimplantés \lstinline{stabilize} et \lstinline{genRanking} en tant
 que \lstinline{State Monad} :
 \begin{lstlisting}
-stabilize :: a -> State Int (Maybe a)
+stabilize :: a -> State Counter (Maybe a)
 stabilize x = do
     i <- get
     if i < 2
@@ -886,7 +917,7 @@ stabilize x = do
 genRanking :: Ticket -> State Ranking Ranking
 genRanking t = do
     r <- get
-    put $ updateRanking t r
+    put (updateRanking t r)
     r' <- get
     return r'
 
@@ -898,7 +929,7 @@ genRanking t = do
 
 Si nous tentons de les combiner en tant que \lstinline{Category}, c'est impossible
 car le second type de \lstinline{genRanking}, \lstinline{Ranking}, n'est pas le
-même que le premier type de \lstinline{stabilize}, \lstinline{Int}.
+même que le premier type de \lstinline{stabilize}, \lstinline{Counter}.
 
 Il en va de même pour les \lstinline{Monad}.
 En effet \lstinline{>>=} a le type suivant :
@@ -908,7 +939,7 @@ En effet \lstinline{>>=} a le type suivant :
 
 Et nous avons vu que \lstinline{State} était considéré comme une \lstinline{Monad}
 avec son premier paramètre de type, \lstinline{State s}.
-Ainsi \lstinline{State Ranking} et \lstinline{State Int} sont deux types distincts
+Ainsi \lstinline{State Ranking} et \lstinline{State Counter} sont deux types distincts
 et \lstinline{>>=} nécessite deux \lstinline{Monad} du même type.
 
 La différence entre les \Arrs et les \lstinline{Monad}s est que nous pouvons
@@ -935,7 +966,7 @@ Si nous mettons côte-à-côte \lstinline{runKleisli}, \lstinline{genRanking} et
 \lstinline{stabilize}, nous nous rendons compte que \lstinline{Kleisli} est une
 généralisation.
 \begin{lstlisting}
-stabilize  :: a         -> State Int        (Maybe a)
+stabilize  :: a         -> State Counter    (Maybe a)
 genRanking :: Ticket    -> State Ranking    Ranking
 runKleisli :: a         -> m                b
 \end{lstlisting}
@@ -968,7 +999,7 @@ est une \lstinline{Monad}.
 \begin{lstlisting}
 instance Monad m => Arrow (Kleisli m) where
     arr f = Kleisli (return . f)
-    first (Kleisli f) = Kleisli (\ ~(b,d) -> f b >>= \c -> return (c,d))
+    first  (Kleisli f) = Kleisli (\ ~(b,d) -> f b >>= \c -> return (c,d))
     second (Kleisli f) = Kleisli (\ ~(d,b) -> f b >>= \c -> return (d,c))
 \end{lstlisting}
 \lstinline{arr} attends un argument, une fonction \lstinline{f} et construit
@@ -991,6 +1022,7 @@ inutile avec \lstinline{Kleisli} :
 \begin{lstlisting}
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
 type Ticket = String
+type Counter = Int
 type Ranking = [Rank]
 \end{lstlisting}
 
@@ -998,23 +1030,23 @@ Pour que nos noeuds soient conforme à \lstinline{Kleisli}, nous encapsulons les
 versions monadiques dans le constructeur de \lstinline{Kleisli}.
 \begin{lstlisting}
 genRanking :: Kleisli (State Ranking) Ticket Ranking
-genRanking = Kleisli $ \t -> get >>= put . updateRanking t >> get
+genRanking = Kleisli (\t -> get >>= put . updateRanking t >> get)
 
 updateRanking :: Ticket -> Ranking -> Ranking
 updateRanking t r = case b of
                         []          -> a ++ [Rank t 1]
                         (x : xs)    -> sortBy (flip compare `on` visitors) (Rank t (1 + visitors x) : a ++ xs)
-    where (a, b) = break (\(Rank i _) -> i == t) r
+    where (a, b) = break (\ (Rank i _) -> i == t) r
 
-stabilize :: Kleisli (State Int) a (Maybe a)
-stabilize = Kleisli $ \e -> get >>= \i ->  if i < 2
-                                           then put (i + 1) >> return Nothing
-                                           else put 0 >> return (Just e)
+stabilize :: Kleisli (State Counter) a (Maybe a)
+stabilize = Kleisli (\e -> get >>= \i ->  if i < 2
+                                          then put (i + 1) >> return Nothing
+                                          else put 0 >> return (Just e))
 \end{lstlisting}
 Comme nous l'avons vu, \lstinline{Kleisli} prend pour premier type paramétrique
 une \lstinline{Monad}, \lstinline{State Ranking} pour \lstinline{genRanking} et
-\lstinline{State Int} pour \lstinline{stabilize}, en fonction qu'ils doivent
-maintenir l'état d'un \lstinline{Ranking} ou d'un \lstinline{Int}.
+\lstinline{State Counter} pour \lstinline{stabilize}, en fonction qu'ils doivent
+maintenir l'état d'un \lstinline{Ranking} ou d'un \lstinline{Counter}.
 \lstinline{Kleisli} attend ensuite, comme tout \lstinline{Arrow}, un type d'entrée,
 \lstinline{Ticket} et \lstinline{a}, ainsi qu'un type de sortie, \lstinline{Ranking}
 et \lstinline{Maybe a}.
@@ -1024,19 +1056,19 @@ Kleisli m               a         b         -- generique
  runKleisli ::          a ->      m b
 Kleisli (State Ranking) Ticket    Ranking   -- genRanking
  runKleisli ::          Ticket -> State Ranking Ranking
-Kleisli (State Int)     a         (Maybe a) -- stabilize
+Kleisli (State Counter) a         (Maybe a) -- stabilize
  runKleisli ::          a ->      Maybe a
 \end{lstlisting}
 
 La composition ne peux plus se faire selon les fonctions classiques comme \lstinline{>>>}
-puisque les contextes, ici \lstinline{Kleisli (State Ranking)} et \lstinline{Kleisli (State Int)},
+puisque les contextes, ici \lstinline{Kleisli (State Ranking)} et \lstinline{Kleisli (State Counter)},
 sont différents.
 
 \begin{lstlisting}
-stabilizedRanking :: Kleisli (State (Ranking, Int)) Ticket (Maybe Ranking)
+stabilizedRanking :: Kleisli (State (Ranking, Counter)) Ticket (Maybe Ranking)
 stabilizedRanking = Kleisli stabilizedRanking'
 
-stabilizedRanking' :: Ticket -> State (Ranking, Int) (Maybe Ranking)
+stabilizedRanking' :: Ticket -> State (Ranking, Counter) (Maybe Ranking)
 stabilizedRanking' e = do
     (ir, is) <- get
     let (rv, rs) = runState (runKleisli genRanking e) ir
@@ -1049,7 +1081,7 @@ Cette composition est coûteuse car nous devons définir nous-même la sémantiq
 d'évaluation qui n'est pas propre à ces deux noeuds en particulier.
 
 Notre \lstinline{Monad} stocke un état qui est une paire comprennant les états
-des deux noeuds le composant, \lstinline{Ranking} et \lstinline{Int}.
+des deux noeuds le composant, \lstinline{Ranking} et \lstinline{Counter}.
 
 Nous récupérons et séparons les deux états ligne 6.
 

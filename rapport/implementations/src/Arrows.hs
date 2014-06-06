@@ -32,9 +32,10 @@ instance Arrow Node where
 type Ticket = String
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
 type Ranking = [Rank]
+type Counter = Int
 
 genRanking :: Node (Ticket, Ranking) Ranking
-genRanking = arr $ uncurry updateRanking
+genRanking = arr (uncurry updateRanking)
 
 updateRanking :: Ticket -> Ranking -> Ranking
 updateRanking t r = case b of
@@ -42,11 +43,11 @@ updateRanking t r = case b of
                         (x : xs)    -> sortBy (flip compare `on` visitors) (Rank t (1 + visitors x) : a ++ xs)
     where (a, b) = break (\(Rank i _) -> i == t) r
 
-stabilize :: Node (a, Int) (Maybe a, Int)
-stabilize = arr $ \(x, i) -> if i < 2 then (Nothing, i + 1) else (Just x, 0)
+stabilize :: Node (a, Counter) (Maybe a, Counter)
+stabilize = arr (\(x, i) -> if i < 2 then (Nothing, i + 1) else (Just x, 0))
 
 -- TODO : MT State Maybe into Kielsi arrow 
-stabilizedRanking :: Node ((Ticket, Ranking), Int) (Maybe Ranking, Int)
+stabilizedRanking :: Node ((Ticket, Ranking), Counter) (Maybe Ranking, Counter)
 stabilizedRanking = first genRanking >>> stabilize
 
 -- helper
