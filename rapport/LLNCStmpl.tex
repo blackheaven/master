@@ -24,6 +24,11 @@
 \newcommand{\DFp}{\emph{Data-Flow}. }
 \newcommand{\SA}{\emph{Heterogeneous-Arrow} }
 \newcommand{\SAs}{\emph{Heterogeneous-Arrow}s }
+\newcommand{\SAp}{\emph{Heterogeneous-Arrow}. }
+\newcommand{\HA}{\lstinline{HeterogeneousArrow} }
+\newcommand{\HAs}{\lstinline{HeterogeneousArrow}s }
+\newcommand{\HAp}{\lstinline{HeterogeneousArrow}. }
+\newcommand{\HAv}{\lstinline{HeterogeneousArrow}, }
 \newcommand{\FB}{\emph{Flow-based programming} }
 \newcommand{\RP}{\emph{Reactive-based programming} }
 \newcommand{\FRP}{\emph{Functional reactive programming} }
@@ -1111,8 +1116,110 @@ précédents dans de nouveaux types, mais comme nous l'avons, la composition
 n'en serait que plus difficile.
 
 \subsection{Introduction des \SAs}
+L'idée de base est de prendre 2 types et d'en générer un 3ème, nous pouvons
+décrire le \emph{typeclass} de la manière suivante :
+\begin{lstlisting}
+class HeterogeneousArrow x y z where
+    (>*>) :: x a b -> y b c -> z a c
+\end{lstlisting}
+\HA est un \emph{typeclass} qui se base sur trois types : \lstinline{x},
+\lstinline{y} et \lstinline{z}.
+Il possède un opérateur, \lstinline{>*>}, qui combine deux types dont les
+paramètres sont composables dans un troisième.
+
+Cette définition est trop générale, en effet, cela nous laisse la possibilité de
+définir n'importe quel \lstinline{z} en fonction de \lstinline{x} et de \lstinline{y}.
+Nous devons mettre en évidence que \lstinline{z} dépend du couple \lstinline{x} et \lstinline{y}.
+Pour cela nous utilisons les dépendances fonctionnelles, ou \emph{functional dependencies}.
+\begin{lstlisting}
+class HeterogeneousArrow x y z | x y -> z where
+    (>*>) :: x a b -> y b c -> z a c
+\end{lstlisting}
+
+L'\lstinline{instance} la plus triviale est lorsque \lstinline{x} et \lstinline{y}
+sont de même type et qu'il est composable, au sens qu'il implante l'\lstinline{instance}
+de \lstinline{Category} :
+\begin{lstlisting}
+instance (Category x) => HeterogeneousArrow x x x where
+    f >*> g = g . f
+\end{lstlisting}
+Nous définissons ainsi que les \lstinline{Category} ne sont qu'un cas particulier
+de \HAp
+Dans ce cas, \lstinline{>*>} équivault à la composition, \lstinline{.}, de
+\lstinline{Category}.
+
+Nous définissons l'\lstinline{instance} \lstinline{Kleisli (State s)} de \HA de 
+la manière suivante :
+\begin{lstlisting}
+instance HeterogeneousArrow (Kleisli (State s)) (Kleisli (State s')) (Kleisli (State (s, s'))) where
+f >*> g = Kleisli (\e -> do
+                        (ir, is) <- get
+                        let (rv, rs) = runState (runKleisli f e) ir
+                        let (sv, ss) = runState (runKleisli g rv) is
+                        put (rs, ss)
+                        return sv)
+\end{lstlisting}
+Nous avons utilisé une méthode similaire pour \lstinline{stabilizedRanking}.
+Il y a deux différences : d'une part les \lstinline{Kleisli} sont paramétrées,
+d'autre part, nous nous assurons de manière générique que le type d'entrée de la
+seconde \lstinline{Kleisli} est bien du type de sortie de la première.
+
+\lstinline{stabilizedRanking} devient donc :
+\begin{lstlisting}
+stabilizedRanking :: Kleisli (State (Ranking, Counter)) Ticket (Maybe Ranking)
+stabilizedRanking = genRanking >*> stabilize
+\end{lstlisting}
+\lstinline{stabilizedRanking} en est réduit à sa forme la plus simple car c'est
+\HA qui a la charge de la difficulté de la omposition.
+
+Nous rajoutons à présent une notion de rythme.
+Elle prendra la forme de deux types encapsulés, via \lstinline{newtype}, il s'agit
+simplement pour le compilateur de distinquer deux types.
+
+Le type \lstinline{Fast}, avec son constructeur \lstinline{F}, est déstiné à
+encapsuler \lstinline{genRanking}.
+\lstinline{Slow} va contenir \lstinline{stabilize}.
+\begin{lstlisting}
+newtype Fast s i o = F (Kleisli (State s) i o)
+newtype Slow s i o = S (Kleisli (State s) i o)
+
+encStabilize :: Slow Counter a (Maybe a)
+encStabilize = S stabilize
+
+encGenRanking :: Fast Ranking Ticket Ranking
+encGenRanking = F genRanking
+\end{lstlisting}
+
+\lstinline{Fast} et \lstinline{Slow} n'ayant pas d'\lstinline{instance} de \HAv
+il faut en définir une pour pouvoir les composer :
+\begin{lstlisting}
+instance HeterogeneousArrow (Fast s) (Slow s') (Slow (s, s')) where
+    F f >*> S g = S (f >*> g)
+\end{lstlisting}
+Comme nous le voyons ci-dessus, \lstinline{Fast} et \lstinline{Slow} n'apportent
+aucune données, elles ne sont là que pour distinguer deux valeurs de même type qui
+n'ont pas la même "nature".
+
+Nous voyons ici que composer deux traitements, dont un lent donnera un traitement
+lent.
+
+\lstinline{stabilizedRanking} est donc définie de la manière suivante :
+\begin{lstlisting}
+stabilizedRanking :: Slow (Ranking, Counter) Ticket (Maybe Ranking)
+stabilizedRanking = encGenRanking >*> encStabilize
+\end{lstlisting}
 
 \section{Conclusion}
+Nous arrivons donc à modéliser des traitements générants des flux de natures et de
+rythmes différents grâce aux \SAp
+
+Il fallait généraliser la composition pour obtenir une table de correspondance entre
+les différents éléments.
+
+Même si notre méthode résoud des problèmes de compositions, elle se base sur un
+ensemble de paires, ce qui peut nuire à la lisibilité et à la manipulation.
+Une des pistes d'amélioration est de considérer les états comme des collections
+hétérogènes, ou \emph{heterogeneous collections}.
 
 %The bibliography, done here without a bib file
 %This is the old BibTeX style for use with llncs.cls
