@@ -2,6 +2,7 @@ module Arrows2 (
           Ticket(..)
         , Rank(..)
         , Ranking(..)
+        , Counter(..)
         , genRanking
         , stabilize
         , stabilizedRanking
