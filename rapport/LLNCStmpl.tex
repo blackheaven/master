@@ -86,9 +86,9 @@ Nous fournissons une généralisation des \Arrs en Haskell.
 Le \DF modélise le "continu" dans les programmes informatiques.
 Ce qui permet par exemple de décrire des animations graphiques sous l'aspect de
 formules mathématiques sans gérer la manière dont elles seront interprêtées.
-Les formules étant exprimées selon des variables continues, elle seront ensuite
+Les formules étant exprimées selon des variables continues, elles seront ensuite
 automatiquement discrétisées pour le rendu visuel.
-Du fait que le continu est représenté par une infinité de valeur entre deux bornes,
+Du fait que le continu est représenté par une infinité de valeurs entre deux bornes,
 il en découle une notion d'infini, les bornes étant inacessibles.
 Ce qui force le calcul sur des données incomplètes entrainant des calculs partiels.
 
@@ -326,7 +326,7 @@ add 4 5 :: Int
 Alors que les fonctions en position préfixes créent automatiquement des fonctions
 lorsqu'elles ne sont que partiellement appliquées, si un des deux premiers arguments
 manquent à un opérateur, une erreur de syntaxe est levée.
-Les exemples suivants ne sont pas syntaxiquement valide :
+Les exemples suivants ne sont pas syntaxiquement valides :
 \begin{lstlisting}
 `add`
 `add` 5
@@ -336,7 +336,7 @@ Les exemples suivants ne sont pas syntaxiquement valide :
 4 +
 \end{lstlisting}
 
-Pour les rendres valide, il faut les entourer de parenthèses :
+Pour les rendres valides, il faut les entourer de parenthèses :
 \begin{lstlisting}
 (`add`)
 (`add` 5)
@@ -435,7 +435,7 @@ Il est suivi de l'identifieur de type, qui commence toujours par une lettre
 majuscule lorsqu'il est alphanumérique, ici \lstinline{Node}.
 Il peut être ensuite suivi d'un ou plusieurs paramètres de types, ici
 \lstinline{a} et \lstinline{b}.
-L'identifieur de type est utilisé uniquement dans les déclaration de types.
+L'identifieur de type est utilisé uniquement dans les déclarations de types.
 
 Ensuite, après le \lstinline{=} vient le ou les constructeurs, ici \lstinline{Node}.
 Ils suivent les mêmes conventions de nommage que les identifieurs de types, mais
@@ -575,11 +575,10 @@ updateRanking t r = case b of
 La fonction \lstinline{break} est appelée à la ligne 5.
 Son rôle est de, à partir d'une fonction renvoyant un booléen en fonction d'un
 élément de son second paramètre, une liste, ici les \lstinline{Rank}s \lstinline{r},
-parcourir sa liste, de gauche à droite et lorsque la fonction passé
-\lstinline{True}, générer une
-paire de tableau dans lequel son premier membre sera l'ensemble des éléments déjà
-parcourus et son membre de gauche sera le tableau contenant l'élement courant et
-le reste de la liste.
+parcourir sa liste, de gauche à droite et lorsque la fonction passée renvoie
+\lstinline{True}, générer une paire de tableau dans lequel son premier membre
+sera l'ensemble des éléments déjà parcourus et son membre de gauche sera le
+tableau contenant l'élement courant et le reste de la liste.
 La fonction donnée à \lstinline{break} renvoie \lstinline{True} lorsque le titre
 du film \lstinline{i} de l'élément courant est égale au titre du film sur le
 \lstinline{Ticket} \lstinline{t}.
@@ -715,12 +714,12 @@ un type de donnée \lstinline{m} paramétré par le type de la valeur de son arg
 L'opérateur important ici est \lstinline{>>=}, il attend une valeur de type
 \lstinline{a} dans un contexte \lstinline{m}, soit
 le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
-et renvoyant une valeur de type \lstinline{b} encapsulé dans le même contexte \lstinline{m}
+et renvoyant une valeur de type \lstinline{b} encapsulée dans le même contexte \lstinline{m}
 que le premier arguement de l'opérateur, la fonction attendue retourne
 une valeur de type \lstinline{m b}. L'opérateur retourne ensuite une valeur de
 type \lstinline{m b}.
-L'implantation triviale est de renvoyer le retour de la fonction attendue à
-laquelle on a transmis la valeur de type \lstinline{a} désencapsulé de son contexte
+L'implantation naive consiste à renvoyer le retour de la fonction attendue à
+laquelle on a transmis la valeur de type \lstinline{a} désencapsulée de son contexte
 \lstinline{m a}.
 
 Par exemple prenons le type de données \lstinline{Maybe} vu plus haut dont la définition
@@ -802,7 +801,7 @@ newtype State s a = State { runState :: s -> (a, s) }
 \end{lstlisting}
 \lstinline{State} est un type qui n'aura pas d'existence réelle lors de l'exécution,
 \lstinline{newtype} est un mot-clef permettant d'indiquer au compilateur qu'un type
-existe uniquement pour distinguer certaines expressions, sans qu'elles aient de
+existe uniquement pour distinguer certaines expressions, sans qu'elles n'aient de
 structure particulière.
 Ainsi, \lstinline{State} réprésente certaines expressions qui sont des fonctions
 prenant un état de type \lstinline{s} et renvoyant une paire avec un état
@@ -1050,7 +1049,7 @@ stabilize = Kleisli (\e -> get >>= \i ->  if i < 2
 \end{lstlisting}
 Comme nous l'avons vu, \lstinline{Kleisli} prend pour premier type paramétrique
 une \lstinline{Monad}, \lstinline{State Ranking} pour \lstinline{genRanking} et
-\lstinline{State Counter} pour \lstinline{stabilize}, en fonction qu'ils doivent
+\lstinline{State Counter} pour \lstinline{stabilize}, selon qu'ils doivent
 maintenir l'état d'un \lstinline{Ranking} ou d'un \lstinline{Counter}.
 \lstinline{Kleisli} attend ensuite, comme tout \lstinline{Arrow}, un type d'entrée,
 \lstinline{Ticket} et \lstinline{a}, ainsi qu'un type de sortie, \lstinline{Ranking}
@@ -1082,9 +1081,6 @@ stabilizedRanking' e = do
     return sv
 \end{lstlisting}
 
-Cette composition est coûteuse car nous devons définir nous-même la sémantique
-d'évaluation qui n'est pas propre à ces deux noeuds en particulier.
-
 Notre \lstinline{Monad} stocke un état qui est une paire comprennant les états
 des deux noeuds le composant, \lstinline{Ranking} et \lstinline{Counter}.
 
@@ -1103,6 +1099,9 @@ Nous changeons l'état de la \lstinline{Monad} du niveau supérieur avec les nou
 
 Enfin nous renvoyons la valeur produite \lstinline{sv}, ligne 10, par l'évaluation
 du noeud \lstinline{stabilize}, ligne 8.
+
+Cette composition est coûteuse car nous devons définir nous-même la sémantique
+d'évaluation qui n'est pas propre à ces deux noeuds en particulier.
 
 Ce qui entraîne une forte duplication qui ne va faire que s'accroître de
 composition en composition.
@@ -1146,7 +1145,7 @@ instance (Category x) => HeterogeneousArrow x x x where
 \end{lstlisting}
 Nous définissons ainsi que les \lstinline{Category} ne sont qu'un cas particulier
 de \HAp
-Dans ce cas, \lstinline{>*>} équivault à la composition, \lstinline{.}, de
+Dans ce cas, \lstinline{>*>} équivault à la composition, \lstinline{(.)}, de
 \lstinline{Category}.
 
 Nous définissons l'\lstinline{instance} \lstinline{Kleisli (State s)} de \HA de 
@@ -1199,7 +1198,7 @@ instance HeterogeneousArrow (Fast s) (Slow s') (Slow (s, s')) where
 \end{lstlisting}
 Comme nous le voyons ci-dessus, \lstinline{Fast} et \lstinline{Slow} n'apportent
 aucune donnée, elles ne sont là que pour distinguer deux valeurs de même type qui
-n'ont pas la même "nature".
+n'ont pas la même signification au sein d'un programme.
 
 Nous voyons ici que composer deux traitements, dont un lent donnera un traitement
 lent.
