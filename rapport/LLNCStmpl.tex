@@ -87,14 +87,14 @@ Le \DF modélise le "continu" dans les programmes informatiques.
 Ce qui permet par exemple de décrire des animations graphiques sous l'aspect de
 formules mathématiques sans gérer la manière dont elles seront interprêtées.
 Les formules étant exprimées selon des variables continues, elle seront ensuite
-discrétisées pour le rendu visuel de manière automatiquement.
+automatiquement discrétisées pour le rendu visuel.
 Du fait que le continu est représenté par une infinité de valeur entre deux bornes,
 il en découle une notion d'infini, les bornes étant inacessibles.
 Ce qui force le calcul sur des données incomplètes entrainant des calculs partiels.
 
-Cette notion d'incomplétude des données est utilisé pour répondre à un problème
+Cette notion d'incomplétude des données est utilisée pour répondre à un problème
 de charge de traitements.
-Par exemple l'afflux de données provenant de l'Iternet a tellement augmenté qu'il
+Par exemple l'afflux de données provenant de l'Internet a tellement augmenté qu'il
 devient trop coûteux en ressources de lancer un calcul donné sur l'ensemble des
 données.
 De plus, lorsqu'on modélise un flux, il est déjà existant, donc nous n'avons pas
@@ -113,7 +113,7 @@ Strachey~\cite{Strachey73} décrit l'état du monde de la programmation
 informatique, en opposant deux paradigmes : la programmation fonctionnelle et impérative.
 
 L'une des premières implantation du \DFc~\cite{Dennis72} réalisée
-est présentée comme une généralisation de LISP, qui est un langage fonctionnel.
+est présentée comme une généralisation de LISP, un langage fonctionnel.
 
 Le \DF est défini par Dennis et al.~\cite{Dennis72} comme un modèle dont l'exécution
 est déclenchée par la disponibilité des données.
@@ -126,9 +126,8 @@ où les programmes sont découpés en entités communiquant entre elles via des
 tampon fixe.
 
 \subsection{Prémisses de la modélisation du continu avec le \FB}
-Lucid~\cite{AshcroftW76} modélise l'infini en se basant sur les suites mathématiques.
-L'infini est modélisé par une valeur de départ et un code pour calculer les valeurs
-suivantes.
+Lucid~\cite{AshcroftW76} modélise l'infini en se basant sur les suites mathématiques,
+c'est-à-dire par une valeur de départ et un code pour calculer les valeurs suivantes.
 
 Une notion de temps a été ajoutée au flux par Esterel~\cite{Berry84}.
 Les programmes sont proches des filtres UNIX : ils n'ont qu'une entrée auxquels
@@ -159,7 +158,7 @@ en fonction du temps.
 Il effectue ensuite son rendu graphique dynamiquement.
 
 Fran est le point de départ de nombreux papiers comme RT-FRP~\cite{Wan02}
-qui ajoute un aspect temps-réel où Nilsson et al.\cite{Nilsson2002a} qui se base
+qui ajoute un aspect temps-réel ou Nilsson et al.\cite{Nilsson2002a} qui se base
 sur la déclaration de l'enchaînement des traitements.
 
 Le \FRP considère, comme dans André~\cite{Andre96}, les programmes comme
@@ -189,8 +188,8 @@ que partiellement.
 
 \subsubsection{Rythme et nature du flux}
 Nous appelons nature d'un flux la méthode de construction des données sortantes.
-Par exemple, le fait d'aggréger les informations d'un flux à un autre va changer
-sa nature car nous obtenons une donnée qui va dépendre de son historique
+Par exemple, le fait d'aggréger les informations d'un flux à un autre change
+sa nature car nous obtenons une donnée qui dépend de son historique
 à partir d'une donnée unitaire.
 
 Le rythme est modifié si, par exemple, le calcul est lancé uniquement toutes les
@@ -207,7 +206,7 @@ Ce qui implique un changement de nature du flux.
 Le rythme du flux ne change pas puisque la liste est mise à jour à chaque nouveau
 ticket.
 
-À partir de ce flux, nous voulons limiter le débit en le divisant par 100 pour
+À partir de ce flux, nous voulons limiter le débit en le divisant par 3 pour
 que la donnée puisse être affichée de manière stable, obtenu via un noeud \lstinline{stabilize}.
 Nous opérons un changement de rythme.
 
@@ -259,21 +258,23 @@ Ainsi, les fonctions suivante ont le même type :
 f :: a -> b -> c -> d -> e
 g :: a -> (b -> (c -> (d -> e)))
 \end{lstlisting}
+On parle de currification ou \emph{currying}.
 
+Ici nous déclarons le \emph{typeclass} \lstinline{Category}, qui représente
+la notion de composabilité.
 \begin{lstlisting}
 class Category cat where
   id :: cat a a
   (.) :: cat b c -> cat a b -> cat a c
 \end{lstlisting}
 
-Ici nous déclarons le \emph{typeclass} \lstinline{Category}.
 Pour un type arbitraire \lstinline{cat}, une fonction et un opérateur lui est
 associés.
 
 La fonction \lstinline{id}, qui représente l'identité, c'est à dire
 que \lstinline{cat} a ses deux paramètres de même type, le type \lstinline{a}.
 
-L'opérateur de composition \lstinline{(.)} qui va créer une \lstinline{Category}
+L'opérateur de composition \lstinline{(.)} qui crée une \lstinline{Category}
 ayant pour types paramétriques \lstinline{a c} en redirigeant la sortie d'une
 \lstinline{Category} \lstinline{b c} vers l'entrée d'une \lstinline{Category} \lstinline{a b}.
 
@@ -309,9 +310,9 @@ Ainsi, voici l'équivalent des deux exemples précédents en inversant les posit
 
 Cette distinction est importante car, lorsque nous mentionnons une fonction en position
 préfixe et que nous omettons un ou plusieurs de ses dernier arguments, une fonction
-est automatiquement créée.
+est automatiquement créée, grâce au \emph{currying}.
 Cette fonction aura pour paramètres, les paramètres omis.
-On parle de currification ou \emph{currying} ou d'application partielle.
+On parle d'application partielle.
 Comme nous l'avons vu plus haut, de manière plus général, en Haskell, toutes les
 fonctions n'attendent qu'un argument et ne renvoient qu'une valeur.
 Ainsi, conceptuellement, lorsqu'une fonction attends plusieurs arguments, lors de
@@ -377,7 +378,7 @@ noté \lstinline{a} et renvoyant un type quelconque \lstinline{b}, le tout est
 noté \lstinline{a -> b}.
 \lstinline{(.)} crée une \emph{lambda expression}, une sorte de fonction anonyme,
 via \lstinline{\x ->} attendant un paramètre \lstinline{x}.
-Il va appliquer ce paramètre à la fonction \lstinline{g}, via \lstinline{g x}.
+Il applique ce paramètre à la fonction \lstinline{g}, via \lstinline{g x}.
 Puis le résultat de cette application sera appliqué à la fonction \lstinline{f}.
 Par conséquent, la fonction résultante aura un paramètre du type de celui de la
 fonction \lstinline{g}, ie. \lstinline{a}, et un type de retour de sa fonction \lstinline{f},
@@ -403,7 +404,7 @@ prod2Add3 = add3 . prod2
 
 Ainsi \lstinline{prod2Add3 1} renvoie \lstinline{5}.
 Nous aurions put l'ecrire \lstinline{prod2Add3 x = prod2 (add3 x)}.
-En fait il se passe le mécanisme de substitution suivant :
+En fait il se passe le mécanisme de substitution, appelé évaluation, suivant :
 \begin{lstlisting}
 prod2Add3 = add3 . prod2
 -- f . g = \x -> f (g x)
@@ -421,7 +422,11 @@ add3 2
 \end{lstlisting}
 
 Pour représenter notre cas pratique, nous modélisons la notion de noeud de calcul
-par un type de données \lstinline{Node}, ligne 1.
+par un type de données \lstinline{Node}.
+\begin{lstlisting}
+data Node a b = Node { process :: a -> b }
+\end{lstlisting}
+
 Il contient une fonction transformant un \lstinline{a} en un \lstinline{b} qui
 sont représentés par ses types paramétriques.
 
@@ -440,27 +445,6 @@ type \lstinline{a -> b}.
 \lstinline{process} est une fonction créé automatiquement, elle a le type
 \lstinline{Node -> a -> b}.
 
-Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
-une \lstinline{instance} du \emph{typeclass} \lstinline{Category}, ligne 4 et 5.
-Nous n'avons pas besoin d'indiquer le type des fonctions, Haskell le déduit automatiquement
-via \emph{typeclass} qu'il implante.
-\lstinline{id}, ligne 4, est un appel au constructeur \lstinline{Node} avec la
-fonction générique \lstinline{id}.
-Ainsi le type de cette fonction est \lstinline{Node a a}.
-
-L'opérateur de composition, ligne 5, extrait, par déconstruction, filtrage par motifs
-ou \emph{pattern matching}, les valeurs du constructeur de \lstinline{Node} de chacun de ses argument.
-\lstinline{g} et \lstinline{f} sont deux fonctions qui sont recomposées au sein
-d'un nouveau \lstinline{Node}.
-
-\begin{lstlisting}
-data Node a b = Node { process :: a -> b }
-
-instance Category Node where
-    id = Node id
-    (Node g) . (Node f) = Node (g . f)
-\end{lstlisting}
-
 \lstinline{Node} peut se manipuler de la manière suivante :
 \begin{lstlisting}
 -- Pour : f :: Int -> Char
@@ -469,6 +453,26 @@ Node f :: Node Int Char
 process' :: Node a b -> a -> b -- equivalent de process
 process' (Node f) = f
 \end{lstlisting}
+
+Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
+une \lstinline{instance} du \emph{typeclass} \lstinline{Category}, ligne 2 et 3.
+
+\begin{lstlisting}
+instance Category Node where
+    id = Node id
+    (Node g) . (Node f) = Node (g . f)
+\end{lstlisting}
+
+Nous n'avons pas besoin d'indiquer le type des fonctions, Haskell le déduit automatiquement
+via \emph{typeclass} qu'il implante.
+\lstinline{id}, ligne 2, est un appel au constructeur \lstinline{Node} avec la
+fonction générique \lstinline{id}.
+Ainsi le type de cette fonction est \lstinline{Node a a}.
+
+L'opérateur de composition, ligne 3, extrait, par déconstruction, filtrage par motifs
+ou \emph{pattern matching}, les valeurs du constructeur de \lstinline{Node} de chacun de ses argument.
+\lstinline{g} et \lstinline{f} sont deux fonctions qui sont recomposées au sein
+d'un nouveau \lstinline{Node}.
 
 Ensuite viennent les types plus spécifiques à notre problème :
 
@@ -512,7 +516,7 @@ de son propre type.
 Nous implémentons un noeud \lstinline{stabilize} qui limite le débit d'un flux.
 Pour cela nous avons besoin d'une valeur quelconque et d'un compteur en entrée,
 nous utilisons un tuple \lstinline{a, Int}.
-Le noeud va produire une nouvelle valeur pour le compteur et peut-être une valeur,
+Le noeud produit une nouvelle valeur pour le compteur et peut-être une valeur,
 en fonction de l'état de son compteur.
 
 La possibilité de présence ou de l'absence d'une valeur est représenté par le type
@@ -525,7 +529,7 @@ data Maybe a = Nothing
 
 Le constructeur \lstinline{Nothing}, ligne 1, représente l'absence de valeur.
 Tandis que \lstinline{Just}, ligne 2, représente la présence d'une valeur de type
-\lstinline{a} qu'il va contenir.
+\lstinline{a} qu'il contient.
 
 Nous implémentons \lstinline{stabilize} de cette manière :
 \begin{lstlisting}
@@ -549,7 +553,7 @@ le compteur à 0.
 
 L'implantation des noeuds \lstinline{genRanking} qui met à jour un classement
 nécessite un classement et un ticket et un classement pour générer un nouveau classement.
-Comme pour \lstinline{stabilize}, \lstinline{genRanking} va attendre une paire en
+Comme pour \lstinline{stabilize}, \lstinline{genRanking} attend une paire en
 entrée, comprenant un \lstinline{Ticket} et un \lstinline{Ranking} et produira
 un \lstinline{Ranking}.
 \begin{lstlisting}
@@ -559,7 +563,7 @@ genRanking = Node (uncurry updateRanking)
 \lstinline{uncurry} est une fonction qui transforme une fonction attendant deux éléments
 en fonction attendant une paire.
 
-\lstinline{updateRanking} va attendre un \lstinline{Ticket} \lstinline{t} et un
+\lstinline{updateRanking} attend un \lstinline{Ticket} \lstinline{t} et un
 \lstinline{Ranking} \lstinline{r}.
 \begin{lstlisting}
 updateRanking :: Ticket -> Ranking -> Ranking
@@ -568,15 +572,15 @@ updateRanking t r = case b of
                         (x : xs)    -> sortBy (flip compare `on` visitors) (Rank t (1 + visitors x) : a ++ xs)
     where (a, b) = break (\ (Rank i _) -> i == t) r
 \end{lstlisting}
-La fonction \lstinline{break} va être appelée à la ligne 5.
-Son rôle est de, à partir d'une fonction, renvoyant un booléen en fonction d'un
+La fonction \lstinline{break} est appelée à la ligne 5.
+Son rôle est de, à partir d'une fonction renvoyant un booléen en fonction d'un
 élément de son second paramètre, une liste, ici les \lstinline{Rank}s \lstinline{r}.
 \lstinline{break} parcourt sa liste, de gauche à droite et lorsque la fonction passé
-en première argument renvoie \lstinline{True}, \lstinline{break} va générer une
+en première argument renvoie \lstinline{True}, \lstinline{break} génére une
 paire de tableau dans lequel son premier membre sera l'ensemble des éléments déjà
 parcourus et son membre de gauche sera le tableau contenant l'élement courant et
 le reste de la liste.
-La fonction donnée à \lstinline{break} va renvoyer \lstinline{True} lorsque le titre
+La fonction donnée à \lstinline{break} renvoie \lstinline{True} lorsque le titre
 du film \lstinline{i} de l'élément courant est égale au titre du film sur le
 \lstinline{Ticket} \lstinline{t}.
 Le résultat de \lstinline{break} est séparé en \lstinline{a} et \lstinline{b}.
@@ -641,8 +645,7 @@ De plus deux opérateurs de composition sont introduits :
 \lstinline{<<<} est un alias de l'opérateur de composition \lstinline{(.)}.
 \lstinline{>>>} est aussi un alias mais dont les paramètres ont été inversés.
 Ce sont des fonctions qui dépendent d'un \emph{typeclass}, mais qui n'en font pas
-partie, elles n'ont qu'une définition et ne sont pas sont pas spécialisation par
-type.
+partie, elles n'ont qu'une définition et ne sont pas spécialisables par type.
 
 Nous définissons ensuite les fonctions nécessaires pour que \lstinline{Node} soit
 une \lstinline{instance} du \emph{typeclass} \Arrv ligne 2 et 3.
@@ -656,13 +659,13 @@ instance Arrow Node where
     first (Node f) = Node (\ ~(b, c) -> (f b, c))
 \end{lstlisting}
 
-\lstinline{arr}, ligne 2, se contente d'appeler le constructeur de \lstinline{Node}.
+\lstinline{arr}, ligne 2, appel le constructeur de \lstinline{Node}.
 Par currification, cela revient à écrire \lstinline{arr x = Node x}.
 
-\lstinline{first}, ligne 3, va extraire la fonction \lstinline{f} de \lstinline{Node}.
-Il va ensuite créer un nouveau \lstinline{Node}, dont la fonction est définie par
+\lstinline{first}, ligne 3, extrait la fonction \lstinline{f} de \lstinline{Node}.
+Il crée un nouveau \lstinline{Node}, dont la fonction est définie par
 une \emph{lambda expression}.
-Celle-ci attend un tuple et va en renvoyer un dont le second membre, \lstinline{c},
+Celle-ci attend un tuple et en renvoie un dont le second membre, \lstinline{c},
 sera inchangé, mais dont le premier, \lstinline{b}, se voit appliqué à la fonction \lstinline{f}.
 
 Ainsi, si nous appliquons \lstinline{first} à \lstinline{genRanking}, nous obtenons
@@ -687,7 +690,7 @@ produit \lstinline{(Nothing, _)}.
 
 Il faudrait être en mesure de stocker un état qui conserverait le dernier classement
 généré.
-Malheureusement Haskell étant un langage fonctionnel pur, cela signifie qu'il disppose
+Malheureusement Haskell étant un langage fonctionnel pur, cela signifie qu'il dispose
 de la transparence référentielle, ainsi, toute fonction appelée avec les mêmes arguments
 donnera toujours le même résultat.
 
@@ -704,19 +707,19 @@ class Monad (m :: * -> *) where
 Ici on se place dans le cas d'un type de données \lstinline{m} avec un paramètre
 \lstinline{m :: * -> *}.
 
-Par exemple la fonction \lstinline{return} va attendre un paramètre de type quelconque
-\lstinline{a} et va l'encapsuler, transmettre cette valeur à un constructeur, dans
+Par exemple la fonction \lstinline{return} attend un paramètre de type quelconque
+\lstinline{a} et l'encapsule, transmettre cette valeur à un constructeur, dans
 un type de donnée \lstinline{m} paramétré par le type de la valeur de son argument
 \lstinline{a}, il aura donc pour type de retour \lstinline{m a}.
 
 L'opérateur, un fonction n'ayant pas de caractères alphabétiques, important ici
 est \lstinline{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
 position de préfixe.
-Il va attendre une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
+Il attend une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
 le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
 et renvoyant une valeur de type \lstinline{b} encapsulé dans le même contexte \lstinline{m}
-que le premier arguement de l'opérateur, la fonction attendue va donc retourner
-une valeur de type \lstinline{m b}. L'opérateur va ensuite retourner une valeur de
+que le premier arguement de l'opérateur, la fonction attendue retourne
+une valeur de type \lstinline{m b}. L'opérateur retourne ensuite une valeur de
 type \lstinline{m b}.
 L'implantation triviale est de renvoyer le retour de la fonction attendue à
 laquelle on a transmis la valeur de type \lstinline{a} désencapsulé de son contexte
@@ -753,7 +756,7 @@ Pour le constructeur \lstinline{Nothing}, ligne 3, on ignore de le second argume
 \lstinline{Just} et le revoie.
 
 \lstinline{>>}, ligne 7, appel \lstinline{>>=} en lui passant son premier paramètre
-puis en créant une \emph{lambda expression} qui va ignorer son paramètre d'entrée
+puis en créant une \emph{lambda expression} qui ignore son paramètre d'entrée
 et renvoyer le second paramètre de \lstinline{>>}.
 
 \lstinline{fail}, ligne 9, ignore son paramètre et renvoye \lstinline{Nothing}.
@@ -777,7 +780,7 @@ De plus, si nous l'appliquons encore, elle renverra toujours \lstinline{Nothing}
 sans que \lstinline{addUntil3} soit évaluée.
 
 Nous pouvons réécrire \lstinline{addUntil3' 1 >>= addUntil3} en \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
-puisque \lstinline{>>=} va extraire \lstinline{1} de \lstinline{Just}.
+puisque \lstinline{>>=} extrait \lstinline{1} de \lstinline{Just}.
 
 Si nous regardons l'implantation de l'interface, \lstinline{Just 1 >>= addUntil3 >>= addUntil3}
 est équivalent à \lstinline{return 1 >>= addUntil3 >>= addUntil3} et \lstinline{addUntil3}
@@ -801,7 +804,7 @@ newtype State s a = State { runState :: s -> (a, s) }
 \end{lstlisting}
 \lstinline{State} est un type qui n'aura pas d'existence réelle lors de l'exécution,
 \lstinline{newtype} est un mot-clef permettant d'indiquer au compilateur qu'un type
-existe uniquement pour distinguer certains expressions, sans qu'elles aient de
+existe uniquement pour distinguer certaines expressions, sans qu'elles aient de
 structure particulière.
 Ainsi, \lstinline{State} réprésente certaines expressions qui sont des fonctions
 prenant un état de type \lstinline{s} et renvoyant une paire avec un état
@@ -823,19 +826,19 @@ nous utilisons la currification au niveau des types et nous fixons \lstinline{s}
 ligne 1, ce qui signifie que ce qui compte pour que \lstinline{State} soit une \lstinline{Monad},
 c'est le type de son état.
 
-\lstinline{return}, ligne 2, va prendre une valeur, qui sera produite lors de
+\lstinline{return}, ligne 2, prend une valeur, qui sera produite lors de
 l'exécution de la fonction représentée par \lstinline{State}.
 Cette fonction se bornera à renvoyer l'état qui lui sera transmis.
 
-\lstinline{>>=}, ligne 3, va récupérer la fonction \lstinline{v} de \lstinline{State}.
-Il va ensuite créer une nouvelle fonction dans \lstinline{State} qui va prendre
+\lstinline{>>=}, ligne 3, récupère la fonction \lstinline{v} de \lstinline{State}.
+Il crée une nouvelle fonction dans \lstinline{State} qui prend
 un argument d'état \lstinline{s}, il sera appliqué à \lstinline{v}, ce qui
 produira un couple \lstinline{(a, b)} où \lstinline{a} est la valeur produite
 et  \lstinline{b} le nouvel état.
 \lstinline{let} fonctionne comme le \lstinline{where} vu plus haut.
 Ensuite nous allons appliquer \lstinline{f} à la valeur produite \lstinline{a},
 nous donnant un nouveau \lstinline{State}.
-Nous appelons \lstinline{runState} qui va sortir la fonction de \lstinline{State}
+Nous appelons \lstinline{runState} qui sort la fonction de \lstinline{State}
 puis nous lui passons le nouvel etat \lstinline{b}.
 
 \lstinline{State} possède également des fonctions pour rendre sa manipulation
@@ -903,7 +906,7 @@ incr3 = do
     incrIncr -- (8, 5)
 \end{lstlisting}
 
-Nous pouvons réimplantés \lstinline{stabilize} et \lstinline{genRanking} en tant
+Nous pouvons réimplanter \lstinline{stabilize} et \lstinline{genRanking} en tant
 que \lstinline{State Monad} :
 \begin{lstlisting}
 stabilize :: a -> State Counter (Maybe a)
@@ -963,7 +966,7 @@ Ils sont déclarés de la manière suivante :
 newtype Kleisli m a b = Kleisli { runKleisli :: a -> m b }
 \end{lstlisting}
 
-\lstinline{Kleisli} représente donc une fonction prennant une valeur et renvoyant
+\lstinline{Kleisli} représente donc une fonction prenant une valeur et renvoyant
 une valeur dans un type ayant un paramètre.
 
 Si nous mettons côte-à-côte \lstinline{runKleisli}, \lstinline{genRanking} et
@@ -987,12 +990,12 @@ Comme nous l'avons vu pour la déclaration de l'\lstinline{instance} \lstinline{
 de \lstinline{State}, nous fixons le premier type paramétrique pour que ça corresponde
 au nombre de type paramétriques attendu, ici, 2.
 
-\lstinline{id}, ligne 2, va appeler le constructeur de \lstinline{Kleisli} avec
+\lstinline{id}, ligne 2, appel le constructeur de \lstinline{Kleisli} avec
 l'équivalent monadique de la fonction identité, à savoir \lstinline{return}.
 
 La fonction de composition, \lstinline{(.)}, ligne 3, extrait les fonctions
 \lstinline{f} et \lstinline{g} des constructeurs \lstinline{Kleisli}.
-Il va ensuite créer une nouvelle valeur \lstinline{Kleisli} qui sera composé d'une
+Il crée ensuite une nouvelle valeur \lstinline{Kleisli} qui est composée d'une
 \emph{lambda expression} attendant un argument qui sera appliqué à \lstinline{g}.
 La valeur résultante sera une \lstinline{Monad}, il faut donc la passer à \lstinline{g}
 en utilisant \lstinline{>>=}.
@@ -1015,7 +1018,7 @@ construit un nouveau \lstinline{Kleisli} à l'aide d'une \emph{lambda expression
 qui attend une pair \lstinline{(b, d)}.
 \lstinline{b} est appliqué à \lstinline{f} et sa valeur est extraite de la
 \lstinline{Monad} résultante pour être placé dans \lstinline{c}.
-\lstinline{return} va ensuite encapsuler une paire contenant le résultat produit,
+\lstinline{return} encapsule une paire contenant le résultat produit,
 \lstinline{c}, et la valeur \lstinline{d} qui est inchangé.
 
 \lstinline{second} est construite comme \lstinline{first} mais dans l'ordre inverse
@@ -1178,7 +1181,7 @@ simplement pour le compilateur de distinquer deux types.
 
 Le type \lstinline{Fast}, avec son constructeur \lstinline{F}, est déstiné à
 encapsuler \lstinline{genRanking}.
-\lstinline{Slow} va contenir \lstinline{stabilize}.
+\lstinline{Slow} contient \lstinline{stabilize}.
 \begin{lstlisting}
 newtype Fast s i o = F (Kleisli (State s) i o)
 newtype Slow s i o = S (Kleisli (State s) i o)
