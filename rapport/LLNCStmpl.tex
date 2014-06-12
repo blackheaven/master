@@ -109,59 +109,59 @@ rythmes et des structures différents explicitement modélisés.
 Nous exposons l'historique des langages \DF afin
 de mettre en avant l'importance du rythme dans les systèmes \DFp
 
-Strachey~\cite{Strachey73} décrit l'état du monde de la programmation
+Strachey~\cite{Strachey73} décrit en 1973 l'état du monde de la programmation
 informatique, en opposant deux paradigmes : la programmation fonctionnelle et impérative.
 
 L'une des premières implantation du \DFc~\cite{Dennis72} réalisée
-est présentée comme une généralisation de LISP, un langage fonctionnel.
+en 1972 est présentée comme une généralisation de LISP, un langage fonctionnel.
 
 Le \DF est défini par Dennis et al.~\cite{Dennis72} comme un modèle dont l'exécution
 est déclenchée par la disponibilité des données.
 Il y a une dépendance explicitement modélisée du code vis-à-vis des données.
 
 \subsection{Réseaux de Kahn}
-Kahn~\cite{Kahn74} fournit un langage pour effectuer des calculs en parallèle,
+Kahn~\cite{Kahn74} fournit un langage en 1974 pour effectuer des calculs en parallèle,
 où les programmes sont découpés en entités communiquant entre elles via des
 \emph{channel}s, qui sont des listes \emph{FIFO} infinies ayant une taille de
 tampon fixe.
 
 \subsection{Prémisses de la modélisation du continu avec le \FB}
-Lucid~\cite{AshcroftW76} modélise l'infini en se basant sur les suites mathématiques,
+Lucid (1976)~\cite{AshcroftW76} modélise l'infini en se basant sur les suites mathématiques,
 c'est-à-dire par une valeur de départ et un code pour calculer les valeurs suivantes.
 
-Une notion de temps a été ajoutée au flux par Esterel~\cite{Berry84}.
+Une notion de temps a été ajoutée au flux par Esterel (1984)~\cite{Berry84}.
 Les programmes sont proches des filtres UNIX : ils n'ont qu'une entrée auxquels
 ils réagissent sur leur sortie.
 
-Les flux sont considérés comme un ensemble et plus comme un flux unique dans Signal~\cite{Benveniste85}.
-Ce qui permet, comme dans StreamIT~\cite{Thies02}, de mettre en relation des flux
+Les flux sont considérés comme un ensemble et plus comme un flux unique dans Signal (1985)~\cite{Benveniste85}.
+Ce qui permet, comme dans StreamIT (2002)~\cite{Thies02}, de mettre en relation des flux
 pour en créer de nouveaux.
 
 Les programmes sont des graphes acycliques orientés, où les noeuds représentent des
 algorithmes élémentaires et les arcs les dépendances sur les données, comme dans
-Lustre~\cite{Caspi87}.
+Lustre (1987)~\cite{Caspi87}.
 
 \subsection{L'avènement des environnements interactifs avec le \RP}
-TBAG~\cite{Elliott94} introduit la notion de variation temporelle.
+TBAG (1994)~\cite{Elliott94} introduit la notion de variation temporelle.
 De manière graphique l'utilisateur va définir un ensemble de relations
 entre les objects qui vont varier au cours du temps.
 TBAG se charge d'évaluer ces relations pour des valeurs temporelles
 significatives afin que l'animation semble avoir été calculée depuis
 un flux continu.
 
-Par la suite, MediaFlow~\cite{Elliott95} va permettre la combinaison visuelle
+Par la suite, MediaFlow (1995)~\cite{Elliott95} va permettre la combinaison visuelle
 de flux continus.
 
-\emph{Functional Reactive Animation} (Fran)~\cite{Elliott97}~\cite{Elliott98}
+\emph{Functional Reactive Animation} (Fran, 1997-1998)~\cite{Elliott97}~\cite{Elliott98}
 s'appuie sur une spécification programmatique des relations entre des objets
 en fonction du temps.
 Il effectue ensuite son rendu graphique dynamiquement.
 
-Fran est le point de départ de nombreux papiers comme RT-FRP~\cite{Wan02}
-qui ajoute un aspect temps-réel ou Nilsson et al.\cite{Nilsson2002a} qui se base
+Fran est le point de départ de nombreux papiers comme RT-FRP (2002)~\cite{Wan02}
+qui ajoute un aspect temps-réel ou Nilsson et al. (2002)\cite{Nilsson2002a} qui se base
 sur la déclaration de l'enchaînement des traitements.
 
-Le \FRP considère, comme dans André~\cite{Andre96}, les programmes comme
+Le \FRP considère, comme dans André (1996)~\cite{Andre96}, les programmes comme
 une réaction à un ensemble de signaux. Un signal perçu déclenche l'exécution
 d'un comportement, le programme réagit à un principe de stimuli.
 
@@ -176,7 +176,7 @@ Nous devons mettre en place des mécanismes pour permettre de diminuer la charge
 de traitements à effectuer.
 
 Le choix que nous avons fait est de considérer que l'information n'est pas complète.
-Nous n'en possédons pas la fin, et nous ne possédons pas souvent le début.
+Nous n'en possédons pas la fin, et nous ne possédons souvent pas le début.
 
 Ainsi, nos calculs sont effectués sur une information incomplète, ce qui nous
 donne un calcul partiel.
@@ -186,7 +186,8 @@ précédemment calculé pour le compléter avec la nouvelle donnée.
 Il y a une diminution du nombre de calculs, puisque ceux-ci ne sont effectués
 que partiellement.
 
-\subsubsection{Rythme et nature du flux}
+\section{Modélisation du rythme et de la structure des flux}
+\subsection{Rythme et nature du flux}
 Nous appelons nature d'un flux la méthode de construction des données sortantes.
 Par exemple, le fait d'aggréger les informations d'un flux à un autre change
 sa nature car nous obtenons une donnée qui dépend de son historique
@@ -195,7 +196,6 @@ sa nature car nous obtenons une donnée qui dépend de son historique
 Le rythme est modifié si, par exemple, le calcul est lancé uniquement toutes les
 N nouvelles données, le flux de sortie aura N fois moins de messages que le flux d'entrée.
 
-\section{Modélisation du rythme et de la structure des flux}
 \subsection{Cas pratique : box office}
 Nous disposons d'un flux de tickets de cinéma.
 Un ticket est identifié par un nom de film.
@@ -242,7 +242,7 @@ f :: Int -> Char
 Les types de données sont nommés par une lettre commençant en majuscule.
 Les types de données commençant en minuscule sont des types qui seront déterminés
 en fonction de leur(s) usage(s), comme les \emph{template}s C++.
-Lorsque deux types commençant en miniscule sont les mêmes, le type assigné à
+Lorsque deux types commençant en minuscule sont les mêmes, le type assigné à
 l'usage sera le même.
 \begin{lstlisting}
 f :: a    -> a    -- Definition
@@ -253,7 +253,7 @@ f :: Char -> Int  -- Illegal
 
 Pour qu'une fonction prennent plusieurs arguments, il faut que, conceptuellement,
 à chaque nouvel argument appliqué, elle retourne une nouvelle fonction.
-Ainsi, les fonctions suivante ont le même type :
+Ainsi, les fonctions suivantes ont le même type :
 \begin{lstlisting}
 f :: a -> b -> c -> d -> e
 g :: a -> (b -> (c -> (d -> e)))
@@ -268,10 +268,10 @@ class Category cat where
   (.) :: cat b c -> cat a b -> cat a c
 \end{lstlisting}
 
-Pour un type arbitraire \lstinline{cat}, une fonction et un opérateur lui est
+Pour un type arbitraire \lstinline{cat}, une fonction \lstinline{id} et un opérateur \lstinline{(.)} lui sont
 associés.
 
-La fonction \lstinline{id}, qui représente l'identité, c'est à dire
+La fonction \lstinline{id}, représente l'identité, c'est à dire
 que \lstinline{cat} a ses deux paramètres de même type, le type \lstinline{a}.
 
 L'opérateur de composition \lstinline{(.)} qui crée une \lstinline{Category}
@@ -289,7 +289,7 @@ Les fonctions classiques ont une position préfixe :
 add 4 5
 \end{lstlisting}
 
-ici, \lstinline{add} est une fonction classique, elle est donc placée devant ses
+\lstinline{add} est une fonction classique, elle est placée devant ses
 arguments.
 
 Les opérateurs ont une position infixe :
@@ -297,7 +297,7 @@ Les opérateurs ont une position infixe :
 4 + 5
 \end{lstlisting}
 
-ici, \lstinline{+} est un opérateur, il est donc placé entre ses deux premiers
+\lstinline{+} est un opérateur, il est placé entre ses deux premiers
 arguments.
 
 Nous pouvons changer la position des fonctions classiques et des opérateurs en
@@ -322,6 +322,8 @@ add :: Int -> Int -> Int
 add 4 :: Int -> Int
 add 4 5 :: Int
 \end{lstlisting}
+Ici, il y a donc création de trois fonctions : une fonction d'addition générale,
+une fonction qui ajoute \lstinline{4} à un nombre et une fonction constante.
 
 Alors que les fonctions en position préfixes créent automatiquement des fonctions
 lorsqu'elles ne sont que partiellement appliquées, si un des deux premiers arguments
@@ -421,7 +423,7 @@ add3 2
 5
 \end{lstlisting}
 
-Pour représenter notre cas pratique, nous modélisons la notion de noeud de calcul
+Pour représenter le box office présenté enn introduction, nous modélisons la notion de noeud de calcul
 par un type de données \lstinline{Node}.
 \begin{lstlisting}
 data Node a b = Node { process :: a -> b }
@@ -437,7 +439,7 @@ Il peut être ensuite suivi d'un ou plusieurs paramètres de types, ici
 \lstinline{a} et \lstinline{b}.
 L'identifieur de type est utilisé uniquement dans les déclarations de types.
 
-Ensuite, après le \lstinline{=} vient le ou les constructeurs, ici \lstinline{Node}.
+Ensuite, après le \lstinline{=} viennent le ou les constructeurs, ici \lstinline{Node}.
 Ils suivent les mêmes conventions de nommage que les identifieurs de types, mais
 l'identifieur de type et le constructeur n'ont pas obligatoirement le même nom.
 Un construteur peut attendre des valeurs ou non, ici il attend une fonction de
@@ -664,7 +666,7 @@ Par currification, cela revient à écrire \lstinline{arr x = Node x}.
 \lstinline{first}, ligne 3, extrait la fonction \lstinline{f} de \lstinline{Node}.
 Il crée un nouveau \lstinline{Node}, dont la fonction est définie par
 une \emph{lambda expression}.
-Celle-ci attend une paire et en renvoie un dont le second membre, \lstinline{c},
+Celle-ci attend une paire et en renvoie une paire dont le second membre, \lstinline{c},
 sera inchangé, mais dont le premier, \lstinline{b}, se voit appliqué à la fonction \lstinline{f}.
 
 Ainsi, si nous appliquons \lstinline{first} à \lstinline{genRanking}, nous obtenons
@@ -715,7 +717,7 @@ L'opérateur important ici est \lstinline{>>=}, il attend une valeur de type
 \lstinline{a} dans un contexte \lstinline{m}, soit
 le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
 et renvoyant une valeur de type \lstinline{b} encapsulée dans le même contexte \lstinline{m}
-que le premier arguement de l'opérateur, la fonction attendue retourne
+que le premier argument de l'opérateur, la fonction attendue retourne
 une valeur de type \lstinline{m b}. L'opérateur retourne ensuite une valeur de
 type \lstinline{m b}.
 L'implantation naive consiste à renvoyer le retour de la fonction attendue à
@@ -750,9 +752,9 @@ Pour le constructeur \lstinline{Nothing}, ligne 3, on ignore de le second argume
 \lstinline{\_} et on renvoie \lstinline{Nothing}.
 
 \lstinline{return}, ligne 5, prend une valeur et la passe au constructeur
-\lstinline{Just} et le revoie.
+\lstinline{Just} et le renvoie.
 
-\lstinline{>>}, ligne 7, appel \lstinline{>>=} en lui passant son premier paramètre
+\lstinline{>>}, ligne 7, appelle \lstinline{>>=} en lui passant son premier paramètre
 puis en créant une \emph{lambda expression} qui ignore son paramètre d'entrée
 et renvoie le second paramètre de \lstinline{>>}.
 
@@ -794,7 +796,7 @@ de donnée \lstinline{Maybe}, à n'importe quelle type de données implantant le
 \lstinline{Monad}.
 
 Notre but à présent est de créer une \lstinline{Monad} capable de stocker un état.
-Elle se nomme la \emph{State Monad}~\cite{PeytonJones95} et est définie de la manière
+Elle existe et se nomme la \emph{State Monad}~\cite{PeytonJones95} et est définie de la manière
 suivante :
 \begin{lstlisting}
 newtype State s a = State { runState :: s -> (a, s) }
@@ -868,7 +870,7 @@ runState get 2 -- (2,2)
 \end{lstlisting}
 
 Nous souhaitons créer une fonction qui récupère l'état courant,
-l'incrémente et produise la valeur initiale de l'état ajouté à lui-même.
+l'incrémente et produit la valeur initiale de l'état ajouté à lui-même.
 L'implantation est la suivante :
 \begin{lstlisting}
 incrIncr :: State Int Int
