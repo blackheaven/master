@@ -315,7 +315,7 @@ Cette fonction aura pour paramètres, les paramètres omis.
 On parle d'application partielle.
 Comme nous l'avons vu plus haut, de manière plus général, en Haskell, toutes les
 fonctions n'attendent qu'un argument et ne renvoient qu'une valeur.
-Ainsi, conceptuellement, lorsqu'une fonction attends plusieurs arguments, lors de
+Ainsi, conceptuellement, lorsqu'une fonction attend plusieurs arguments, lors de
 chacun de ses appels, une nouvelle fonction est retournée :
 \begin{lstlisting}
 add :: Int -> Int -> Int
@@ -347,7 +347,7 @@ Pour les rendres valide, il faut les entourer de parenthèses :
 \end{lstlisting}
 
 C'est la raison pour laquelle, lorsque l'on déclare le type d'un opérateur, comme
-l'opérateur de composition \lstinline{(.)}, nous sommes obligés de le parenthésés,
+l'opérateur de composition \lstinline{(.)}, nous sommes obligés de le parenthéser,
 puisque nous ne lui passons aucune valeur.
 
 Un exemple d'\lstinline{instance} de \lstinline{Category} concerne le type des fonctions.
@@ -383,7 +383,7 @@ Puis le résultat de cette application sera appliqué à la fonction \lstinline{
 Par conséquent, la fonction résultante aura un paramètre du type de celui de la
 fonction \lstinline{g}, ie. \lstinline{a}, et un type de retour de sa fonction \lstinline{f},
 ie. \lstinline{c}.
-Donc, c'est une fonction qui prend deux fonctions, l'un prenant un \lstinline{a}
+Donc, c'est une fonction qui prend deux fonctions, l'une prenant un \lstinline{a}
 et renvoyant un \lstinline{b}, l'autre prenant un \lstinline{b} et renvoyant un \lstinline{c}.
 Elle renvoie une fonction prenant un \lstinline{a} et renvoyant un \lstinline{c},
 qui est bien la notion de composition.
@@ -427,13 +427,13 @@ par un type de données \lstinline{Node}.
 data Node a b = Node { process :: a -> b }
 \end{lstlisting}
 
-Il contient une fonction transformant un \lstinline{a} en un \lstinline{b} qui
-sont représentés par ses types paramétriques.
+Il contient une fonction transformant un \lstinline{a} en un \lstinline{b}, ces
+types étant les types paramétriques de \lstinline{Node}.
 
-Le mot clef \lstinline{data} permet de définir de nouveau types de données.
-Il est suivit de l'indentifieur de type, qui commence toujours par une lettre
+Le mot clef \lstinline{data} permet de définir de nouveaux types de données.
+Il est suivi de l'identifieur de type, qui commence toujours par une lettre
 majuscule lorsqu'il est alphanumérique, ici \lstinline{Node}.
-Il peut être ensuite suivit d'un ou plusieurs paramètres de types, ici
+Il peut être ensuite suivi d'un ou plusieurs paramètres de types, ici
 \lstinline{a} et \lstinline{b}.
 L'identifieur de type est utilisé uniquement dans les déclaration de types.
 
@@ -469,7 +469,7 @@ via \emph{typeclass} qu'il implante.
 fonction générique \lstinline{id}.
 Ainsi le type de cette fonction est \lstinline{Node a a}.
 
-L'opérateur de composition, ligne 3, extrait, par déconstruction, filtrage par motifs
+L'opérateur de composition, ligne 3, extrait par déconstruction, filtrage par motifs
 ou \emph{pattern matching}, les valeurs du constructeur de \lstinline{Node} de chacun de ses argument.
 \lstinline{g} et \lstinline{f} sont deux fonctions qui sont recomposées au sein
 d'un nouveau \lstinline{Node}.
@@ -491,7 +491,7 @@ pour faire des comparaisons entre deux valeurs.
 Le compilateur est en mesure de déduire les implantations naives pour un certain
 nombre de \emph{typeclass}.
 
-Puis, trois alias de types : \lstinline{Ticket}, \lstinline{Ticket} et
+Puis, trois alias de types : \lstinline{Ticket}, \lstinline{Counter} et
 \lstinline{Ranking} qui sont, respectivement, les alias de \lstinline{String},
 \lstinline{Int} et de \lstinline{[Rank]}.
 Les alias ne font qu'améliorer la lisibilité des types, ils n'influent pas sur
@@ -507,7 +507,7 @@ data [] a = []
 Le type liste est composé de deux constructeurs, séparés par un \lstinline{|}.
 Le premier, ligne 1, \lstinline{[]}, ne prend aucun valeur et représente l'élément
 liste vide.
-Le second, ligne 2, est l'opérateur \lstinline{(:)}, qui attends deux arguments :
+Le second, ligne 2, est l'opérateur \lstinline{(:)}, qui attend deux arguments :
 le premier est une valeur de type \lstinline{a} et le second est une autre liste de
 type \lstinline{a}, noté \lstinline{[a]}.
 Il s'agit d'un type récursif puisqu'un de ses constructeurs a un de ses paramètres
@@ -515,7 +515,7 @@ de son propre type.
 
 Nous implémentons un noeud \lstinline{stabilize} qui limite le débit d'un flux.
 Pour cela nous avons besoin d'une valeur quelconque et d'un compteur en entrée,
-nous utilisons un tuple \lstinline{a, Int}.
+nous utilisons une paire \lstinline{a, Int}.
 Le noeud produit une nouvelle valeur pour le compteur et peut-être une valeur,
 en fonction de l'état de son compteur.
 
@@ -574,9 +574,9 @@ updateRanking t r = case b of
 \end{lstlisting}
 La fonction \lstinline{break} est appelée à la ligne 5.
 Son rôle est de, à partir d'une fonction renvoyant un booléen en fonction d'un
-élément de son second paramètre, une liste, ici les \lstinline{Rank}s \lstinline{r}.
-\lstinline{break} parcourt sa liste, de gauche à droite et lorsque la fonction passé
-en première argument renvoie \lstinline{True}, \lstinline{break} génére une
+élément de son second paramètre, une liste, ici les \lstinline{Rank}s \lstinline{r},
+parcourir sa liste, de gauche à droite et lorsque la fonction passé
+\lstinline{True}, générer une
 paire de tableau dans lequel son premier membre sera l'ensemble des éléments déjà
 parcourus et son membre de gauche sera le tableau contenant l'élement courant et
 le reste de la liste.
@@ -624,17 +624,17 @@ Ici la fonction \lstinline{arr} construit un type de données
 Typiquement il s'agit de stocker la fonction dans un type de données.
 
 \lstinline{first} et \lstinline{second} changent le type d'entrée et de sortie
-en tuple ayant un membre supplémentaire.
+en paire ayant un membre supplémentaire.
 Cette valeur a un type quelconque et sera simplement recopiée lors de l'évaluation
 du calcul.
-Cette valeur se situe en seconde position du tuple pour \lstinline{first} et en
-première position du tuple pour \lstinline{second}.
+Cette valeur se situe en seconde position de la paire pour \lstinline{first} et en
+première position de la paire pour \lstinline{second}.
 
 \lstinline{***} aggrége deux calculs qui seront effectués sans interaction l'un
 avec l'autre.
 
 \lstinline{&&&} crée un calcul qui applique un même argument à deux calculs ayant
-le même type d'entrée et retournera ensuite leur résultat respectif dans un tuple.
+le même type d'entrée et retournera ensuite leur résultat respectif dans une paire.
 
 De plus deux opérateurs de composition sont introduits :
 \begin{lstlisting}
@@ -665,7 +665,7 @@ Par currification, cela revient à écrire \lstinline{arr x = Node x}.
 \lstinline{first}, ligne 3, extrait la fonction \lstinline{f} de \lstinline{Node}.
 Il crée un nouveau \lstinline{Node}, dont la fonction est définie par
 une \emph{lambda expression}.
-Celle-ci attend un tuple et en renvoie un dont le second membre, \lstinline{c},
+Celle-ci attend une paire et en renvoie un dont le second membre, \lstinline{c},
 sera inchangé, mais dont le premier, \lstinline{b}, se voit appliqué à la fonction \lstinline{f}.
 
 Ainsi, si nous appliquons \lstinline{first} à \lstinline{genRanking}, nous obtenons
@@ -708,11 +708,11 @@ Ici on se place dans le cas d'un type de données \lstinline{m} avec un paramèt
 \lstinline{m :: * -> *}.
 
 Par exemple la fonction \lstinline{return} attend un paramètre de type quelconque
-\lstinline{a} et l'encapsule, transmettre cette valeur à un constructeur, dans
+\lstinline{a} et l'encapsule, transmet cette valeur à un constructeur, dans
 un type de donnée \lstinline{m} paramétré par le type de la valeur de son argument
 \lstinline{a}, il aura donc pour type de retour \lstinline{m a}.
 
-L'opérateur, un fonction n'ayant pas de caractères alphabétiques, important ici
+L'opérateur, une fonction n'ayant pas de caractères alphabétiques, important ici
 est \lstinline{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
 position de préfixe.
 Il attend une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
@@ -757,7 +757,7 @@ Pour le constructeur \lstinline{Nothing}, ligne 3, on ignore de le second argume
 
 \lstinline{>>}, ligne 7, appel \lstinline{>>=} en lui passant son premier paramètre
 puis en créant une \emph{lambda expression} qui ignore son paramètre d'entrée
-et renvoyer le second paramètre de \lstinline{>>}.
+et renvoie le second paramètre de \lstinline{>>}.
 
 \lstinline{fail}, ligne 9, ignore son paramètre et renvoye \lstinline{Nothing}.
 
@@ -1009,7 +1009,7 @@ instance Monad m => Arrow (Kleisli m) where
     first  (Kleisli f) = Kleisli (\ ~(b,d) -> f b >>= \c -> return (c,d))
     second (Kleisli f) = Kleisli (\ ~(d,b) -> f b >>= \c -> return (d,c))
 \end{lstlisting}
-\lstinline{arr} attends un argument, une fonction \lstinline{f} et construit
+\lstinline{arr} attend un argument, une fonction \lstinline{f} et construit
 \lstinline{Kleisli} en mettant dans une \lstinline{Monad}, via \lstinline{return},
 le résultat de \lstinline{f}.
 
@@ -1108,8 +1108,8 @@ du noeud \lstinline{stabilize}, ligne 8.
 
 Ce qui entraine une forte duplication qui ne va faire que s'accroitre de
 composition en composition.
-Le mécanisme ne passe pas à l'échelle puisque le tuple sera de plus en plus
-grand en fonction des composition.
+Le mécanisme ne passe pas à l'échelle puisque la paire sera de plus en plus
+grande en fonction des composition.
 
 Ce mécanisme est adhoc est non pérein.
 
