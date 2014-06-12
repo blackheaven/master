@@ -176,7 +176,7 @@ Nous devons mettre en place des mécanismes pour permettre de diminuer la charge
 de traitements à effectuer.
 
 Le choix que nous avons fait est de considérer que l'information n'est pas complète.
-Nous n'en possèdons pas la fin, et nous ne possédons pas souvent le début.
+Nous n'en possédons pas la fin, et nous ne possédons pas souvent le début.
 
 Ainsi, nos calculs sont effectués sur une information incomplète, ce qui nous
 donne un calcul partiel.
@@ -200,7 +200,7 @@ N nouvelles données, le flux de sortie aura N fois moins de messages que le flu
 Nous disposons d'un flux de tickets de cinéma.
 Un ticket est identifié par un nom de film.
 
-Nous souhaitons avoir un premier flux contenant une liste des films ordonnés par
+Nous souhaitons avoir un premier flux contenant une liste de films ordonnés par
 nombre d'entrées décroissant, obtenu via un noeud \lstinline{genRanking}.
 Ce qui implique un changement de nature du flux.
 Le rythme du flux ne change pas puisque la liste est mise à jour à chaque nouveau
@@ -289,7 +289,7 @@ Les fonctions classiques ont une position préfixe :
 add 4 5
 \end{lstlisting}
 
-ici, \lstinline{add} est une fonction classique, elle est donc placé devant ses
+ici, \lstinline{add} est une fonction classique, elle est donc placée devant ses
 arguments.
 
 Les opérateurs ont une position infixe :
@@ -301,7 +301,7 @@ ici, \lstinline{+} est un opérateur, il est donc placé entre ses deux premiers
 arguments.
 
 Nous pouvons changer la position des fonctions classiques et des opérateurs en
-les entourant, respectivement, de \emph{back-quotes} (\lstinline{`}) et de paranthèses.
+les entourant, respectivement, de \emph{back-quotes} (\lstinline{`}) et de parenthèses.
 Ainsi, voici l'équivalent des deux exemples précédents en inversant les positions :
 \begin{lstlisting}
 4 `add` 5
@@ -403,7 +403,7 @@ prod2Add3 = add3 . prod2
 \end{lstlisting}
 
 Ainsi \lstinline{prod2Add3 1} renvoie \lstinline{5}.
-Nous aurions put l'ecrire \lstinline{prod2Add3 x = prod2 (add3 x)}.
+Nous aurions pu l'ecrire \lstinline{prod2Add3 x = prod2 (add3 x)}.
 En fait il se passe le mécanisme de substitution, appelé évaluation, suivant :
 \begin{lstlisting}
 prod2Add3 = add3 . prod2
@@ -609,7 +609,7 @@ stabilize :: Node (a, Counter) (Maybe a, Counter)
 Les \Arrs~\cite{Hughes00} ont été introduits pour pouvoir combiner de manière
 standard des fonctions au sein d'une \lstinline{Category}.
 Il s'agit d'une spécialisation des \lstinline{Category}.
-Ils \Arrs sont définis en Haskell via le \emph{typeclass} suivant :
+Les \Arrs sont définis en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}
 class Category a => Arrow a where
     arr :: (b -> c) -> a b c
@@ -712,10 +712,8 @@ Par exemple la fonction \lstinline{return} attend un paramètre de type quelconq
 un type de donnée \lstinline{m} paramétré par le type de la valeur de son argument
 \lstinline{a}, il aura donc pour type de retour \lstinline{m a}.
 
-L'opérateur, une fonction n'ayant pas de caractères alphabétiques, important ici
-est \lstinline{>>=}, il est entouré de paranthèses pour indiquer qu'il est en
-position de préfixe.
-Il attend une valeur de type \lstinline{a} dans un contexte \lstinline{m}, soit
+L'opérateur important ici est \lstinline{>>=}, il attend une valeur de type
+\lstinline{a} dans un contexte \lstinline{m}, soit
 le type \lstinline{m a}, puis une fonction ayant un paramètre de type \lstinline{a}
 et renvoyant une valeur de type \lstinline{b} encapsulé dans le même contexte \lstinline{m}
 que le premier arguement de l'opérateur, la fonction attendue retourne
@@ -850,9 +848,9 @@ evalState act = fst . runState act
 execState :: State s a -> s -> s
 execState act = snd . runState act
 \end{lstlisting}
-\lstinline{evalState} récupère le premier membre de la paire générée par l'execution
+\lstinline{evalState} récupère le premier membre de la paire générée par l'exécution
 de la \lstinline{Monad}, via la fonction \lstinline{fst}.
-\lstinline{execState} récupère le second membre de la paire générée par l'execution
+\lstinline{execState} récupère le second membre de la paire générée par l'exécution
 de la \lstinline{Monad}, via la fonction \lstinline{snd}.
 
 Il faut également des fonctions pour récupérer et assigner l'état :
@@ -871,7 +869,7 @@ runState get 2 -- (2,2)
 \end{lstlisting}
 
 Nous souhaitons créer une fonction qui récupère l'état courant,
-l'incrémente et produise la valeur initial de l'état ajouté à lui-même.
+l'incrémente et produise la valeur initiale de l'état ajouté à lui-même.
 L'implantation est la suivante :
 \begin{lstlisting}
 incrIncr :: State Int Int
@@ -884,7 +882,7 @@ incrIncr = do
 représentons par \lstinline{i}.
 Nous mettons ensuite sa valeur incrémentée dans l'état avec \lstinline{put} à la
 ligne 3.
-Puis nous renvons l'état initial, \lstinline{i}, ajouté à lui-même.
+Puis nous renvoyons l'état initial, \lstinline{i}, ajouté à lui-même.
 
 Cette notation est appelée \lstinline{do}-notation et est en fait du sucre syntaxique
 pour :
@@ -1024,7 +1022,7 @@ qui attend une pair \lstinline{(b, d)}.
 \lstinline{second} est construite comme \lstinline{first} mais dans l'ordre inverse
 au niveau des paires.
 
-Nous reprennons nos types précédants, sans \lstinline{Node} qui est devenu
+Nous reprennons nos types précédents, sans \lstinline{Node} qui est devenu
 inutile avec \lstinline{Kleisli} :
 \begin{lstlisting}
 data Rank = Rank { title :: String, visitors :: Int } deriving (Show, Eq)
@@ -1033,7 +1031,7 @@ type Counter = Int
 type Ranking = [Rank]
 \end{lstlisting}
 
-Pour que nos noeuds soient conforme à \lstinline{Kleisli}, nous encapsulons les
+Pour que nos noeuds soient conformes à \lstinline{Kleisli}, nous encapsulons les
 versions monadiques dans le constructeur de \lstinline{Kleisli}.
 \begin{lstlisting}
 genRanking :: Kleisli (State Ranking) Ticket Ranking
@@ -1067,7 +1065,7 @@ Kleisli (State Counter) a         (Maybe a) -- stabilize
  runKleisli ::          a ->      Maybe a
 \end{lstlisting}
 
-La composition ne peux plus se faire selon les fonctions classiques comme \lstinline{>>>}
+La composition ne peut plus se faire selon les fonctions classiques comme \lstinline{>>>}
 puisque les contextes, ici \lstinline{Kleisli (State Ranking)} et \lstinline{Kleisli (State Counter)},
 sont différents.
 
@@ -1106,7 +1104,7 @@ Nous changeons l'état de la \lstinline{Monad} du niveau supérieur avec les nou
 Enfin nous renvoyons la valeur produite \lstinline{sv}, ligne 10, par l'évaluation
 du noeud \lstinline{stabilize}, ligne 8.
 
-Ce qui entraine une forte duplication qui ne va faire que s'accroitre de
+Ce qui entraîne une forte duplication qui ne va faire que s'accroître de
 composition en composition.
 Le mécanisme ne passe pas à l'échelle puisque la paire sera de plus en plus
 grande en fonction des composition.
@@ -1173,7 +1171,7 @@ stabilizedRanking :: Kleisli (State (Ranking, Counter)) Ticket (Maybe Ranking)
 stabilizedRanking = genRanking >*> stabilize
 \end{lstlisting}
 \lstinline{stabilizedRanking} en est réduit à sa forme la plus simple car c'est
-\HA qui a la charge de la difficulté de la omposition.
+\HA qui a la charge de la difficulté de la composition.
 
 Nous rajoutons à présent une notion de rythme.
 Elle prendra la forme de deux types encapsulés, via \lstinline{newtype}, il s'agit
@@ -1200,7 +1198,7 @@ instance HeterogeneousArrow (Fast s) (Slow s') (Slow (s, s')) where
     F f >*> S g = S (f >*> g)
 \end{lstlisting}
 Comme nous le voyons ci-dessus, \lstinline{Fast} et \lstinline{Slow} n'apportent
-aucune données, elles ne sont là que pour distinguer deux valeurs de même type qui
+aucune donnée, elles ne sont là que pour distinguer deux valeurs de même type qui
 n'ont pas la même "nature".
 
 Nous voyons ici que composer deux traitements, dont un lent donnera un traitement
@@ -1219,7 +1217,7 @@ rythmes différents grâce aux \SAp
 Il fallait généraliser la composition pour obtenir une table de correspondance entre
 les différents éléments.
 
-Même si notre méthode résoud des problèmes de compositions, elle se base sur un
+Même si notre méthode résout des problèmes de compositions, elle se base sur un
 ensemble de paires, ce qui peut nuire à la lisibilité et à la manipulation.
 Une des pistes d'amélioration est de considérer les états comme des collections
 hétérogènes, ou \emph{heterogeneous collections}.
