@@ -5,7 +5,7 @@
 
 \documentclass{llncs}
 \usepackage[T1]{fontenc}
-\usepackage[frenchb]{babel}
+\usepackage[frenchb,english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
 \lstset{
@@ -39,6 +39,7 @@
 
 
 \begin{document}
+\selectlanguage{french}
 \title{\SA : modéliser le rythme du \DF}
 
 %If you're using runningheads you can add an abreviated title for the running head on odd pages using the following
@@ -81,6 +82,15 @@ cas pratique, une faiblesse dans le modèle actuel qui réside dans la difficult
 de composer des contextes de calculs différents.
 Nous fournissons une généralisation des \Arrs en Haskell.
 \end{abstract}
+
+\selectlanguage{english}
+\begin{abstract}
+The \DF is a tool that allow us to express data flows traveling between execution entities.
+
+We will show its goals, then we will expose a weakness in the current design, that is hard to compose different computational context.
+We will provide a generalisation of Haskell \Arrs.
+\end{abstract}
+\selectlanguage{french}
 
 \section{Introduction}
 Le \DF modélise le "continu" dans les programmes informatiques.
@@ -218,12 +228,24 @@ notre domaine d'étude.
 
 \subsubsection{Modélisation sans notion de rythme}
 La méthode classique pour gérer le \DF en Haskell sont les \Arrs~\cite{Hughes00}.
-C'est une spécialisation des \lstinline{Category}
-qui définissent la notion de composition sous forme de \emph{typeclass}.
-Un \emph{typeclass} représente la capacité à appeler un ensemble
+
+Nous verrons successivement différents concepts afin de gérer la composition de
+noeuds de calculs sans notion de rythme.
+Les concepts sont implantés via des \emph{typeclass} qui représentent la capacité à appeler un ensemble
 de fonctions sur un ensemble de type de données.
 Il s'agit d'un mécanisme proche des \emph{template}s spécialisées du C++.
 
+Dans un premier temps nous nous arrêterons sur la notion de fonctions puisque
+les calculs sont effectué en leur sein.
+Ensuite viendra les \lstinline{Category} qui définissent la relation de composition
+pour un type donné.
+Nous étudierons les \Arrs qui founrissent un moyen de composition plus avancé.
+Nous présenterons les \lstinline{Monad}s afin d'obtenir un état persistent.
+Nous combinerons \Arrs et \lstinline{Monad}s pour obtenir un calcul à états, ce
+qui nous donnera un \lstinline{Kleisli Arrow} dont le résultat de l'évaluation
+d'une même donnée varie au court du temps.
+
+\subsubsection{Définition des fonctions}
 En Haskell, tout est expression, le type d'expressions le plus courant est le type
 fonction noté \lstinline{->}.
 Il est fourni par le langage.
@@ -260,6 +282,7 @@ g :: a -> (b -> (c -> (d -> e)))
 \end{lstlisting}
 On parle de currification ou \emph{currying}.
 
+\subsubsection{Définition de la composabilité avec les \lstinline{Category}}
 Ici nous déclarons le \emph{typeclass} \lstinline{Category}, qui représente
 la notion de composabilité.
 \begin{lstlisting}
@@ -607,6 +630,28 @@ genRanking :: Node (Ticket, Ranking) Ranking
 stabilize :: Node (a, Counter) (Maybe a, Counter)
 \end{lstlisting}
 
+Comme nous l'avons vu le type de \lstinline{>>>} est le suivant :
+\begin{lstlisting}
+  (.) :: cat b c -> cat a b -> cat a c
+  -- Soit
+  (.) :: Node b c -> Node a b -> Node a c
+\end{lstlisting}
+
+Nous voulons composer \lstinline{stabilize} et \lstinline{genRanking}.
+Si nous substitutons les types, \lstinline{c} devient le type de sortie de \lstinline{stabilize},
+soit \lstinline{(Maybe a, Counter)} et \lstinline{a} devient le type d'entrée de
+\lstinline{genRanking} soit \lstinline{(Ticket, Ranking)}.
+
+Il nous reste à substituer \lstinline{c}, qui doit être à la fois le type de sortie
+de \lstinline{genRanking} et le type d'entrée de \lstinline{stabilize}.
+Mais \lstinline{genRanking} à pour type de sortie \lstinline{Ranking}
+et \lstinline{stabilize} à pour type d'entrée \lstinline{(a, Counter)},
+les deux types n'étant pas les mêmes, \lstinline{(.)} ne peux pas être appliqué
+directement à ces fonctions.
+
+\lstinline{Category} ne permet pas la composition dans ce cas.
+
+\subsubsection{Standardisation des compositions avec les \Arrs}
 Les \Arrs~\cite{Hughes00} ont été introduits pour pouvoir combiner de manière
 standard des fonctions au sein d'une \lstinline{Category}.
 Il s'agit d'une spécialisation des \lstinline{Category}.
@@ -625,7 +670,7 @@ Ici la fonction \lstinline{arr} construit un type de données
 Typiquement il s'agit de stocker la fonction dans un type de données.
 
 \lstinline{first} et \lstinline{second} changent le type d'entrée et de sortie
-en paire ayant un membre supplémentaire.
+en paire ayant un membre, \lstinline{d}, supplémentaire.
 Cette valeur a un type quelconque et sera simplement recopiée lors de l'évaluation
 du calcul.
 Cette valeur se situe en seconde position de la paire pour \lstinline{first} et en
@@ -695,6 +740,7 @@ Malheureusement Haskell étant un langage fonctionnel pur, cela signifie qu'il d
 de la transparence référentielle, ainsi, toute fonction appelée avec les mêmes arguments
 donnera toujours le même résultat.
 
+\subsubsection{Gestion de l'état via les \lstinline{Monads}}
 Ainsi, un mécanisme nommé \lstinline{Monad}~\cite{Wadler90} a été mis en place.
 Les \lstinline{Monad}s sont définies en Haskell via le \emph{typeclass} suivant :
 \begin{lstlisting}
@@ -956,7 +1002,9 @@ C'est ce qui les rend plus composable que les \lstinline{Monad}s.
 Il nous faut donc combiner une \lstinline{State Monad} pour conserver l'état et un
 \lstinline{Arrow} pour la composition.
 
-Nous obtenons un \lstinline{Kielsi Arrow}~\cite{Hughes00}.
+\subsubsection{\lstinline{Kleisli arrow}s : fusion des \lstinline{Monad}s et des \Arrs}
+Nous obtenons un \lstinline{Kielsi Arrow}~\cite{Hughes00} à d'un \lstinline{Monad}
+et d'un \Arrv ce qui va nous permettre d'obtenir un calcul qui va dépendre de son état.
 \lstinline{Node} devient alors inutile puisque \lstinline{Kleisli} implante déjà les
 \emph{typeclass} \Arr et \lstinline{Monad}.
 
