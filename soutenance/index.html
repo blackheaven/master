@@ -54,18 +54,35 @@
                     <section data-markdown>
                         <script type="text/template">
                             ### Big data
+
+                             * Afflux de données trop important
+                             * Coût du stockage élevé
+                             * Coût du traitement de l'ensemble des données
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
                             ### Traitement continue de l'information
+
+                             * Les données arrivent par morceaux
+                             * Elles font partie d'un tout incomplet
+                             * Calculs partiels
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Cinéma
+                            ### Flux
+
+                             * Ensemble de données morcellées
+                             * Début inaccessible et sans fin
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Cas pratique : Cinéma
 
                              * Flux de tickets
                              * Flux de classements
@@ -84,18 +101,27 @@
                     <section data-markdown>
                         <script type="text/template">
                             ### Nature
+
+                             * Types de données consommés/produits
+                             * L'état joue-t-il pour les valeurs produites ?
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
                             ### Rythme
+
+                             * Débit de consommation et de production des données
+                             * Rapport entre les données consommés et produites
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
                             ### Composition
+
+                             * Nature : comment faire lorsque les types de données sont incompatibles ?
+                             * Rythme : comment faire lorsque les rythmes sont différents ?
                         </script>
                     </section>
                 </section>
@@ -152,6 +178,9 @@
                     <section data-markdown>
                         <script type="text/template">
                             ### Haskell
+
+                             * La plupart des travaux sur le FRP se basent dessus
+                             * Le système de types est suffisament avancé pour modéliser les problématiques de composition
                         </script>
                     </section>
 
@@ -159,8 +188,8 @@
                         <script type="text/template">
                             ### Composition
 
-                             * Category
-                             * Arrows
+                             * Category : modélisation de la composition
+                             * Arrows : uniformisation des transformations de types pour améliorer la composition
                         </script>
                     </section>
                 </section>
@@ -174,7 +203,7 @@
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Nouveau typeclass
+                            ### Nouveau conpect : Heterogeneous-Arrows
 
                             Définit les compositions une à une, comme les transitions d'une machine à états
                         </script>
@@ -186,8 +215,8 @@
                         <script type="text/template">
                             # Conclusion
 
-                             * Un début
-                             * Généralisable
+                             * Un début : généralisation basique du concept de composition
+                             * Généralisable : duplication des opérations n'ayant pas d'état par exemple
                         </script>
                     </section>
 
