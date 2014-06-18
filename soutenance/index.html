@@ -63,6 +63,16 @@
 
                     <section data-markdown>
                         <script type="text/template">
+                            ### Méthodes classiques
+
+                             * Agrandissement des infrastructures
+                             * Surveillance de l'infrastructure
+                             * Éstimations
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
                             ### Traitement continue de l'information
 
                              * Les données arrivent par morceaux
@@ -79,16 +89,6 @@
                              * Début inaccessible et sans fin
                         </script>
                     </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
-                            ### Cas pratique : Cinéma
-
-                             * Flux de tickets
-                             * Flux de classements
-                             * Flux d'affichage
-                        </script>
-                    </section>
                 </section>
 
                 <section><!-- 2 minutes -->
@@ -100,7 +100,16 @@
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Nature
+                            ### Expression dans le langage
+
+                             * Traitements
+                             * Flux
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Nature du flux
 
                              * Types de données consommés/produits
                              * L'état joue-t-il pour les valeurs produites ?
@@ -109,7 +118,7 @@
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Rythme
+                            ### Rythme du flux
 
                              * Débit de consommation et de production des données
                              * Rapport entre les données consommés et produites
@@ -131,7 +140,7 @@
                         <script type="text/template">
                             # Bibliographie
                         </script>
-                    </section>
+                    </section><!-- TODO : tableau -->
 
                     <section data-markdown>
                         <script type="text/template">
@@ -166,6 +175,16 @@
                              * 2002 : RT-FRP
                         </script>
                     </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+|               | Flow-based programming          | Reactive-based programming  |
+| ------------- |:-------------:| :-----:|
+| Mémoire partageable | X | V | V |
+| Contrôle du traitement | V | ~ | ~ |
+| Multi-flux et combinaison | ~ | ~ | V |
+                        </script>
+                    </section>
                 </section>
 
                 <section><!-- 4 minutes -->
@@ -179,6 +198,10 @@
                         <script type="text/template">
                             ### Haskell
 
+                             * Fonctionnel pure
+                             * Statiquement et fortement typé
+                             * Non-strict
+
                              * La plupart des travaux sur le FRP se basent dessus
                              * Le système de types est suffisament avancé pour modéliser les problématiques de composition
                         </script>
@@ -186,10 +209,42 @@
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Composition
+                            ### 1. Notion de calcul et de composition : Category
 
-                             * Category : modélisation de la composition
-                             * Arrows : uniformisation des transformations de types pour améliorer la composition
+                             * Représente un type composable
+                             * Un type d'entrée, un type de sortie
+                             * a -> b + b -> c = a -> c
+                             * Il faut que les types d'entrées soit *identiques*
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### 2. Composition standard : Arrow
+
+                             * Spécialisation de Category
+                             * Facilité de compositions
+                             * Ne gère pas l'état interne
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### 3. Gestion de l'état : Monad
+
+                             * Gestion interne de l'état
+                             * Composable lorsque le genre est le même
+                             * Seule le type de sortie peut varier
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### 4. État et calcul : Kleisli Arrow
+
+                             * Gère l'état
+                             * Gère la composition avec les types d'entrée et de sortie
+                             * Ne se compose que lorsque le type de valeur stockée par le Monad est la même
                         </script>
                     </section>
                 </section>
@@ -203,9 +258,10 @@
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Nouveau conpect : Heterogeneous-Arrows
+                            ### Nouveau concept : Heterogeneous-Arrows
 
-                            Définit les compositions une à une, comme les transitions d'une machine à états
+                             * Définit les compositions une à une, comme les transitions d'une machine à états
+                             * Category devient un cas particulier
                         </script>
                     </section>
                 </section>
