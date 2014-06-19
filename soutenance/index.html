@@ -224,7 +224,7 @@
 
                              * Spécialisation de Category
                              * Facilité de compositions
-                             * Permet d'enrichire de manière transparente les types d'entrée et de sortie
+                             * Permet d'enrichir de manière transparente les types d'entrée et de sortie
                              * Ne gère pas l'état interne
                         </script>
                     </section>
@@ -234,6 +234,7 @@
                             ### 3. Gestion de l'état : Monad
 
                              * Gestion interne de l'état
+                             * Met les valeurs dans un contexte (on dit que les calculs sont effectués dans un contexte)
                              * Composable lorsque le genre est le même
                              * Seule le type de sortie peut varier
                         </script>
@@ -244,7 +245,7 @@
                             ### 4. État et calcul : Kleisli Arrow
 
                              * Gère l'état
-                             * Met les valeurs dans un contexte (on dit que les calculs sont effectués dans un contexte)
+                             * On ajoute une dépendance au contexte (la monad) d'un calcul
                              * Gère la composition avec les types de sortie
                              * Ne se compose que lorsque le type de valeur stockée par le Monad est la même
                         </script>
