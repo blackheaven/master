@@ -211,7 +211,7 @@
                         <script type="text/template">
                             ### 1. Notion de calcul et de composition : Category
 
-                             * Représente un type composable
+                             * Représente un type composable (comme une fonction)
                              * Un type d'entrée, un type de sortie
                              * a -> b + b -> c = a -> c
                              * Il faut que les types d'entrées soit *identiques*
@@ -224,6 +224,7 @@
 
                              * Spécialisation de Category
                              * Facilité de compositions
+                             * Permet d'enrichire de manière transparente les types d'entrée et de sortie
                              * Ne gère pas l'état interne
                         </script>
                     </section>
@@ -243,7 +244,8 @@
                             ### 4. État et calcul : Kleisli Arrow
 
                              * Gère l'état
-                             * Gère la composition avec les types d'entrée et de sortie
+                             * Met les valeurs dans un contexte (on dit que les calculs sont effectués dans un contexte)
+                             * Gère la composition avec les types de sortie
                              * Ne se compose que lorsque le type de valeur stockée par le Monad est la même
                         </script>
                     </section>
