@@ -40,6 +40,10 @@
                         ## Heterogeneous-Arrow
                         ### Modéliser le rythme du Data-Flow
 
+                        Gautier DI FOLCO, Master II en Recherche Réseaux Télécoms et Services, Université Lyon 1.
+
+                        Laboratoire CITI, sous la direction de Stéfane Frénot.
+
                         Lyon, 23/06/14
                     </script>
                 </section>
@@ -55,9 +59,10 @@
                         <script type="text/template">
                             ### Big data
 
-                             * Afflux de données trop important
-                             * Coût du stockage élevé
-                             * Coût du traitement de l'ensemble des données
+                             * Afflux de données très important
+                             * Volume de stockage important
+                             * Nécessité de rapidité traitement rapide
+                             * Nécessité d'accumuler indéfiniement les données
                         </script>
                     </section>
 
@@ -65,72 +70,35 @@
                         <script type="text/template">
                             ### Méthodes classiques
 
-                             * Agrandissement des infrastructures
-                             * Surveillance de l'infrastructure
-                             * Éstimations
+                             * Augmentation des performances d'infrastructure matérielle
+                               * Datacenter
+                               * Économie
+
+                             * Augmentation des performances d'infrastructure logicielle
+                               * Hadoop (batch)
+                               * Storm (flux)
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Traitement continue de l'information
+                            ### Gestion du Data-flow
 
-                             * Les données arrivent par morceaux
-                             * Elles font partie d'un tout incomplet
-                             * Calculs partiels
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
-                            ### Flux
-
-                             * Ensemble de données morcellées
                              * Début inaccessible et sans fin
-                        </script>
-                    </section>
-                </section>
+                             * Delta plus important que le vitesse
+                             * Middleware + Infrastructure
 
-                <section><!-- 2 minutes -->
-                    <section data-markdown>
-                        <script type="text/template">
-                            # Problématique
+                             => Approche des problèmes de flux par le langage
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Expression dans le langage
+                            ### Définir un langage de programmation
 
-                             * Traitements
-                             * Flux
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
-                            ### Nature du flux
-
-                             * Types de données consommés/produits
-                             * L'état joue-t-il pour les valeurs produites ?
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
-                            ### Rythme du flux
-
-                             * Débit de consommation et de production des données
-                             * Rapport entre les données consommés et produites
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
-                            ### Composition
-
-                             * Nature : comment faire lorsque les types de données sont incompatibles ?
-                             * Rythme : comment faire lorsque les rythmes sont différents ?
+                             * Formaliser les flux
+                             * Formaliser des algorithmes de traitements
+                             * Offrant les meilleurs garanties de preuve sur les délais de bout en bout
                         </script>
                     </section>
                 </section>
@@ -140,49 +108,66 @@
                         <script type="text/template">
                             # Bibliographie
                         </script>
-                    </section><!-- TODO : tableau -->
+                    </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ## Réseaux de Kahn
+                            ### Un langage de programmation
 
-                             * 1974
-                             * Programmes comme un ensemble d'entités
-                             * Communication via **channels**
-                             * Premier objectif : programmation parallèle
+                             * 1974 : Réseaux de Kahn
+                               * Divise le programme en entité communicants par **channels** des listes FIFO
+                               * Fourni une notation, pas un langage
+
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ## Flow-based programming
+                            ### Formaliser les flux
+                             * 1976 : Lucid
+                               * Se base sur des suites (premier élément et méthode pour calculer les suivants) pour modéliser les flux
+                               * Le flux est tronqué pour obtenir un résultat
+                             * 1984 : Esterel
+                               * Le programme n'a qu'une entrée et qu'une sortie
+                               * Nous sommes limité à la transformation d'un flux
 
-                             * 1976 : Lucid (suites)
-                             * 1984 : Esterel (filtres)
-                             * 1985 : Signal (ensemble de flux)
-                             * 1987 : Lustre (DAG)
-                             * 2002 : StreamIT (correlation)
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ## Reactive-based programming
+                            ### Formaliser des algorithmes de traitements
 
-                             * 1994 : TBAG (variation temporelle des relations)
-                             * 1995 : Mediaflow (combinaison visuelle)
+                             * 1994 : TBAG
+                               * Modélise les variations temporelle des relations
+                               * Ne gère pas les traitements
+                             * 1995 : Mediaflow
+                               * Combinaison visuelle des flux
+                               * Pas de notion de traitements
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            ### Offrant les meilleurs garanties de preuve sur les délais de bout en bout
+
                              * 1997 : Fran
+                               * Modélise la composition de traitements
+                               * Aucune gestion des délais
                              * 2002 : RT-FRP
+                               * Approche du temps réelle par calcul des coûts de traitements
+                               * Aucune garantie globale
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-|               | Flow-based programming          | Reactive-based programming  | Heterogeneous-Arrow |
-| ------------- |:-------------:| :-----:|
-| Mémoire partageable | X | V | V |
-| Contrôle du traitement | V | ~ | ~ |
-| Multi-flux et combinaison | ~ | ~ | V |
+|                                    | Kahn  | Lucid  | Esterel | TBAG   | Mediaflow | Fran   | RT-FRP | Heterogeneous-Arrow |
+| -------------                      | :---: | :----: | :----:  | :----: | :----:    | :----: | :----: | :----:              |
+| Un langage de programmation        | X     | V      | V       | X      | X         | V      | V      | V                   |
+| Formaliser les flux                | V     | X      | X       | V      | V         | V      | V      | V                   |
+| Formaliser des algorithmes         | X     | X      | X       | X      | X         | V      | V      | V                   |
+| Garanties de preuve sur les délais | X     | X      | V       | X      | X         | X      | V      | V                   |
                         </script>
                     </section>
                 </section>
@@ -190,81 +175,317 @@
                 <section><!-- 4 minutes -->
                     <section data-markdown>
                         <script type="text/template">
-                            # Propositions
+                            # Proposition
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Haskell
+                            ### Langage de programmation de flux
 
-                             * Fonctionnel pure
-                             * Statiquement et fortement typé
-                             * Non-strict
-
-                             * La plupart des travaux sur le FRP se basent dessus
-                             * Le système de types est suffisament avancé pour modéliser les problématiques de composition
+                             * Formel
+                               * Typage fort
+                                 * Haskell
+                                   * Théorie des catégories
+                                   * Type => Flux (**Arrow**)
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### 1. Notion de calcul et de composition : Category
+                            ### Composition de 2 Arrow
 
-                             * Représente un type composable (comme une fonction)
-                             * Un type d'entrée, un type de sortie
-                             * a -> b + b -> c = a -> c
-                             * Il faut que les types d'entrées soit *identiques*
+                            On compose deux valeurs de même type :
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+</svg>
+.
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+=
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">h</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+
+
+                            On compose deux valeurs de types différents :
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+</svg>
+.
+<svg width="120" height="50">
+    <circle r="25" cy="25" cx="60" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+=
+<svg width="120" height="50">
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <rect width="60" height="50" y="0" x="30" fill="black" />
+    <text x="55" y="35" fill="white">?</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### 2. Composition standard : Arrow
+                            ### Mon travail
 
-                             * Spécialisation de Category
-                             * Facilité de compositions
-                             * Permet d'enrichir de manière transparente les types d'entrée et de sortie
-                             * Ne gère pas l'état interne
+                             * Partir des Arrows
+                             * Résoudre la composition
+                               * Rythme : Débit de consommation et de production des données
+                               * Nature : Besoin d'un état ou non
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### 3. Gestion de l'état : Monad
+                            ### Notes
 
-                             * Gestion interne de l'état
-                             * Met les valeurs dans un contexte (on dit que les calculs sont effectués dans un contexte)
-                             * Composable lorsque le genre est le même
-                             * Seule le type de sortie peut varier
+                             * Utilisation des **Category** qui sont une généralisation des **Arrow**
+                             * Décrit la notion de composition
+
+comme
+
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+</svg>
+.
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+=
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">h</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+
+ou
+
+<svg width="120" height="50">
+    <circle r="25" cy="25" cx="60" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+</svg>
+.
+<svg width="120" height="50">
+    <circle r="25" cy="25" cx="60" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+=
+<svg width="120" height="50">
+    <circle r="25" cy="25" cx="60" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">h</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### 4. État et calcul : Kleisli Arrow
+                            ### Notes
 
-                             * Gère l'état
-                             * On ajoute une dépendance au contexte (la monad) d'un calcul
-                             * Gère la composition avec les types de sortie
-                             * Ne se compose que lorsque le type de valeur stockée par le Monad est la même
+                             * Utilisation des **Arrow**
+                             * Décrit les dérivation automatiques
+
+Non-composable :
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="55">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+
+    <line y1="60" x1="0" y2="60" x2="120" stroke="white" />
+    <text x="5" y="90" fill="white">E</text>
+    <text x="100" y="90" fill="white">F</text>
+</svg>
+.
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+
+Composable :
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="55">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+
+    <line y1="60" x1="0" y2="60" x2="120" stroke="white" />
+    <text x="5" y="90" fill="white">E</text>
+    <text x="100" y="90" fill="white">F</text>
+</svg>
+.
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+
+    <line y1="60" x1="0" y2="60" x2="120" stroke="white" />
+    <text x="5" y="90" fill="white">&alpha;</text>
+    <text x="100" y="90" fill="white">&alpha;</text>
+    <text x="55" y="55">g'</text>
+</svg>
+=
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="55">h</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">C</text>
+
+    <line y1="60" x1="0" y2="60" x2="120" stroke="white" />
+    <text x="5" y="90" fill="white">E</text>
+    <text x="100" y="90" fill="white">F</text>
+</svg>
                         </script>
                     </section>
-                </section>
 
-                <section><!-- 2 minutes -->
                     <section data-markdown>
                         <script type="text/template">
-                            # Résultats
+                            ### Mise en oeuvre N°1
+
+                             * Utilisation des **Kleisli Arrow**
+                             * Stock l'état d'un traitement
+
+Non-composable :
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="45">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+
+    <rect width="60" height="30" y="70" x="30" fill="grey" />
+    <text x="55" y="95">X</text>
+</svg>
+.
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="45">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+
+    <rect width="60" height="30" y="70" x="30" fill="grey" />
+    <text x="55" y="95">Y</text>
+</svg>
+
+Revient à faire :
+<svg width="120" height="50">
+    <rect width="60" height="50" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+</svg>
+.
+<svg width="120" height="50">
+    <circle r="25" cy="25" cx="60" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="35">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
+=
+<svg width="120" height="50">
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <rect width="60" height="50" y="0" x="30" fill="black" />
+    <text x="55" y="35" fill="white">?</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">C</text>
+</svg>
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Nouveau concept : Heterogeneous-Arrows
+                            ### Mise en oeuvre N°2
 
-                             * Définit les compositions une à une, comme les transitions d'une machine à états
-                             * Category devient un cas particulier
+                             * Utilisation des **Heterogeneous-Arrows**
+                             * Définit les compositions une à une
+                             * Comme les transitions d'une machine à états
+
+Non-composable :
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="45">f</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">B</text>
+
+    <rect width="60" height="30" y="70" x="30" fill="grey" />
+    <text x="55" y="95">X</text>
+</svg>
+.
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="45">g</text>
+    <text x="5" y="20" fill="white">B</text>
+    <text x="100" y="20" fill="white">C</text>
+
+    <rect width="60" height="30" y="70" x="30" fill="grey" />
+    <text x="55" y="95">Y</text>
+</svg>
+=
+<svg width="120" height="100">
+    <rect width="60" height="100" y="0" x="30" fill="white" />
+    <line y1="25" x1="0" y2="25" x2="120" stroke="white" />
+    <text x="55" y="45">g</text>
+    <text x="5" y="20" fill="white">A</text>
+    <text x="100" y="20" fill="white">C</text>
+
+    <rect width="60" height="30" y="70" x="30" fill="grey" />
+    <text x="30" y="95">(X,Y)</text>
+</svg>
                         </script>
                     </section>
                 </section>
@@ -275,7 +496,9 @@
                             # Conclusion
 
                              * Un début : généralisation basique du concept de composition
-                             * Généralisable : duplication des opérations n'ayant pas d'état par exemple
+                             * Généralisable :
+                               * Rapide + Lent = Lent
+                               * Duplication/parallélisation des opérations n'ayant pas d'état
                         </script>
                     </section>
 
