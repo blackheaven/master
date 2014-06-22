@@ -51,12 +51,6 @@
                 <section><!-- 3 minutes -->
                     <section data-markdown>
                         <script type="text/template">
-                            # Contexte
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
                             ### Big data
 
                              * Afflux de données très important
@@ -85,7 +79,7 @@
                             ### Gestion du Data-flow
 
                              * Début inaccessible et sans fin
-                             * Delta plus important que le vitesse
+                             * Gigue plus importante que le vitesse
                              * Middleware + Infrastructure
 
                              => Approche des problèmes de flux par le langage
@@ -106,17 +100,11 @@
                 <section><!-- 7 minutes -->
                     <section data-markdown>
                         <script type="text/template">
-                            # Bibliographie
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
                             ### Un langage de programmation
 
                              * 1974 : Réseaux de Kahn
-                               * Divise le programme en entité communicants par **channels** des listes FIFO
-                               * Fourni une notation, pas un langage
+                               * Divise le programme en entités communicants par **channels** des listes FIFO
+                               * Aucune implantation direct
 
                         </script>
                     </section>
@@ -125,7 +113,7 @@
                         <script type="text/template">
                             ### Formaliser les flux
                              * 1976 : Lucid
-                               * Se base sur des suites (premier élément et méthode pour calculer les suivants) pour modéliser les flux
+                               * Se base sur des suites, premier élément et méthode pour calculer les suivants, pour modéliser les flux
                                * Le flux est tronqué pour obtenir un résultat
                              * 1984 : Esterel
                                * Le programme n'a qu'une entrée et qu'une sortie
@@ -152,22 +140,23 @@
                             ### Offrant les meilleurs garanties de preuve sur les délais de bout en bout
 
                              * 1997 : Fran
+                               * Fondateur du Functional Reactive Programming
                                * Modélise la composition de traitements
                                * Aucune gestion des délais
                              * 2002 : RT-FRP
-                               * Approche du temps réelle par calcul des coûts de traitements
+                               * Approche du temps-réel par calcul des coûts de traitements
                                * Aucune garantie globale
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-|                                    | Kahn  | Lucid  | Esterel | TBAG   | Mediaflow | Fran   | RT-FRP | Heterogeneous-Arrow |
-| -------------                      | :---: | :----: | :----:  | :----: | :----:    | :----: | :----: | :----:              |
-| Un langage de programmation        | X     | V      | V       | X      | X         | V      | V      | V                   |
-| Formaliser les flux                | V     | X      | X       | V      | V         | V      | V      | V                   |
-| Formaliser des algorithmes         | X     | X      | X       | X      | X         | V      | V      | V                   |
-| Garanties de preuve sur les délais | X     | X      | V       | X      | X         | X      | ~      | V                   |
+|                                    | Kahn  | Lucid  | Esterel | TBAG   | Mediaflow | Fran   | RT-FRP |
+| -------------                      | :---: | :----: | :----:  | :----: | :----:    | :----: | :----: |
+| Un langage de programmation        | X     | V      | V       | X      | X         | V      | V      |
+| Formaliser les flux                | V     | X      | X       | V      | V         | V      | V      |
+| Formaliser des algorithmes         | X     | X      | X       | X      | X         | V      | V      |
+| Garanties de preuve sur les délais | X     | X      | V       | X      | X         | X      | X      |
                         </script>
                     </section>
                 </section>
@@ -175,18 +164,11 @@
                 <section><!-- 4 minutes -->
                     <section data-markdown>
                         <script type="text/template">
-                            # Proposition
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
                             ### Langage de programmation de flux
 
                              * Formel
                                * Typage fort
-                                 * Haskell
-                                   * Théorie des catégories
+                                 * Haskell (Théorie des catégories)
                                    * Type => Flux (**Arrow**)
                         </script>
                     </section>
@@ -499,18 +481,6 @@ Non-composable :
                              * Généralisable :
                                * Rapide + Lent = Lent
                                * Duplication/parallélisation des opérations n'ayant pas d'état
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
-                            # Merci
-                        </script>
-                    </section>
-
-                    <section data-markdown>
-                        <script type="text/template">
-                            # Questions
                         </script>
                     </section>
                 </section>
