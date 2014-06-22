@@ -55,20 +55,20 @@
 
                              * Afflux de données très important
                              * Volume de stockage important
-                             * Nécessité de rapidité de traitement
-                             * Nécessité d'accumuler indéfiniement les données
+                             * Nécessité de traitement haute fréquence des données
+                             * Nécessité d'accumuler indéfiniment les données
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-                            ### Méthodes classiques
+                            ### Augmentation des performances
 
-                             * Augmentation des performances d'infrastructure matérielle
+                             * Des infrastructures matérielles
                                * Datacenter
                                * Économie
 
-                             * Augmentation des performances d'infrastructure logicielle
+                             * Des infrastructures logicielles
                                * Hadoop (batch)
                                * Storm (flux)
                         </script>
@@ -82,7 +82,7 @@
                              * Gigue plus importante que le vitesse
                              * Middleware + Infrastructure
 
-                             => Approche des problèmes de flux par le langage
+                             => Approche de la gestion du flux au niveau du langage de programmation initial
                         </script>
                     </section>
 
@@ -92,7 +92,7 @@
 
                              * Formaliser les flux
                              * Formaliser des algorithmes de traitements
-                             * Offrant les meilleurs garanties de preuve sur les délais de bout en bout
+                             * Offrant des garanties de preuve sur les délais de bout en bout
                         </script>
                     </section>
                 </section>
@@ -103,7 +103,8 @@
                             ### Un langage de programmation
 
                              * 1974 : Réseaux de Kahn
-                               * Divise le programme en entités communicants par **channels** des listes FIFO
+                               * Divise le programme en entités
+                               * Communication par **channels**, des listes FIFO
                                * Aucune implantation direct
 
                         </script>
@@ -113,7 +114,7 @@
                         <script type="text/template">
                             ### Formaliser les flux
                              * 1976 : Lucid
-                               * Se base sur des suites, premier élément et méthode pour calculer les suivants, pour modéliser les flux
+                               * Se base sur des suites, premier élément et méthode pour calculer les suivants
                                * Le flux est tronqué pour obtenir un résultat
                              * 1984 : Esterel
                                * Le programme n'a qu'une entrée et qu'une sortie
@@ -127,7 +128,7 @@
                             ### Formaliser des algorithmes de traitements
 
                              * 1994 : TBAG
-                               * Modélise les variations temporelle des relations
+                               * Modélise les variations temporelles des relations
                                * Ne gère pas les traitements
                              * 1995 : Mediaflow
                                * Combinaison visuelle des flux
@@ -144,19 +145,19 @@
                                * Modélise la composition de traitements
                                * Aucune gestion des délais
                              * 2002 : RT-FRP
-                               * Approche du temps-réel par calcul des coûts de traitements
+                               * Approche du temps réel par calcul des coûts de traitements
                                * Aucune garantie globale
                         </script>
                     </section>
 
                     <section data-markdown>
                         <script type="text/template">
-|                                    | Kahn  | Lucid  | Esterel | TBAG   | Mediaflow | Fran   | RT-FRP |
-| -------------                      | :---: | :----: | :----:  | :----: | :----:    | :----: | :----: |
-| Un langage de programmation        | X     | V      | V       | X      | X         | V      | V      |
-| Formaliser les flux                | V     | X      | X       | V      | V         | V      | V      |
-| Formaliser des algorithmes         | X     | X      | X       | X      | X         | V      | V      |
-| Garanties de preuve sur les délais | X     | X      | V       | X      | X         | X      | X      |
+|               | Kahn  | Lucid  | Esterel | TBAG   | Mediaflow | Fran   | RT-FRP |
+| ------------- | :---: | :----: | :----:  | :----: | :----:    | :----: | :----: |
+| Langage       | X     | V      | V       | X      | X         | V      | V      |
+| Structure     | V     | X      | X       | V      | V         | V      | V      |
+| Algorithmes   | X     | X      | X       | X      | X         | V      | V      |
+| Preuves       | X     | X      | V       | X      | X         | X      | X      |
                         </script>
                     </section>
                 </section>
@@ -483,8 +484,54 @@ Non-composable :
                                * Duplication/parallélisation des opérations n'ayant pas d'état
                         </script>
                     </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+                            # Questions
+                            ### Merci
+                        </script>
+                    </section>
                 </section>
 
+                <section><!-- 2 minutes -->
+                    <section data-markdown>
+                        <script type="text/template">
+```
+class Category cat where
+  id :: cat a a
+  (.) :: cat b c -> cat a b -> cat a c
+
+instance Category (->) where
+-- Version prefixe : id :: (->) a a
+-- Version infixe  : id :: a -> a
+  id x = x
+
+-- Version prefixe : (.) :: (->) b c -> (->) a b -> (->) a c
+-- Version infixe  : (.) :: (b -> c) -> (a -> b) -> (a -> c)
+  f . g = \x -> f (g x)
+
+class Category a => Arrow a where
+    arr :: (b -> c) -> a b c
+    first :: a b c -> a (b, d) (c, d)
+    second :: a b c -> a (d, b) (d, c)
+    (***) :: a b c -> a b' c' -> a (b, b') (c, c')
+    (&&&) :: a b c -> a b c' -> a b (c, c')
+```
+                        </script>
+                    </section>
+
+                    <section data-markdown>
+                        <script type="text/template">
+```
+class HeterogeneousArrow x y z | x y -> z where
+    (>*>) :: x a b -> y b c -> z a c
+
+instance (Category x) => HeterogeneousArrow x x x where
+    f >*> g = g . f
+```
+                        </script>
+                    </section>
+                </section>
             </div>
 
         </div>
